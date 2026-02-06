@@ -41,11 +41,6 @@ public class PlayerController : MonoBehaviour
         HandleInventoryInput();
     }
 
-    private void FixedUpdate()
-    {
-        // Velocity is applied in Update for responsive feel; move to FixedUpdate if you prefer physics-only movement.
-    }
-
     private void HandleMovementInput()
     {
         float horizontal = Input.GetAxisRaw("Horizontal");

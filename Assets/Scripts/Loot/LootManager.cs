@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// Handles enemy loot drops (Gel, Teeth) and map-based environmental resource spawn rates.
-/// Rates are modular and editable in the Inspector. Hook enemy death to RollEnemyLoot.
+/// Rates are modular and editable in the Inspector. Use via MapController or LootManager.Instance.
 /// </summary>
 public class LootManager : MonoBehaviour
 {
@@ -65,23 +65,15 @@ public class LootManager : MonoBehaviour
             Instance = null;
     }
 
-    /// <summary>
-    /// Roll and spawn enemy drops at position. Call from enemy death (e.g. HealthSystem.OnDeath).
-    /// </summary>
     public void RollEnemyLoot(HealthSystem.EnemyType enemyType, Vector2 position)
     {
         EnemyLootConfig config = GetEnemyLootConfig(enemyType);
-
         if (UnityEngine.Random.value <= config.gelChance)
             SpawnResource(ResourceType.Gel, position);
-
         if (UnityEngine.Random.value <= config.teethChance)
             SpawnResource(ResourceType.Teeth, position);
     }
 
-    /// <summary>
-    /// Get drop config for an enemy type (for custom roll logic).
-    /// </summary>
     public EnemyLootConfig GetEnemyLootConfig(HealthSystem.EnemyType enemyType)
     {
         switch (enemyType)
@@ -93,17 +85,12 @@ public class LootManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Spawn a single resource at position (with small random offset).
-    /// </summary>
     public void SpawnResource(ResourceType type, Vector2 position)
     {
         GameObject prefab = GetPrefabForResource(type);
         if (prefab == null) return;
-
         Vector2 offset = UnityEngine.Random.insideUnitCircle * dropSpawnRadius;
-        GameObject go = Instantiate(prefab, position + offset, Quaternion.identity);
-        go.SetActive(true);
+        Instantiate(prefab, position + offset, Quaternion.identity);
     }
 
     private GameObject GetPrefabForResource(ResourceType type)
@@ -118,15 +105,10 @@ public class LootManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Get environmental spawn rates for a map. Use for spawning resources on the map by ID.
-    /// Map 1: 0.8 Wood; Map 2: 0.5 Wood, 0.3 Stone; Map 3: 0.2 Wood, 0.6 Stone.
-    /// </summary>
     public void GetMapSpawnRates(int mapId, out float woodRate, out float stoneRate)
     {
         woodRate = 0f;
         stoneRate = 0f;
-
         foreach (var config in mapSpawnConfigs)
         {
             if (config.mapId == mapId)
@@ -138,14 +120,9 @@ public class LootManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Spawn one random environmental resource at position based on map rates.
-    /// Rolls once: wood vs stone vs nothing by map rates.
-    /// </summary>
     public void SpawnEnvironmentalResource(int mapId, Vector2 position)
     {
         GetMapSpawnRates(mapId, out float woodRate, out float stoneRate);
-
         float r = UnityEngine.Random.value;
         if (r < woodRate)
             SpawnResource(ResourceType.Wood, position);
@@ -153,9 +130,6 @@ public class LootManager : MonoBehaviour
             SpawnResource(ResourceType.Stone, position);
     }
 
-    /// <summary>
-    /// Get full config for a map (e.g. for level generation). Returns null if mapId not found.
-    /// </summary>
     public MapSpawnConfig? GetMapConfig(int mapId)
     {
         foreach (var config in mapSpawnConfigs)

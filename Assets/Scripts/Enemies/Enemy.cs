@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Enemy behaviour. Requires HealthSystem (set Enemy Type: Bug, Leader, or Boss).
-/// On death, requests loot from LootManager if present.
+/// On death, requests loot from LootManager (via MapController or singleton).
 /// </summary>
 [RequireComponent(typeof(HealthSystem))]
 public class Enemy : MonoBehaviour
@@ -29,6 +29,6 @@ public class Enemy : MonoBehaviour
     private void OnDeath()
     {
         if (LootManager.Instance != null)
-            LootManager.Instance.RollEnemyLoot(_health.EnemyType, transform.position);
+            LootManager.Instance.RollEnemyLoot(_health.CurrentEnemyType, transform.position);
     }
 }
