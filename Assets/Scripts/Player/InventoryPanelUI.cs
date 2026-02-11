@@ -91,13 +91,13 @@ public class InventoryPanelUI : MonoBehaviour
         panelRect.anchorMax = new Vector2(1f, 1f);
         panelRect.pivot = new Vector2(1f, 1f);
         panelRect.anchoredPosition = new Vector2(-20f, -20f);
-        panelRect.sizeDelta = new Vector2(180f, 120f);
+        panelRect.sizeDelta = new Vector2(200f, 140f);
         var img = panelGo.AddComponent<Image>();
-        img.color = new Color(0f, 0f, 0f, 0.7f);
+        img.color = new Color(0.08f, 0.08f, 0.12f, 0.92f);
 
         var layout = panelGo.AddComponent<VerticalLayoutGroup>();
-        layout.padding = new RectOffset(12, 12, 12, 12);
-        layout.spacing = 4f;
+        layout.padding = new RectOffset(14, 14, 14, 14);
+        layout.spacing = 6f;
         layout.childAlignment = TextAnchor.UpperRight;
         layout.childControlWidth = true;
         layout.childControlHeight = false;
@@ -120,10 +120,16 @@ public class InventoryPanelUI : MonoBehaviour
         text.text = label + ": 0";
         Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         if (font != null) text.font = font;
-        text.fontSize = 18;
-        text.color = Color.white;
+        text.fontSize = 22;
+        text.color = new Color(1f, 1f, 1f, 1f);
+        text.fontStyle = FontStyle.Bold;
+
+        var shadow = go.AddComponent<Shadow>();
+        shadow.effectColor = new Color(0f, 0f, 0f, 0.85f);
+        shadow.effectDistance = new Vector2(1.5f, -1.5f);
+
         var rect = go.GetComponent<RectTransform>();
-        rect.sizeDelta = new Vector2(0f, 24f);
+        rect.sizeDelta = new Vector2(0f, 28f);
         return text;
     }
 }
