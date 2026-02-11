@@ -16,16 +16,26 @@ public class EnemySpawner : MonoBehaviour
     [Tooltip("未设置 MapZone 时使用。矩形右上角。")]
     [SerializeField] private Vector2 spawnAreaMax = new Vector2(10f, 10f);
 
-    [Header("Enemy prefab & type")]
-    [Tooltip("用于刷新的敌人预制体（需带 Enemy + HealthSystem）。")]
-    [SerializeField] private GameObject enemyPrefab;
-    [Tooltip("Bug 类型权重（与 Leader、Boss 一起归一化）。")]
+    [Header("Exclude tower range")]
+    [Tooltip("若设置，怪物只会刷新在该塔攻击范围之外（避免出生在塔射程内）。")]
+    [SerializeField] private Tower towerToExclude;
+
+    [Header("Enemy prefabs (one per type)")]
+    [Tooltip("Bug 敌人预制体（需带 Enemy + HealthSystem，Enemy Type 设为 Bug）。")]
+    [SerializeField] private GameObject bugPrefab;
+    [Tooltip("Leader 敌人预制体（Enemy Type 设为 Leader）。")]
+    [SerializeField] private GameObject leaderPrefab;
+    [Tooltip("Boss 敌人预制体（Enemy Type 设为 Boss）。")]
+    [SerializeField] private GameObject bossPrefab;
+
+    [Header("Type weights (normalized for spawn chance)")]
+    [Tooltip("Bug 刷新权重。")]
     [Range(0f, 1f)]
     [SerializeField] private float bugWeight = 0.7f;
-    [Tooltip("Leader 类型权重。")]
+    [Tooltip("Leader 刷新权重。")]
     [Range(0f, 1f)]
     [SerializeField] private float leaderWeight = 0.25f;
-    [Tooltip("Boss 类型权重。")]
+    [Tooltip("Boss 刷新权重。")]
     [Range(0f, 1f)]
     [SerializeField] private float bossWeight = 0.05f;
 
@@ -72,9 +82,9 @@ public class EnemySpawner : MonoBehaviour
 
     private IEnumerator SpawnWavesCoroutine()
     {
-        if (enemyPrefab == null)
+        if (bugPrefab == null && leaderPrefab == null && bossPrefab == null)
         {
-            Debug.LogWarning("EnemySpawner: enemyPrefab 未设置。", this);
+            Debug.LogWarning("EnemySpawner: 至少需要设置一个敌人预制体 (Bug / Leader / Boss)。", this);
             yield break;
         }
 
@@ -99,22 +109,26 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnOneEnemy(Vector2 position)
     {
-        GameObject go = Instantiate(enemyPrefab, position, Quaternion.identity);
-        go.name = enemyPrefab.name + "(Clone)";
-
-        HealthSystem health = go.GetComponent<HealthSystem>();
-        if (health != null && !health.IsPlayer)
-            health.SetEnemyType(RollEnemyType());
+        GameObject prefab = RollPrefabByWeight();
+        if (prefab == null)
+            return;
+        GameObject go = Instantiate(prefab, position, Quaternion.identity);
+        go.name = prefab.name + "(Clone)";
     }
 
-    private HealthSystem.EnemyType RollEnemyType()
+    /// <summary> Rolls Bug/Leader/Boss by weight; only considers types that have a prefab assigned. </summary>
+    private GameObject RollPrefabByWeight()
     {
-        float total = bugWeight + leaderWeight + bossWeight;
-        if (total <= 0f) return HealthSystem.EnemyType.Bug;
+        float wBug = bugPrefab != null ? bugWeight : 0f;
+        float wLeader = leaderPrefab != null ? leaderWeight : 0f;
+        float wBoss = bossPrefab != null ? bossWeight : 0f;
+        float total = wBug + wLeader + wBoss;
+        if (total <= 0f)
+            return bugPrefab != null ? bugPrefab : (leaderPrefab != null ? leaderPrefab : bossPrefab);
         float r = Random.Range(0f, total);
-        if (r < bugWeight) return HealthSystem.EnemyType.Bug;
-        if (r < bugWeight + leaderWeight) return HealthSystem.EnemyType.Leader;
-        return HealthSystem.EnemyType.Boss;
+        if (r < wBug) return bugPrefab;
+        if (r < wBug + wLeader) return leaderPrefab;
+        return bossPrefab;
     }
 
     private List<Vector2> BuildSpawnPositions()
@@ -137,7 +151,7 @@ public class EnemySpawner : MonoBehaviour
         {
             attempts++;
             Vector2 pos = RandomPointInRing(center, innerR, outerR);
-            if (minDistanceBetween > 0f && !IsFarEnoughFromAll(pos, list))
+            if (!IsOutsideTowerRange(pos) || (minDistanceBetween > 0f && !IsFarEnoughFromAll(pos, list)))
                 continue;
             list.Add(pos);
         }
@@ -154,11 +168,20 @@ public class EnemySpawner : MonoBehaviour
         {
             attempts++;
             Vector2 pos = RandomPointInArea(min, max);
-            if (minDistanceBetween > 0f && !IsFarEnoughFromAll(pos, list))
+            if (!IsOutsideTowerRange(pos) || (minDistanceBetween > 0f && !IsFarEnoughFromAll(pos, list)))
                 continue;
             list.Add(pos);
         }
         return list;
+    }
+
+    /// <summary> True if no tower to exclude, or position is outside the tower's attack range. </summary>
+    private bool IsOutsideTowerRange(Vector2 pos)
+    {
+        if (towerToExclude == null) return true;
+        Vector2 towerCenter = towerToExclude.transform.position;
+        float excludeRadius = towerToExclude.AttackRange;
+        return Vector2.Distance(pos, towerCenter) > excludeRadius;
     }
 
     private static Vector2 RandomPointInRing(Vector2 center, float innerR, float outerR)
@@ -197,6 +220,12 @@ public class EnemySpawner : MonoBehaviour
             Vector3 center = (Vector3)(spawnAreaMin + spawnAreaMax) * 0.5f;
             Vector3 size = new Vector3(spawnAreaMax.x - spawnAreaMin.x, spawnAreaMax.y - spawnAreaMin.y, 0.01f);
             Gizmos.DrawCube(center, size);
+        }
+        if (towerToExclude != null)
+        {
+            Gizmos.color = new Color(1f, 0.5f, 0f, 0.4f);
+            float r = towerToExclude.AttackRange;
+            DrawGizmoRing((Vector2)towerToExclude.transform.position, 0f, r);
         }
     }
 

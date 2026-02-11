@@ -23,7 +23,7 @@
 - **位置邏輯**: 與 EnvironmentalResourceSpawner 相同
   - 有 MapZone → 在環內 (innerRadius ~ outerRadius)
   - 無 MapZone → 在矩形 (spawnAreaMin ~ spawnAreaMax)
-- **敵人類型**: 單一 prefab + Bug/Leader/Boss 權重，生成時由 `HealthSystem.SetEnemyType` 設定
+- **敵人類型**: 三種 prefab（Bug / Leader / Boss）各一，依權重隨機選一種生成；未指定的類型不參與權重
 - **啟動**: `Start()` 時自動執行，或手動呼叫 `StartSpawning()` / `StopSpawning()`
 - **可選**: 連續波次 (continuousWaves)，每波 spawnCount 隻，間隔後再刷下一波
 
@@ -80,7 +80,7 @@ EnvironmentalResourceSpawner.Start()
 EnemySpawner.Start()
     └─> StartSpawning() / SpawnWavesCoroutine()
         └─> SpawnOneEnemy(position)
-            └─> Instantiate(enemyPrefab) + HealthSystem.SetEnemyType(rolled)
+            └─> RollPrefabByWeight() → Instantiate(bugPrefab | leaderPrefab | bossPrefab)
 
 Enemy.OnDeath()
     └─> LootManager.RollEnemyLoot()
@@ -99,5 +99,5 @@ MapController.SpawnEnvironmentalResource(position)  [外部呼叫]
 - [ ] 沒有「無 MapZone」且矩形涵蓋地圖的 EnvironmentalResourceSpawner
 - [ ] 三個 MapZone 的 innerRadius / outerRadius 不重疊
 - [ ] 若有腳本呼叫 MapController.SpawnEnvironmentalResource，確認不會與 EnvironmentalResourceSpawner 重複生成
-- [ ] EnemySpawner 的 enemyPrefab 已指定（帶 Enemy + HealthSystem 的預制體，如 Gel）
+- [ ] EnemySpawner 至少指定一個敵人預制體（Bug / Leader / Boss），各預制體需帶 Enemy + HealthSystem 且對應 Enemy Type
 - [ ] 怪物刷新可依需求綁 MapZone 或使用矩形，與環境資源可共用同一環

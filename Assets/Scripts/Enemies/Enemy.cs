@@ -28,7 +28,10 @@ public class Enemy : MonoBehaviour
 
     private void OnDeath()
     {
+        Vector2 deathPosition = transform.position;
+        HealthSystem.EnemyType enemyType = _health.CurrentEnemyType;
         if (LootManager.Instance != null)
-            LootManager.Instance.RollEnemyLoot(_health.CurrentEnemyType, transform.position);
+            LootManager.Instance.RollEnemyLoot(enemyType, deathPosition);
+        Destroy(gameObject);
     }
 }

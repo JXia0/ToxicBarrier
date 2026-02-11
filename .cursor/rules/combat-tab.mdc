@@ -1,0 +1,33 @@
+---
+description: 本對話負責攻擊系統。塔攻擊敵人、敵人攻擊玩家/塔，以及 HealthSystem 傷害接口。
+globs:
+  - "**/Combat/*.cs"
+  - "**/Combat/*.md"
+  - "**/Enemies/EnemyAttackBehavior.cs"
+  - "**/Enemies/Tower.cs"
+alwaysApply: false
+---
+
+# 攻擊系統 Tab 範圍
+
+你處於 **攻擊系統** Tab，負責遊戲所有攻擊邏輯。
+
+## 你擁有並可自由修改
+- `Assets/Scripts/Combat/HealthSystem.cs` — 血量、ATK、ATS、TakeDamage
+- `Assets/Scripts/Combat/TowerAttackBehavior.cs` — 塔攻擊範圍內敵人
+- `Assets/Scripts/Enemies/EnemyAttackBehavior.cs` — 敵人尋敵與攻擊（仇恨：玩家 > 塔）
+- `Assets/Scripts/Enemies/Tower.cs` — 塔本體、攻擊範圍、等級數值
+- `Assets/Scripts/Combat/ATTACK_SCOPE.md` — 攻擊系統職責說明
+
+## 設計規則
+- 傷害一律透過 `HealthSystem.TakeDamage(amount, source)` 造成
+- 塔目標：範圍內最近敵人
+- 敵人仇恨：預設攻塔，玩家在仇恨範圍內時轉向玩家
+- 攻速 ATS = 每秒攻擊次數，冷卻 = 1/ATS 秒
+
+## 你不擁有（由其他 Tab 負責）
+- **玩家**：PlayerController、移動、輸入
+- **地圖**：MapController、MapZone、環境生成
+- **掉落**：LootManager、ResourcePickup
+
+參考：`Assets/Scripts/Combat/ATTACK_SCOPE.md`、`HEALTH_SCOPE.md`

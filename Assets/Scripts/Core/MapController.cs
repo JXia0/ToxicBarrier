@@ -16,6 +16,8 @@ public class MapController : MonoBehaviour
     [SerializeField] private LootManager lootManager;
     [SerializeField] private MapScale mapScale;
     [SerializeField] private int currentMapId = 1;
+    [Tooltip("Map 1 zone: used for map center and Map 1 radius (e.g. central tower attack range = radius * 0.5).")]
+    [SerializeField] private MapZone map1Zone;
 
     [Header("Toxic Gas (central drive)")]
     [Tooltip("If true, MapController drives toxic gas periods; otherwise each HealthSystem uses its own timer.")]
@@ -70,6 +72,28 @@ public class MapController : MonoBehaviour
     }
 
     public int GetMapId() => currentMapId;
+
+    /// <summary> World position of map center (from Map 1 zone). </summary>
+    public Vector2 GetMapCenter()
+    {
+        if (map1Zone != null)
+        {
+            map1Zone.GetRingParams(out Vector2 center, out _, out _);
+            return center;
+        }
+        return transform.position;
+    }
+
+    /// <summary> Map 1 outer radius. e.g. central tower attack range = this * 0.5. </summary>
+    public float GetMap1Radius()
+    {
+        if (map1Zone != null)
+        {
+            map1Zone.GetRingParams(out _, out _, out float maxRadius);
+            return maxRadius;
+        }
+        return 5f;
+    }
 
     // —— Player (delegate to subsystems, keep individuality there) ——
     public void SetPlayerControlEnabled(bool enabled)

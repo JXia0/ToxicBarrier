@@ -544,6 +544,122 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac0b09e7857660247b1477e93731de29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &358622606
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 358622608}
+  - component: {fileID: 358622607}
+  m_Layer: 0
+  m_Name: EnemySpawnerMap1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &358622607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 358622606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75ef8fd2d11d9614498c2bf578ec694e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapZone: {fileID: 14555992}
+  spawnAreaMin: {x: -10, y: -10}
+  spawnAreaMax: {x: 10, y: 10}
+  bugPrefab: {fileID: 2160710590865165501, guid: e0dcda9373df1f343b404b5469aed9af, type: 3}
+  leaderPrefab: {fileID: 793480216881341300, guid: c313524598815ad40aba778c73c606b1, type: 3}
+  bossPrefab: {fileID: 680548063062773762, guid: e43f9b57cb82e104291cc9babdcf993e, type: 3}
+  bugWeight: 0.7
+  leaderWeight: 0.25
+  bossWeight: 0.05
+  spawnCount: 10
+  spawnIntervalSeconds: 0.8
+  continuousWaves: 0
+  minDistanceBetween: 1
+  drawGizmos: 1
+--- !u!4 &358622608
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 358622606}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.153271, y: 3.2715442, z: -0.07508512}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &504954040
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 504954042}
+  - component: {fileID: 504954041}
+  m_Layer: 0
+  m_Name: EnemySpawnerMap2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &504954041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 504954040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75ef8fd2d11d9614498c2bf578ec694e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapZone: {fileID: 103427035}
+  spawnAreaMin: {x: -10, y: -10}
+  spawnAreaMax: {x: 10, y: 10}
+  bugPrefab: {fileID: 2160710590865165501, guid: e0dcda9373df1f343b404b5469aed9af, type: 3}
+  leaderPrefab: {fileID: 793480216881341300, guid: c313524598815ad40aba778c73c606b1, type: 3}
+  bossPrefab: {fileID: 680548063062773762, guid: e43f9b57cb82e104291cc9babdcf993e, type: 3}
+  bugWeight: 0.7
+  leaderWeight: 0.25
+  bossWeight: 0.05
+  spawnCount: 10
+  spawnIntervalSeconds: 0.8
+  continuousWaves: 0
+  minDistanceBetween: 1
+  drawGizmos: 1
+--- !u!4 &504954042
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 504954040}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.153271, y: 3.2715442, z: -0.07508512}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -833,6 +949,175 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!1 &953627943
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 953627947}
+  - component: {fileID: 953627946}
+  - component: {fileID: 953627945}
+  - component: {fileID: 953627944}
+  - component: {fileID: 953627948}
+  m_Layer: 0
+  m_Name: Tower
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &953627944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 953627943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52b8bfd6f5ca5cd408cf21923f33727e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelStats:
+  - atk: 50
+    ats: 2
+    hp: 1000
+  - atk: 150
+    ats: 4
+    hp: 2500
+  - atk: 500
+    ats: 8
+    hp: 5000
+  - atk: 750
+    ats: 12
+    hp: 8000
+  currentLevel: 0
+  upgradeCosts:
+  - wood: 30
+    stone: 20
+    gel: 0
+    teeth: 0
+  - wood: 0
+    stone: 50
+    gel: 50
+    teeth: 0
+  - wood: 0
+    stone: 0
+    gel: 95
+    teeth: 50
+  placeAtMapCenter: 1
+  attackRangeFromMap1Half: 1
+  manualAttackRange: 2.5
+--- !u!114 &953627945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 953627943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05396d0b0e67b0f4892ef771979edfbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isPlayer: 0
+  isTower: 1
+  enemyType: 0
+  atk: 50
+  ats: 1
+  maxHp: 100
+  affectedByToxicGas: 1
+  toxicGasBaseDamagePerSecond: 5
+  toxicGasPeriodSeconds: 60
+  toxicGasDamageIncreasePerPeriod: 3
+  OnHpChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &953627948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 953627943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7686d3f068adfc8439fce91c1b06f54c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!212 &953627946
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 953627943}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 21300000, guid: 4a5a2d54b82ed5744be76f31120e7378, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!4 &953627947
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 953627943}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 3, y: 3, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1138094805
 GameObject:
   m_ObjectHideFlags: 0
@@ -1023,6 +1308,64 @@ MonoBehaviour:
         m_Calls: []
   m_LegacyBlendHint: 0
   m_ComponentOwner: {fileID: 203763930}
+--- !u!1 &1912571412
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1912571414}
+  - component: {fileID: 1912571413}
+  m_Layer: 0
+  m_Name: EnemySpawnerMap3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1912571413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1912571412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75ef8fd2d11d9614498c2bf578ec694e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapZone: {fileID: 754029412}
+  spawnAreaMin: {x: -10, y: -10}
+  spawnAreaMax: {x: 10, y: 10}
+  bugPrefab: {fileID: 2160710590865165501, guid: e0dcda9373df1f343b404b5469aed9af, type: 3}
+  leaderPrefab: {fileID: 793480216881341300, guid: c313524598815ad40aba778c73c606b1, type: 3}
+  bossPrefab: {fileID: 680548063062773762, guid: e43f9b57cb82e104291cc9babdcf993e, type: 3}
+  bugWeight: 0.7
+  leaderWeight: 0.25
+  bossWeight: 0.05
+  spawnCount: 10
+  spawnIntervalSeconds: 0.8
+  continuousWaves: 0
+  minDistanceBetween: 1
+  drawGizmos: 1
+--- !u!4 &1912571414
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1912571412}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.153271, y: 3.2715442, z: -0.07508512}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2052098699 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 699895196781327770, guid: be34b45c25dc7274b866d768d7fa546b, type: 3}
@@ -1130,6 +1473,7 @@ MonoBehaviour:
   lootManager: {fileID: 1263805882}
   mapScale: {fileID: 0}
   currentMapId: 1
+  map1Zone: {fileID: 14555992}
   driveToxicGasCentrally: 1
   toxicGasPeriodSeconds: 60
 --- !u!4 &2055405488
@@ -1228,3 +1572,7 @@ SceneRoots:
   - {fileID: 1263805883}
   - {fileID: 2055405488}
   - {fileID: 1138094807}
+  - {fileID: 953627947}
+  - {fileID: 358622608}
+  - {fileID: 504954042}
+  - {fileID: 1912571414}

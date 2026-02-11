@@ -69,14 +69,15 @@ public class HealthSystem : MonoBehaviour
             TickToxicGas(Time.deltaTime);
     }
 
+    /// <summary> 按设计表套用怪物数值：Bug ATK100 ATS2 HP50 | Leader ATK50 ATS10 HP150 | Boss ATK3000 ATS1.5 HP500。 </summary>
     private void ApplyEnemyTypeStats()
     {
         if (isPlayer || isTower) return;
         switch (enemyType)
         {
-            case EnemyType.Bug: atk = 100f; maxHp = 50f; break;
-            case EnemyType.Leader: atk = 50f; maxHp = 150f; break;
-            case EnemyType.Boss: atk = 3000f; maxHp = 500f; break;
+            case EnemyType.Bug:    atk = 100f;  ats = 2f;   maxHp = 50f;   break;  // DPS 200
+            case EnemyType.Leader: atk = 50f;   ats = 10f;  maxHp = 150f;  break;  // DPS 500
+            case EnemyType.Boss:   atk = 2000f; ats = 1f; maxHp = 500f;  break;  // DPS 2000
         }
         _currentHp = maxHp;
     }
