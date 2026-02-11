@@ -22,7 +22,7 @@ alwaysApply: false
 ## 設計規則
 - 傷害一律透過 `HealthSystem.TakeDamage(amount, source)` 造成
 - 塔目標：範圍內最近敵人
-- 敵人仇恨：預設攻塔，玩家在仇恨範圍內時轉向玩家
+- 敵人仇恨：預設攻塔，角色在仇恨範圍內時優先角色
 - 攻速 ATS = 每秒攻擊次數，冷卻 = 1/ATS 秒
 
 ## 你不擁有（由其他 Tab 負責）

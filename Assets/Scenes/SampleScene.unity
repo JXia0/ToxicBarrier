@@ -576,6 +576,7 @@ MonoBehaviour:
   mapZone: {fileID: 14555992}
   spawnAreaMin: {x: -10, y: -10}
   spawnAreaMax: {x: 10, y: 10}
+  towerToExclude: {fileID: 0}
   bugPrefab: {fileID: 2160710590865165501, guid: e0dcda9373df1f343b404b5469aed9af, type: 3}
   leaderPrefab: {fileID: 793480216881341300, guid: c313524598815ad40aba778c73c606b1, type: 3}
   bossPrefab: {fileID: 680548063062773762, guid: e43f9b57cb82e104291cc9babdcf993e, type: 3}
@@ -618,7 +619,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &504954041
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -634,6 +635,7 @@ MonoBehaviour:
   mapZone: {fileID: 103427035}
   spawnAreaMin: {x: -10, y: -10}
   spawnAreaMax: {x: 10, y: 10}
+  towerToExclude: {fileID: 0}
   bugPrefab: {fileID: 2160710590865165501, guid: e0dcda9373df1f343b404b5469aed9af, type: 3}
   leaderPrefab: {fileID: 793480216881341300, guid: c313524598815ad40aba778c73c606b1, type: 3}
   bossPrefab: {fileID: 680548063062773762, guid: e43f9b57cb82e104291cc9babdcf993e, type: 3}
@@ -997,17 +999,18 @@ MonoBehaviour:
   currentLevel: 0
   upgradeCosts:
   - wood: 30
-    stone: 20
-    gel: 0
-    teeth: 0
-  - wood: 0
-    stone: 50
-    gel: 50
-    teeth: 0
-  - wood: 0
     stone: 0
+    gel: 20
+    teeth: 0
+  - wood: 10
+    stone: 30
+    gel: 40
+    teeth: 10
+  - wood: 15
+    stone: 30
     gel: 95
     teeth: 50
+  upgradeTriggerRadius: 2
   placeAtMapCenter: 1
   attackRangeFromMap1Half: 1
   manualAttackRange: 2.5
@@ -1033,24 +1036,13 @@ MonoBehaviour:
   toxicGasBaseDamagePerSecond: 5
   toxicGasPeriodSeconds: 60
   toxicGasDamageIncreasePerPeriod: 3
+  playerInvincibleForDebug: 1
   OnHpChanged:
     m_PersistentCalls:
       m_Calls: []
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &953627948
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 953627943}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7686d3f068adfc8439fce91c1b06f54c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!212 &953627946
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1114,6 +1106,68 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &953627948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 953627943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7686d3f068adfc8439fce91c1b06f54c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &1086416031
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1086416033}
+  - component: {fileID: 1086416032}
+  m_Layer: 0
+  m_Name: TowerUpgradeUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1086416032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086416031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cda83e61cdb28a84bafc67d1ac675cca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tower: {fileID: 953627944}
+  inventory: {fileID: 2052098704}
+  panelRoot: {fileID: 0}
+  textLine1: {fileID: 0}
+  textLine2: {fileID: 0}
+  textLine3: {fileID: 0}
+--- !u!4 &1086416033
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086416031}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -4.329291, y: 3.4657264, z: -0.027304543}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1324,7 +1378,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1912571413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1340,6 +1394,7 @@ MonoBehaviour:
   mapZone: {fileID: 754029412}
   spawnAreaMin: {x: -10, y: -10}
   spawnAreaMax: {x: 10, y: 10}
+  towerToExclude: {fileID: 0}
   bugPrefab: {fileID: 2160710590865165501, guid: e0dcda9373df1f343b404b5469aed9af, type: 3}
   leaderPrefab: {fileID: 793480216881341300, guid: c313524598815ad40aba778c73c606b1, type: 3}
   bossPrefab: {fileID: 680548063062773762, guid: e43f9b57cb82e104291cc9babdcf993e, type: 3}
@@ -1576,3 +1631,4 @@ SceneRoots:
   - {fileID: 358622608}
   - {fileID: 504954042}
   - {fileID: 1912571414}
+  - {fileID: 1086416033}

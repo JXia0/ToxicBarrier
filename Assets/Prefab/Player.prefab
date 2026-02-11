@@ -117,7 +117,7 @@ Rigidbody2D:
   m_CollisionDetection: 0
   m_Constraints: 4
 --- !u!66 &1417143989410380376
-CircleCollider2D:
+CompositeCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -149,8 +149,16 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  serializedVersion: 2
-  m_Radius: 0.4
+  m_GeometryType: 0
+  m_GenerationType: 0
+  m_EdgeRadius: 0
+  m_ColliderPaths: []
+  m_CompositePaths:
+    m_Paths: []
+  m_VertexDistance: 0.0005
+  m_OffsetDistance: 0.00005
+  m_UseDelaunayMesh: 0
+  m_CompositeGameObject: {fileID: 5346412235463728807}
 --- !u!114 &133406985545428697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -165,8 +173,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   inputDeadZone: 0.1
-  mainCamera: {fileID: 0}
-  spriteFacingAngleOffset: 0
 --- !u!114 &699895196781327770
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -180,6 +186,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayer: 1
+  isTower: 0
   enemyType: 0
   atk: 50
   ats: 1
@@ -188,6 +195,7 @@ MonoBehaviour:
   toxicGasBaseDamagePerSecond: 5
   toxicGasPeriodSeconds: 60
   toxicGasDamageIncreasePerPeriod: 3
+  playerInvincibleForDebug: 1
   OnHpChanged:
     m_PersistentCalls:
       m_Calls: []

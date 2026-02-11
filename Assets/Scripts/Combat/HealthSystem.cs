@@ -25,6 +25,10 @@ public class HealthSystem : MonoBehaviour
     [SerializeField] private float toxicGasPeriodSeconds = 60f;
     [SerializeField] private float toxicGasDamageIncreasePerPeriod = 3f;
 
+    [Header("Debug")]
+    [Tooltip("勾选后玩家不扣血、不会死亡（仅调试用，发布前请关闭）。")]
+    [SerializeField] private bool playerInvincibleForDebug = true;
+
     private float _currentHp;
     private float _toxicGasTimer;
     private int _toxicGasPeriodsElapsed;
@@ -102,6 +106,7 @@ public class HealthSystem : MonoBehaviour
     public void TakeDamage(float amount, GameObject source)
     {
         if (amount <= 0f || _hasDied) return;
+        if (isPlayer && playerInvincibleForDebug) return;
         _currentHp = Mathf.Max(0f, _currentHp - amount);
         OnHpChanged?.Invoke(_currentHp, maxHp);
         if (_currentHp <= 0f)

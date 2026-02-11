@@ -41,10 +41,14 @@ public class Tower : MonoBehaviour
     [Header("Upgrade cost (to reach Level 1 / 2 / 3)")]
     [SerializeField] private TowerUpgradeCost[] upgradeCosts = new TowerUpgradeCost[]
     {
-        new TowerUpgradeCost { wood = 30, stone = 20, gel = 0, teeth = 0 },   // → Level 1
-        new TowerUpgradeCost { wood = 0, stone = 50, gel = 50, teeth = 0 },    // → Level 2
-        new TowerUpgradeCost { wood = 0, stone = 0, gel = 95, teeth = 50 }     // → Level 3
+        new TowerUpgradeCost { wood = 30, stone = 0, gel = 20, teeth = 0 },    // → Level 1
+        new TowerUpgradeCost { wood = 10, stone = 30, gel = 40, teeth = 10 },  // → Level 2
+        new TowerUpgradeCost { wood = 15, stone = 30, gel = 95, teeth = 50 }  // → Level 3
     };
+
+    [Header("Auto upgrade (player near)")]
+    [Tooltip("When player is within this distance and has enough resources, tower upgrades once per approach.")]
+    [SerializeField] private float upgradeTriggerRadius = 2f;
 
     [Header("Map (central tower)")]
     [Tooltip("If true, position at map center on Start.")]
@@ -55,6 +59,7 @@ public class Tower : MonoBehaviour
     [SerializeField] private float manualAttackRange = 2.5f;
 
     private HealthSystem _health;
+    private bool _playerWasInUpgradeRange;
 
     /// <summary> 攻击范围（Map 1 半径一半或 manualAttackRange）. 供攻击逻辑使用。 </summary>
     public float AttackRange { get; private set; }
@@ -86,6 +91,49 @@ public class Tower : MonoBehaviour
         }
         if (!attackRangeFromMap1Half || AttackRange <= 0f)
             AttackRange = manualAttackRange;
+    }
+
+    private void Update()
+    {
+        TryAutoUpgradeWhenPlayerNear();
+    }
+
+    private void TryAutoUpgradeWhenPlayerNear()
+    {
+        if (currentLevel >= 3) return;
+        if (MapController.Instance == null) return;
+
+        Transform playerTransform = MapController.Instance.Player != null ? MapController.Instance.Player.transform : null;
+        if (playerTransform == null) return;
+
+        float dist = Vector2.Distance(transform.position, playerTransform.position);
+        bool inRange = dist <= upgradeTriggerRadius;
+
+        if (!inRange)
+        {
+            _playerWasInUpgradeRange = false;
+            return;
+        }
+
+        if (_playerWasInUpgradeRange) return;
+        _playerWasInUpgradeRange = true;
+
+        PlayerInventory inventory = MapController.Instance.Player.GetComponent<PlayerInventory>();
+        if (inventory == null) return;
+
+        TowerUpgradeCost cost = GetUpgradeCostForNextLevel();
+        if (inventory.GetCount(LootManager.ResourceType.Wood) < cost.wood ||
+            inventory.GetCount(LootManager.ResourceType.Stone) < cost.stone ||
+            inventory.GetCount(LootManager.ResourceType.Gel) < cost.gel ||
+            inventory.GetCount(LootManager.ResourceType.Teeth) < cost.teeth)
+            return;
+
+        if (!inventory.TryConsume(LootManager.ResourceType.Wood, cost.wood)) return;
+        if (!inventory.TryConsume(LootManager.ResourceType.Stone, cost.stone)) return;
+        if (!inventory.TryConsume(LootManager.ResourceType.Gel, cost.gel)) return;
+        if (!inventory.TryConsume(LootManager.ResourceType.Teeth, cost.teeth)) return;
+
+        SetLevel(currentLevel + 1);
     }
 
     private void ApplyLevelStats()
@@ -148,16 +196,29 @@ public class Tower : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        float r = Application.isPlaying ? AttackRange : manualAttackRange;
-        if (r <= 0f) return;
         Vector2 center = transform.position;
-        const int segments = 24;
-        for (int i = 0; i < segments; i++)
+        float r = Application.isPlaying ? AttackRange : manualAttackRange;
+        if (r > 0f)
         {
-            float a0 = i / (float)segments * Mathf.PI * 2f;
-            float a1 = (i + 1) / (float)segments * Mathf.PI * 2f;
+            const int segments = 24;
             Gizmos.color = new Color(0f, 0.5f, 1f, 0.5f);
-            Gizmos.DrawLine(center + new Vector2(Mathf.Cos(a0), Mathf.Sin(a0)) * r, center + new Vector2(Mathf.Cos(a1), Mathf.Sin(a1)) * r);
+            for (int i = 0; i < segments; i++)
+            {
+                float a0 = i / (float)segments * Mathf.PI * 2f;
+                float a1 = (i + 1) / (float)segments * Mathf.PI * 2f;
+                Gizmos.DrawLine(center + new Vector2(Mathf.Cos(a0), Mathf.Sin(a0)) * r, center + new Vector2(Mathf.Cos(a1), Mathf.Sin(a1)) * r);
+            }
+        }
+        if (upgradeTriggerRadius > 0f)
+        {
+            Gizmos.color = new Color(0f, 1f, 0.5f, 0.3f);
+            const int segments = 24;
+            for (int i = 0; i < segments; i++)
+            {
+                float a0 = i / (float)segments * Mathf.PI * 2f;
+                float a1 = (i + 1) / (float)segments * Mathf.PI * 2f;
+                Gizmos.DrawLine(center + new Vector2(Mathf.Cos(a0), Mathf.Sin(a0)) * upgradeTriggerRadius, center + new Vector2(Mathf.Cos(a1), Mathf.Sin(a1)) * upgradeTriggerRadius);
+            }
         }
     }
 }

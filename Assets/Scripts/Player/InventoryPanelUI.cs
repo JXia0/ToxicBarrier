@@ -1,9 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
-/// 在屏幕右上角显示玩家背包资源数量。挂到任意物体上，在 Inspector 里指定 PlayerInventory；
-/// 若留空则运行时自动查找。若不指定现有 UI，会在运行时自动创建右上角面板。
+/// 在屏幕右上角显示玩家背包资源数量。使用 TextMesh Pro 显示文字。
+/// 挂到任意物体上，在 Inspector 里指定 PlayerInventory；若留空则运行时自动查找。
 /// </summary>
 public class InventoryPanelUI : MonoBehaviour
 {
@@ -13,10 +14,10 @@ public class InventoryPanelUI : MonoBehaviour
     [Header("可选：已有 UI 时指定")]
     [Tooltip("若不指定，会在运行时自动创建右上角 Canvas 与面板。")]
     [SerializeField] private RectTransform panelRoot;
-    [SerializeField] private Text textGel;
-    [SerializeField] private Text textTeeth;
-    [SerializeField] private Text textWood;
-    [SerializeField] private Text textStone;
+    [SerializeField] private TextMeshProUGUI textGel;
+    [SerializeField] private TextMeshProUGUI textTeeth;
+    [SerializeField] private TextMeshProUGUI textWood;
+    [SerializeField] private TextMeshProUGUI textStone;
 
     private void Start()
     {
@@ -56,7 +57,7 @@ public class InventoryPanelUI : MonoBehaviour
         SetText(textStone, LootManager.ResourceType.Stone);
     }
 
-    private void SetText(Text text, LootManager.ResourceType type)
+    private void SetText(TextMeshProUGUI text, LootManager.ResourceType type)
     {
         if (text == null) return;
         int count = inventory.GetCount(type);
@@ -112,24 +113,21 @@ public class InventoryPanelUI : MonoBehaviour
         panelRoot = panelRect;
     }
 
-    private static Text CreateRow(Transform parent, string label)
+    private static TextMeshProUGUI CreateRow(Transform parent, string label)
     {
-        var go = new GameObject("Text_" + label);
+        var go = new GameObject("TMP_Text_" + label);
         go.transform.SetParent(parent, false);
-        var text = go.AddComponent<Text>();
-        text.text = label + ": 0";
-        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        if (font != null) text.font = font;
-        text.fontSize = 22;
-        text.color = new Color(1f, 1f, 1f, 1f);
-        text.fontStyle = FontStyle.Bold;
-
-        var shadow = go.AddComponent<Shadow>();
-        shadow.effectColor = new Color(0f, 0f, 0f, 0.85f);
-        shadow.effectDistance = new Vector2(1.5f, -1.5f);
+        var tmp = go.AddComponent<TextMeshProUGUI>();
+        tmp.text = label + ": 0";
+        if (TMP_Settings.defaultFontAsset != null)
+            tmp.font = TMP_Settings.defaultFontAsset;
+        tmp.fontSize = 22;
+        tmp.color = Color.white;
+        tmp.fontStyle = FontStyles.Bold;
+        tmp.alignment = TextAlignmentOptions.MidlineRight;
 
         var rect = go.GetComponent<RectTransform>();
         rect.sizeDelta = new Vector2(0f, 28f);
-        return text;
+        return tmp;
     }
 }

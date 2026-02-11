@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 敌人攻击逻辑。默认朝向塔移动；若玩家在仇恨范围内则被吸引转向玩家。
+/// 敌人攻击逻辑。开局默认攻击塔；若角色在仇恨范围内则优先攻击玩家。
 /// 靠近目标后按 ATS 造成 ATK 伤害。需要 Rigidbody2D 用于移动。
 /// </summary>
 [RequireComponent(typeof(Enemy))]
@@ -16,7 +16,7 @@ public class EnemyAttackBehavior : MonoBehaviour
     [SerializeField] private float baseMoveSpeed = 2.5f;  // 5 × 1/2，与默认玩家速度匹配
 
     [Header("仇恨 (Agro)")]
-    [Tooltip("若玩家在此范围内，敌人会转向攻击玩家；否则默认攻击塔。")]
+    [Tooltip("角色在此范围内时，敌人优先攻击角色；否则默认攻击塔。")]
     [SerializeField] private float agroRange = 5f;
 
     private HealthSystem _health;
@@ -83,11 +83,11 @@ public class EnemyAttackBehavior : MonoBehaviour
     {
         Vector2 pos = transform.position;
 
-        // 默认目标：塔。若玩家在仇恨范围内，则被吸引转向玩家。
-        Transform playerTransform = GetPlayerInAgroRange(pos);
-        if (playerTransform != null)
+        // 默认攻塔；若角色在仇恨范围内则优先攻击角色。
+        Transform playerInRange = GetPlayerInAgroRange(pos);
+        if (playerInRange != null)
         {
-            _target = playerTransform;
+            _target = playerInRange;
             return;
         }
 
@@ -101,7 +101,7 @@ public class EnemyAttackBehavior : MonoBehaviour
         _target = null;
     }
 
-    /// <summary> 若玩家在仇恨范围内且存活，返回玩家 Transform；否则 null。 </summary>
+    /// <summary> 若角色在仇恨范围内且存活，返回玩家 Transform；否则 null。 </summary>
     private Transform GetPlayerInAgroRange(Vector2 pos)
     {
         if (MapController.Instance == null || MapController.Instance.PlayerHealth == null) return null;

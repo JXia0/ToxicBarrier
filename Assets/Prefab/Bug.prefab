@@ -159,7 +159,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.41, y: 0.78}
   m_EdgeRadius: 0
 --- !u!114 &7660890762595585221
 MonoBehaviour:
@@ -183,6 +183,7 @@ MonoBehaviour:
   toxicGasBaseDamagePerSecond: 5
   toxicGasPeriodSeconds: 60
   toxicGasDamageIncreasePerPeriod: 3
+  playerInvincibleForDebug: 0
   OnHpChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -214,5 +215,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackRange: 1.5
-  moveSpeed: 3
-  agroRange: 5
+  baseMoveSpeed: 2.5
+  agroRange: 7
