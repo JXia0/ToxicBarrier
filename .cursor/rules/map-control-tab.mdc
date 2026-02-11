@@ -1,0 +1,27 @@
+---
+description: This chat/tab is responsible for Map Control only. Other tabs handle loot, monster spawn, player, health, etc.
+globs: 
+  - "**/Core/MapController.cs"
+  - "**/Map/*.cs"
+  - "**/Map/*.md"
+alwaysApply: false
+---
+
+# Map Control Tab Scope
+
+You are in the **Map Control** tab. Your responsibility is limited to map-related systems.
+
+## You OWN and may freely change
+- `Assets/Scripts/Core/MapController.cs`
+- `Assets/Scripts/Map/` (MapZone, EnvironmentalResourceSpawner, MapScale, MAP_CONTROL_SCOPE.md)
+
+## You do NOT own (other tabs)
+- **Loot/drops**: LootManager, ResourcePickup, drop rates, RollEnemyLoot
+- **Monster spawn**: Enemy spawning, waves, spawn points
+- **Player**: PlayerController, PlayerMovement, input
+- **Health**: HealthSystem, toxic gas formula, healing, death flow
+- **Towers/combat**: Tower, aggro, combat
+
+When changes require touching those areas, only add minimal integration (e.g. call an existing API or read a value). Do not refactor or redesign logic inside those modules. Prefer suggesting "have the Loot/Enemy/Player/Health tab do X" when the change belongs there.
+
+Reference: `Assets/Scripts/Map/MAP_CONTROL_SCOPE.md` for full scope and boundaries.

@@ -1,0 +1,26 @@
+---
+description: 本對話/ Tab 負責玩家管理。地圖、掉落、怪物、血量等由其他 Tab 處理。
+globs:
+  - "**/Player/*.cs"
+  - "**/Player/*.md"
+alwaysApply: false
+---
+
+# 玩家管理 Tab 範圍
+
+你處於 **玩家管理** Tab，職責僅限於玩家相關系統。
+
+## 你擁有並可自由修改
+- `Assets/Scripts/Player/PlayerController.cs` — 頂視角移動、面向滑鼠、裝備/材料數字鍵 1–5
+- `Assets/Scripts/Player/PlayerMovement.cs` — 舊版/備用移動（WASD + 翻轉精靈）
+- `Assets/Scripts/Player/PLAYER_SCOPE.md` — 玩家模組範圍說明
+
+## 你不擁有（由其他 Tab 負責）
+- **地圖**：MapController、MapZone、MapScale、環境生成
+- **掉落**：LootManager、ResourcePickup
+- **怪物**：Enemy、Tower、刷新與波次
+- **血量**：HealthSystem、毒氣公式、治療、死亡流程
+
+需要與上述模組接線時，只做最小必要整合（例如使用既有 API 或讀取值），不重構或改寫對方內部邏輯。若改動屬於其他模組，優先建議「由地圖/掉落/血量 Tab 做 X」。
+
+參考：`Assets/Scripts/Player/PLAYER_SCOPE.md` 了解完整邊界與接點。

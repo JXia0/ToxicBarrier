@@ -2,14 +2,16 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// Shared health, ATK, and attack speed. Supports toxic gas DoT for the player;
-/// attach to both player and enemies. Use EnemyType for monster base stats (Bug, Leader, Boss).
-/// When MapController drives toxic gas centrally, it will set periods via SetToxicGasPeriodsElapsed.
+/// 统一血量/攻击/攻速管理，供玩家、敌人、塔共用。
+/// 玩家：受毒气 DoT；敌人：按 EnemyType 套用基础数值（Bug/Leader/Boss）；塔：使用 Inspector 上的 atk/ats/maxHp，不受毒气与敌人类型影响。
+/// 当 MapController 集中驱动毒气时，会通过 SetToxicGasPeriodsElapsed 设置周期。
 /// </summary>
 public class HealthSystem : MonoBehaviour
 {
     [Header("Identity")]
     [SerializeField] private bool isPlayer;
+    [Tooltip("勾选表示塔：不套用敌人类型数值、不受毒气影响，使用下方 Combat Stats。")]
+    [SerializeField] private bool isTower;
     [SerializeField] private EnemyType enemyType = EnemyType.Bug;
 
     [Header("Combat Stats")]
@@ -34,6 +36,7 @@ public class HealthSystem : MonoBehaviour
     public float Atk => atk;
     public float Ats => ats;
     public bool IsPlayer => isPlayer;
+    public bool IsTower => isTower;
     public EnemyType CurrentEnemyType => enemyType;
 
     public UnityEvent<float, float> OnHpChanged;
@@ -68,7 +71,7 @@ public class HealthSystem : MonoBehaviour
 
     private void ApplyEnemyTypeStats()
     {
-        if (isPlayer) return;
+        if (isPlayer || isTower) return;
         switch (enemyType)
         {
             case EnemyType.Bug: atk = 100f; maxHp = 50f; break;
@@ -135,5 +138,13 @@ public class HealthSystem : MonoBehaviour
         maxHp = Mathf.Max(1f, newMaxHp);
         _currentHp = maxHp * (_currentHp / Mathf.Max(0.001f, oldMax));
         OnHpChanged?.Invoke(_currentHp, maxHp);
+    }
+
+    /// <summary> Set enemy type at runtime (e.g. from EnemySpawner). Applies stats immediately. </summary>
+    public void SetEnemyType(EnemyType type)
+    {
+        enemyType = type;
+        if (!isPlayer)
+            ApplyEnemyTypeStats();
     }
 }

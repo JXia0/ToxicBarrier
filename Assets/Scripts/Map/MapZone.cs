@@ -12,12 +12,50 @@ public class MapZone : MonoBehaviour
     [Tooltip("Map 1, 2, or 3. Drives spawn rates: Map 1 = 0.8 Wood; Map 2 = 0.5 Wood, 0.3 Stone; Map 3 = 0.2 Wood, 0.6 Stone.")]
     [SerializeField] private int mapId = 1;
 
+    [Header("Ring spawn area")]
+    [Tooltip("If set, inner radius = this zone's outer radius. Use for concentric rings: Map 2 → Map 1, Map 3 → Map 2.")]
+    [SerializeField] private MapZone innerZone;
+    [Tooltip("Inner radius when Inner Zone is not set. Map 1 = 0.")]
+    [SerializeField] private float innerRadius = 0f;
+    [Tooltip("Outer radius (max) = this map radius. If Use Collider For Outer Radius is on, this is ignored.")]
+    [SerializeField] private float radius = 5f;
+    [Tooltip("Use CircleCollider2D bounds for outer radius so it matches the visual circle.")]
+    [SerializeField] private bool useColliderForOuterRadius = true;
+
     [Header("Player detection")]
     [SerializeField] private string playerTag = "Player";
 
     public int MapId => Mathf.Clamp(mapId, 1, 3);
 
-    /// <summary> World-space bounds of this zone (from Collider2D). Used by spawner to place resources inside the circle. </summary>
+    /// <summary> Ring params: center, inner radius (min), outer radius (max). Resources spawn only inside this ring. </summary>
+    public void GetRingParams(out Vector2 center, out float minRadius, out float maxRadius)
+    {
+        if (innerZone != null)
+        {
+            innerZone.GetRingParams(out _, out _, out float innerOuter);
+            minRadius = Mathf.Max(0f, innerOuter);
+        }
+        else
+        {
+            minRadius = Mathf.Max(0f, innerRadius);
+        }
+
+        Collider2D c = GetComponent<Collider2D>();
+        if (useColliderForOuterRadius && c != null)
+        {
+            Bounds b = c.bounds;
+            center = b.center;
+            maxRadius = Mathf.Min(b.extents.x, b.extents.y);
+        }
+        else
+        {
+            center = transform.position;
+            maxRadius = Mathf.Max(minRadius, radius);
+        }
+        maxRadius = Mathf.Max(minRadius, maxRadius);
+    }
+
+    /// <summary> World-space bounds (for collider). </summary>
     public Bounds Bounds
     {
         get
@@ -44,18 +82,34 @@ public class MapZone : MonoBehaviour
         return false;
     }
 
-    /// <summary> Get spawn area as Min/Max for EnvironmentalResourceSpawner. </summary>
+    /// <summary> Legacy rect mode. Prefer GetRingParams for ring spawning. </summary>
     public void GetSpawnArea(out Vector2 min, out Vector2 max)
     {
-        Bounds b = Bounds;
-        min = new Vector2(b.min.x, b.min.y);
-        max = new Vector2(b.max.x, b.max.y);
+        Vector2 center = transform.position;
+        min = new Vector2(center.x - radius, center.y - radius);
+        max = new Vector2(center.x + radius, center.y + radius);
     }
 
     private void OnDrawGizmosSelected()
     {
-        Bounds b = Bounds;
-        Gizmos.color = new Color(1f, 0.5f, 0f, 0.25f);
-        Gizmos.DrawCube(b.center, b.size);
+        GetRingParams(out Vector2 center, out float innerR, out float outerR);
+        Gizmos.color = new Color(1f, 0.5f, 0f, 0.2f);
+        DrawCircle(center, innerR);
+        DrawCircle(center, outerR);
+    }
+
+    private void DrawCircle(Vector2 center, float r)
+    {
+        if (r <= 0f) return;
+        const int segments = 32;
+        float step = 360f / segments * Mathf.Deg2Rad;
+        for (int i = 0; i < segments; i++)
+        {
+            float a0 = i * step;
+            float a1 = (i + 1) * step;
+            Gizmos.DrawLine(
+                center + new Vector2(Mathf.Cos(a0), Mathf.Sin(a0)) * r,
+                center + new Vector2(Mathf.Cos(a1), Mathf.Sin(a1)) * r);
+        }
     }
 }

@@ -85,12 +85,13 @@ public class LootManager : MonoBehaviour
         }
     }
 
-    public void SpawnResource(ResourceType type, Vector2 position)
+    public void SpawnResource(ResourceType type, Vector2 position, bool addRandomOffset = true)
     {
         GameObject prefab = GetPrefabForResource(type);
         if (prefab == null) return;
-        Vector2 offset = UnityEngine.Random.insideUnitCircle * dropSpawnRadius;
-        Instantiate(prefab, position + offset, Quaternion.identity);
+        if (addRandomOffset)
+            position += (Vector2)UnityEngine.Random.insideUnitCircle * dropSpawnRadius;
+        UnityEngine.Object.Instantiate(prefab, position, Quaternion.identity);
     }
 
     private GameObject GetPrefabForResource(ResourceType type)
@@ -125,9 +126,9 @@ public class LootManager : MonoBehaviour
         GetMapSpawnRates(mapId, out float woodRate, out float stoneRate);
         float r = UnityEngine.Random.value;
         if (r < woodRate)
-            SpawnResource(ResourceType.Wood, position);
+            SpawnResource(ResourceType.Wood, position, addRandomOffset: false);
         else if (r < woodRate + stoneRate)
-            SpawnResource(ResourceType.Stone, position);
+            SpawnResource(ResourceType.Stone, position, addRandomOffset: false);
     }
 
     public MapSpawnConfig? GetMapConfig(int mapId)

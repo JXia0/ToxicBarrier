@@ -1,0 +1,129 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+/// <summary>
+/// 在屏幕右上角显示玩家背包资源数量。挂到任意物体上，在 Inspector 里指定 PlayerInventory；
+/// 若留空则运行时自动查找。若不指定现有 UI，会在运行时自动创建右上角面板。
+/// </summary>
+public class InventoryPanelUI : MonoBehaviour
+{
+    [Header("背包引用")]
+    [SerializeField] private PlayerInventory inventory;
+
+    [Header("可选：已有 UI 时指定")]
+    [Tooltip("若不指定，会在运行时自动创建右上角 Canvas 与面板。")]
+    [SerializeField] private RectTransform panelRoot;
+    [SerializeField] private Text textGel;
+    [SerializeField] private Text textTeeth;
+    [SerializeField] private Text textWood;
+    [SerializeField] private Text textStone;
+
+    private void Start()
+    {
+        if (inventory == null)
+            inventory = FindObjectOfType<PlayerInventory>();
+
+        if (inventory == null)
+        {
+            Debug.LogWarning("InventoryPanelUI: 未找到 PlayerInventory，请指定或确保场景中有带 PlayerInventory 的玩家。");
+            return;
+        }
+
+        if (panelRoot == null || textGel == null)
+            CreateDefaultUI();
+
+        inventory.OnResourceCountChanged.AddListener(OnCountChanged);
+        RefreshAll();
+    }
+
+    private void OnDestroy()
+    {
+        if (inventory != null)
+            inventory.OnResourceCountChanged.RemoveListener(OnCountChanged);
+    }
+
+    private void OnCountChanged(LootManager.ResourceType type, int count)
+    {
+        RefreshAll();
+    }
+
+    private void RefreshAll()
+    {
+        if (inventory == null) return;
+        SetText(textGel, LootManager.ResourceType.Gel);
+        SetText(textTeeth, LootManager.ResourceType.Teeth);
+        SetText(textWood, LootManager.ResourceType.Wood);
+        SetText(textStone, LootManager.ResourceType.Stone);
+    }
+
+    private void SetText(Text text, LootManager.ResourceType type)
+    {
+        if (text == null) return;
+        int count = inventory.GetCount(type);
+        text.text = $"{TypeName(type)}: {count}";
+    }
+
+    private static string TypeName(LootManager.ResourceType type)
+    {
+        switch (type)
+        {
+            case LootManager.ResourceType.Gel: return "Gel";
+            case LootManager.ResourceType.Teeth: return "Teeth";
+            case LootManager.ResourceType.Wood: return "Wood";
+            case LootManager.ResourceType.Stone: return "Stone";
+            default: return type.ToString();
+        }
+    }
+
+    private void CreateDefaultUI()
+    {
+        var canvasGo = new GameObject("InventoryCanvas");
+        var canvas = canvasGo.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvasGo.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        canvasGo.GetComponent<CanvasScaler>().referenceResolution = new Vector2(1920, 1080);
+        canvasGo.AddComponent<GraphicRaycaster>();
+
+        var panelGo = new GameObject("InventoryPanel");
+        panelGo.transform.SetParent(canvasGo.transform, false);
+        var panelRect = panelGo.AddComponent<RectTransform>();
+        panelRect.anchorMin = new Vector2(1f, 1f);
+        panelRect.anchorMax = new Vector2(1f, 1f);
+        panelRect.pivot = new Vector2(1f, 1f);
+        panelRect.anchoredPosition = new Vector2(-20f, -20f);
+        panelRect.sizeDelta = new Vector2(180f, 120f);
+        var img = panelGo.AddComponent<Image>();
+        img.color = new Color(0f, 0f, 0f, 0.7f);
+
+        var layout = panelGo.AddComponent<VerticalLayoutGroup>();
+        layout.padding = new RectOffset(12, 12, 12, 12);
+        layout.spacing = 4f;
+        layout.childAlignment = TextAnchor.UpperRight;
+        layout.childControlWidth = true;
+        layout.childControlHeight = false;
+        layout.childForceExpandWidth = true;
+        layout.childForceExpandHeight = false;
+
+        textGel = CreateRow(panelGo.transform, "Gel");
+        textTeeth = CreateRow(panelGo.transform, "Teeth");
+        textWood = CreateRow(panelGo.transform, "Wood");
+        textStone = CreateRow(panelGo.transform, "Stone");
+
+        panelRoot = panelRect;
+    }
+
+    private static Text CreateRow(Transform parent, string label)
+    {
+        var go = new GameObject("Text_" + label);
+        go.transform.SetParent(parent, false);
+        var text = go.AddComponent<Text>();
+        text.text = label + ": 0";
+        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        if (font != null) text.font = font;
+        text.fontSize = 18;
+        text.color = Color.white;
+        var rect = go.GetComponent<RectTransform>();
+        rect.sizeDelta = new Vector2(0f, 24f);
+        return text;
+    }
+}
