@@ -83,12 +83,26 @@
 
 ---
 
-## 六、相机边界（逐环解锁）
+## 六、相机边界（逐环解锁）— 只看到已解锁的 Map
 
-当使用**逐环解锁地图**时，希望相机在走到 Map 1 边境时被「挡」在当前解锁范围内（不会看到未解锁的 Map 2/3 全屏）：
+**目标**：Cinemachine 只显示**已解锁**的 Map 区域，未解锁的 Map 里**看不到任何内容**（相机不进入、地图视觉与内容可隐藏）。
 
-1. 在挂有 **CinemachineFollowPlayer** 的同一物体（如 `CameraSetup`）上添加组件 **CameraBoundsFromMapUnlock**。
-2. **Virtual Camera Component** 可留空，脚本会自动找到场景中的 Cinemachine Virtual Camera。
-3. 运行后脚本会自动为 Virtual Camera 添加 **Cinemachine Confiner 2D**（若尚未存在），并创建一个圆形 **CameraBounds** 作为 Bounding Shape，半径随当前解锁环（Map 1 → Map 2 → Map 3）更新。
+### 6.1 相机被「挡」在当前解锁范围内
 
-这样只解锁 Map 1 时相机会被限制在 Map 1 圆内；解锁 Map 2 后边界扩大到 Map 2；满级后扩大到 Map 3。
+1. 在 **MapController**（或任意常驻物体）上添加组件 **Camera Bounds From Map Unlock**（已挂好则可略过）。
+2. **Virtual Camera Component** 留空时，脚本会自动查找场景中的 Cinemachine Virtual Camera。
+3. 运行后脚本会为 Virtual Camera 添加 **Cinemachine Confiner 2D**，并用 **PolygonCollider2D** 近似圆形作为 Bounding Shape，半径随当前解锁环更新：
+   - 只解锁 Map 1 → 相机只能在 Map 1 圆内移动，**看不到 Map 2/3 区域**；
+   - 解锁 Map 2 → 边界扩大到 Map 2；
+   - 满级解锁 Map 3 → 边界扩大到 Map 3。
+
+这样相机**只能看到已解锁的 Map**，不会把镜头移进未解锁区域。
+
+### 6.2 未解锁 Map 不显示任何内容（MapZone）
+
+在 **Map 2、Map 3** 的 **MapZone** 组件上：
+
+- **Hide Map Visual When Locked**（默认勾选）：锁定该环时隐藏本环的**地图圈 Sprite**，只显示战争迷雾；解锁后显示地图圈、隐藏迷雾。这样未解锁环不会露出「地图图形」。
+- **Content Root To Hide When Locked**（可选）：拖入该环下的一个子物体（例如专门放刷怪/资源的容器）。锁定该环时该物体（及子物体）会被 **SetActive(false)**，未解锁环内的**内容**（刷怪、资源等）也不会被看到。
+
+配合上面的 Confiner，Cinemachine 里就只会看到已解锁 Map，且未解锁 Map 里的 feature 不会显示。

@@ -5,18 +5,22 @@ namespace ToxicBarrier.Camera
     /// <summary>
     /// 根据当前解锁的 Map 环更新相机边界：只解锁 Map 1 时相机被限制在 Map 1 内；
     /// 解锁 Map 2 后边界扩大到 Map 2；满级解锁 Map 3 后扩大到 Map 3。
-    /// 依赖 CinemachineConfiner2D（挂在 Virtual Camera 上），会创建或使用一个圆形 Collider2D 作为 Bounding Shape。
+    /// 使用 PolygonCollider2D 近似圆形（CinemachineConfiner2D 不支持 CircleCollider2D，只认多边形）。
     /// </summary>
     public class CameraBoundsFromMapUnlock : MonoBehaviour
     {
         [Header("绑定（可选）")]
         [Tooltip("Cinemachine Virtual Camera。留空则自动查找场景中第一个。")]
         [SerializeField] private Component virtualCameraComponent;
-        [Tooltip("用于 Confiner 的边界物体（带 CircleCollider2D）。留空则自动创建。")]
+        [Tooltip("用于 Confiner 的边界物体（带 PolygonCollider2D）。留空则自动创建。")]
         [SerializeField] private GameObject boundsShapeObject;
 
+        [Header("边界形状")]
+        [Tooltip("近似圆形的多边形边数，越大越圆。")]
+        [SerializeField] private int circleSegments = 64;
+
         private GameObject _boundsRoot;
-        private CircleCollider2D _boundsCollider;
+        private PolygonCollider2D _boundsCollider;
         private Component _confiner;
         private float _lastRadius = -1f;
         private Vector2 _lastCenter;
@@ -37,7 +41,7 @@ namespace ToxicBarrier.Camera
         {
             if (boundsShapeObject != null)
             {
-                _boundsCollider = boundsShapeObject.GetComponent<CircleCollider2D>();
+                _boundsCollider = boundsShapeObject.GetComponent<PolygonCollider2D>();
                 if (_boundsCollider != null)
                 {
                     _boundsRoot = boundsShapeObject;
@@ -49,15 +53,27 @@ namespace ToxicBarrier.Camera
             if (t != null)
             {
                 _boundsRoot = t.gameObject;
-                _boundsCollider = _boundsRoot.GetComponent<CircleCollider2D>();
+                _boundsCollider = _boundsRoot.GetComponent<PolygonCollider2D>();
                 if (_boundsCollider != null) return;
             }
 
             _boundsRoot = new GameObject("CameraBounds");
             _boundsRoot.transform.SetParent(transform);
-            _boundsCollider = _boundsRoot.AddComponent<CircleCollider2D>();
+            _boundsCollider = _boundsRoot.AddComponent<PolygonCollider2D>();
             _boundsCollider.isTrigger = true;
-            _boundsCollider.radius = 1f;
+            _boundsCollider.SetPath(0, GetCirclePoints(1f));
+        }
+
+        private Vector2[] GetCirclePoints(float radius)
+        {
+            int n = Mathf.Max(8, circleSegments);
+            var points = new Vector2[n];
+            for (int i = 0; i < n; i++)
+            {
+                float angle = (i / (float)n) * Mathf.PI * 2f;
+                points[i] = new Vector2(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius);
+            }
+            return points;
         }
 
         private void EnsureConfiner()
@@ -129,7 +145,7 @@ namespace ToxicBarrier.Camera
             float radius = MapController.Instance.GetMaxAllowedRadius();
 
             _boundsRoot.transform.position = new Vector3(center.x, center.y, _boundsRoot.transform.position.z);
-            _boundsCollider.radius = radius;
+            _boundsCollider.SetPath(0, GetCirclePoints(radius));
 
             bool changed = Mathf.Abs(radius - _lastRadius) > 0.001f || (center - _lastCenter).sqrMagnitude > 0.0001f;
             _lastRadius = radius;

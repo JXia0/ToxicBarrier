@@ -30,6 +30,10 @@ public class MapZone : MonoBehaviour
     [SerializeField] private GameObject fogOverlay;
     [Tooltip("Fog color when zone is locked.")]
     [SerializeField] private Color fogColor = new Color(0.1f, 0.1f, 0.15f, 0.85f);
+    [Tooltip("When true, hide this zone's map graphic (SpriteRenderer) when locked so only fog is visible. Unlocked = show map, hide fog.")]
+    [SerializeField] private bool hideMapVisualWhenLocked = true;
+    [Tooltip("Optional. When locked, this object (and its children) are disabled so no features (spawns, etc.) of the locked map are visible. Assign a child that contains spawners or content.")]
+    [SerializeField] private GameObject contentRootToHideWhenLocked;
 
     public int MapId => Mathf.Clamp(mapId, 1, 3);
 
@@ -122,11 +126,22 @@ public class MapZone : MonoBehaviour
 
     private void RefreshFogVisibility()
     {
-        if (mapId <= 1 || fogOverlay == null) return;
+        if (mapId <= 1) return;
 
         bool locked = !IsUnlocked;
-        if (fogOverlay.activeSelf != locked)
+
+        if (fogOverlay != null && fogOverlay.activeSelf != locked)
             fogOverlay.SetActive(locked);
+
+        if (hideMapVisualWhenLocked)
+        {
+            SpriteRenderer zoneSr = GetComponent<SpriteRenderer>();
+            if (zoneSr != null && zoneSr.enabled == locked)
+                zoneSr.enabled = !locked;
+        }
+
+        if (contentRootToHideWhenLocked != null && contentRootToHideWhenLocked.activeSelf == locked)
+            contentRootToHideWhenLocked.SetActive(!locked);
     }
 
     private bool IsPlayer(Collider2D other)

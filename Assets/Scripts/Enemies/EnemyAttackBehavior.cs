@@ -1,7 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// 敌人攻击逻辑。开局默认攻击塔；若角色在仇恨范围内则优先攻击玩家。
+/// 敌人攻击逻辑。开局默认攻击塔；若角色在仇恨范围内则优先攻击角色。
+/// 一旦确认目标后不会更换（直到目标死亡），即使玩家进入仇恨范围也不会转火。
 /// 靠近目标后按 ATS 造成 ATK 伤害。需要 Rigidbody2D 用于移动。
 /// </summary>
 [RequireComponent(typeof(Enemy))]
@@ -81,6 +82,11 @@ public class EnemyAttackBehavior : MonoBehaviour
 
     private void UpdateTarget()
     {
+        // 已有目标且仍有效时，不更换目标（无论玩家是否进入仇恨范围）。
+        if (_target != null && IsTargetValid(_target))
+            return;
+
+        _target = null;
         Vector2 pos = transform.position;
 
         // 默认攻塔；若角色在仇恨范围内则优先攻击角色。
@@ -97,8 +103,15 @@ public class EnemyAttackBehavior : MonoBehaviour
             _target = tower.transform;
             return;
         }
+    }
 
-        _target = null;
+    private bool IsTargetValid(Transform t)
+    {
+        if (t == null || !t.gameObject.activeInHierarchy) return false;
+
+        HealthSystem h = t.GetComponent<HealthSystem>();
+        if (h == null) return true;
+        return h.CurrentHp > 0f;
     }
 
     /// <summary> 若角色在仇恨范围内且存活，返回玩家 Transform；否则 null。 </summary>
