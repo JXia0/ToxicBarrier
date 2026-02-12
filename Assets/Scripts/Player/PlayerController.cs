@@ -4,6 +4,7 @@ using UnityEngine;
 /// Top-down player controller: WASD movement (Rigidbody2D), face left/right by movement direction,
 /// and numeric inventory input (keys 1-5) for equipment/materials.
 /// Default facing: right. Attach to the player GameObject with a Rigidbody2D (set to Dynamic, freeze rotation Z).
+/// Ensures player sprite renders in front of map zones when crossing edges (sorting order).
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
@@ -11,6 +12,10 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float inputDeadZone = 0.1f;
+
+    [Header("Rendering (crossing map edge)")]
+    [Tooltip("Sorting order for player sprite so it stays in front of map zone sprites when crossing edges. Map zones use 0.")]
+    [SerializeField] private int playerSortingOrder = 10;
 
     private Rigidbody2D _rb;
     private float _lastHorizontal;
@@ -25,6 +30,10 @@ public class PlayerController : MonoBehaviour
             _rb.freezeRotation = true;
 
         transform.rotation = Quaternion.identity;
+
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr != null)
+            sr.sortingOrder = playerSortingOrder;
     }
 
     private void Update()
