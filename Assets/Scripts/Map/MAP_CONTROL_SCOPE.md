@@ -10,8 +10,10 @@
 
 | 腳本 | 路徑 | 職責 |
 |------|------|------|
-| **MapController** | `Core/MapController.cs` | 中央地圖控制：Map ID、玩家引用、Loot/MapScale 引用、毒氣週期、環境生成 API |
-| **MapZone** | `Map/MapZone.cs` | 三環地圖區域：Map ID、環半徑 (inner/outer)、玩家進入切換 Map、Debug 顏色 |
+| **MapController** | `Core/MapController.cs` | 中央地圖控制：Map ID、玩家引用、Loot/MapScale 引用、毒氣週期、**逐環解鎖**（Tower 等級）、GetMaxAllowedRadius |
+| **MapZone** | `Map/MapZone.cs` | 三環地圖區域：Map ID、環半徑、玩家進入切換 Map（僅解鎖時）、**戰爭迷霧**（Map 2/3 鎖定時） |
+| **MapRevealMask** | `Map/MapRevealMask.cs` | 掛在 Map 1：提供 Sprite Mask，使鎖定環的迷霧只顯示「Map 1 外」的一小部分 |
+| **PlayerMapBounds** | `Player/PlayerMapBounds.cs` | 掛在玩家：將玩家位置限制在當前解鎖半徑內，無法進入未解鎖環 |
 | **EnvironmentalResourceSpawner** | `Map/EnvironmentalResourceSpawner.cs` | 環境資源 (Wood/Stone) 在環內/矩形內生成、間隔與類型控制 |
 | **MapScale** | `Map/MapScale.cs` | 地圖階級對應的玩家移動速度 (Tier 1–4) |
 
@@ -43,4 +45,17 @@
 
 ---
 
-*最後更新：依專案分 Tab 分工時建立。*
+---
+
+## 逐環解鎖與戰爭迷霧
+
+- **Map 1**：始終解鎖。
+- **Map 2**：塔等級 ≥ 2 時解鎖。
+- **Map 3**：塔滿級（等級 3）時解鎖。
+- 未解鎖環：顯示迷霧（Fog of War），僅在與 Map 1 邊界處露出一小部分；玩家無法進入（PlayerMapBounds 限制半徑）；進入 trigger 不會切換 Map ID（MapZone 檢查 IsMapUnlocked）。
+
+**場景設定**：在 MapController 上指定 **Tower**、**Map 2 Zone**、**Map 3 Zone**；在 **Map 1** 上掛 **MapRevealMask**（用於迷霧裁切）。玩家 Prefab 已含 **PlayerMapBounds**。
+
+---
+
+*最後更新：依專案分 Tab 分工時建立；新增逐環解鎖與戰爭迷霧。*

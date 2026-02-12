@@ -80,3 +80,15 @@
 - [ ] 玩家 GameObject 的 **Tag** 为 `Player`。
 
 完成以上步骤后，运行游戏即可看到摄像机跟随玩家移动。
+
+---
+
+## 六、相机边界（逐环解锁）
+
+当使用**逐环解锁地图**时，希望相机在走到 Map 1 边境时被「挡」在当前解锁范围内（不会看到未解锁的 Map 2/3 全屏）：
+
+1. 在挂有 **CinemachineFollowPlayer** 的同一物体（如 `CameraSetup`）上添加组件 **CameraBoundsFromMapUnlock**。
+2. **Virtual Camera Component** 可留空，脚本会自动找到场景中的 Cinemachine Virtual Camera。
+3. 运行后脚本会自动为 Virtual Camera 添加 **Cinemachine Confiner 2D**（若尚未存在），并创建一个圆形 **CameraBounds** 作为 Bounding Shape，半径随当前解锁环（Map 1 → Map 2 → Map 3）更新。
+
+这样只解锁 Map 1 时相机会被限制在 Map 1 圆内；解锁 Map 2 后边界扩大到 Map 2；满级后扩大到 Map 3。

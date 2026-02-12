@@ -34,7 +34,9 @@ public class TowerAttackBehavior : MonoBehaviour
         _lineRenderer.positionCount = 2;
         _lineRenderer.startWidth = laserStartWidth;
         _lineRenderer.endWidth = laserEndWidth;
-        _lineRenderer.material = _lineRenderer.material != null ? _lineRenderer.material : new Material(Shader.Find("Sprites/Default"));
+        Shader lineShader = Shader.Find("Sprites/Default");
+        if (lineShader != null && _lineRenderer.material == null)
+            _lineRenderer.material = new Material(lineShader);
         _lineRenderer.startColor = laserColor;
         _lineRenderer.endColor = new Color(laserColor.r, laserColor.g, laserColor.b, 0.4f);
     }
@@ -85,6 +87,7 @@ public class TowerAttackBehavior : MonoBehaviour
 
     private void DealDamage(Enemy target)
     {
+        if (target == null) return;
         HealthSystem targetHealth = target.GetComponent<HealthSystem>();
         if (targetHealth == null || targetHealth.CurrentHp <= 0f) return;
 

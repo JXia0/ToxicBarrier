@@ -2,8 +2,8 @@ using UnityEngine;
 
 /// <summary>
 /// Attach to each of the three circle objects representing Map 1, Map 2, and Map 3.
-/// When the player enters the trigger, MapController's current map ID is set to this zone's ID.
-/// Use with EnvironmentalResourceSpawner on the same (or child) object so resources spawn inside this zone with this map's rates.
+/// When the player enters the trigger, MapController's current map ID is set to this zone's ID (only if zone is unlocked).
+/// Map 2/3 show a fog overlay when locked (progressive unlock by Tower level). Use with EnvironmentalResourceSpawner for spawn rates.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class MapZone : MonoBehaviour
@@ -25,7 +25,26 @@ public class MapZone : MonoBehaviour
     [Header("Player detection")]
     [SerializeField] private string playerTag = "Player";
 
+    [Header("Fog of War (Map 2 & 3 when locked)")]
+    [Tooltip("Optional. When locked, this overlay is shown (fog). Assign a child with SpriteRenderer; or leave empty to auto-create from this zone's sprite.")]
+    [SerializeField] private GameObject fogOverlay;
+    [Tooltip("Fog color when zone is locked.")]
+    [SerializeField] private Color fogColor = new Color(0.1f, 0.1f, 0.15f, 0.85f);
+
     public int MapId => Mathf.Clamp(mapId, 1, 3);
+
+    /// <summary> True if this zone is unlocked (Map 1 always; Map 2/3 by Tower level). </summary>
+    public bool IsUnlocked => MapController.Instance != null && MapController.Instance.IsMapUnlocked(MapId);
+
+    private void Start()
+    {
+        EnsureFogOverlay();
+    }
+
+    private void Update()
+    {
+        RefreshFogVisibility();
+    }
 
     /// <summary> Ring params: center, inner radius (min), outer radius (max). Resources spawn only inside this ring. </summary>
     public void GetRingParams(out Vector2 center, out float minRadius, out float maxRadius)
@@ -68,9 +87,46 @@ public class MapZone : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!IsPlayer(other)) return;
+        if (MapController.Instance == null) return;
+        if (!MapController.Instance.IsMapUnlocked(MapId)) return;
 
-        if (MapController.Instance != null)
-            MapController.Instance.SetMapId(MapId);
+        MapController.Instance.SetMapId(MapId);
+    }
+
+    private void EnsureFogOverlay()
+    {
+        if (mapId <= 1) return;
+        if (fogOverlay != null) return;
+
+        Transform fogT = transform.Find("Fog");
+        if (fogT != null) { fogOverlay = fogT.gameObject; return; }
+
+        SpriteRenderer zoneSr = GetComponent<SpriteRenderer>();
+        if (zoneSr == null || zoneSr.sprite == null) return;
+
+        GameObject fog = new GameObject("Fog");
+        fog.transform.SetParent(transform, false);
+        fog.transform.localPosition = Vector3.zero;
+        fog.transform.localScale = Vector3.one;
+        fog.transform.localRotation = Quaternion.identity;
+
+        SpriteRenderer sr = fog.AddComponent<SpriteRenderer>();
+        sr.sprite = zoneSr.sprite;
+        sr.color = fogColor;
+        sr.sortingOrder = zoneSr.sortingOrder + 1;
+        sr.sortingLayerID = zoneSr.sortingLayerID;
+        sr.maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+
+        fogOverlay = fog;
+    }
+
+    private void RefreshFogVisibility()
+    {
+        if (mapId <= 1 || fogOverlay == null) return;
+
+        bool locked = !IsUnlocked;
+        if (fogOverlay.activeSelf != locked)
+            fogOverlay.SetActive(locked);
     }
 
     private bool IsPlayer(Collider2D other)

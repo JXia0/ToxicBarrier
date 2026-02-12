@@ -135,6 +135,7 @@ GameObject:
   - component: {fileID: 14555994}
   - component: {fileID: 14555993}
   - component: {fileID: 14555992}
+  - component: {fileID: 14555995}
   m_Layer: 0
   m_Name: Map1
   m_TagString: Untagged
@@ -183,7 +184,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5a8b700a8fccc0749908ad7106a59363, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -283,6 +284,19 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &14555995
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 14555989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spriteMaskSource: {fileID: 0}
 --- !u!1 &103427032
 GameObject:
   m_ObjectHideFlags: 0
@@ -344,8 +358,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 1, g: 0.5862533, b: 0.5862533, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 67cec9cd52350c1438c80a4555d0b65a, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -851,8 +865,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0.2574123, g: 1, b: 0.996836, a: 1}
+  m_Sprite: {fileID: 21300000, guid: a0a142d8c09503344af21e584e643bde, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1122,6 +1136,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7686d3f068adfc8439fce91c1b06f54c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  laserDisplayDuration: 0.08
+  laserStartWidth: 0.15
+  laserEndWidth: 0.05
+  laserColor: {r: 1, g: 0.3, b: 0.2, a: 0.9}
 --- !u!1 &1086416031
 GameObject:
   m_ObjectHideFlags: 0
@@ -1504,6 +1522,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2055405488}
   - component: {fileID: 2055405487}
+  - component: {fileID: 2055405489}
   m_Layer: 0
   m_Name: MapController
   m_TagString: Untagged
@@ -1531,6 +1550,20 @@ MonoBehaviour:
   map1Zone: {fileID: 14555992}
   driveToxicGasCentrally: 1
   toxicGasPeriodSeconds: 60
+--- !u!114 &2055405489
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2055405486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  virtualCameraComponent: {fileID: 0}
+  boundsShapeObject: {fileID: 0}
 --- !u!4 &2055405488
 Transform:
   m_ObjectHideFlags: 0

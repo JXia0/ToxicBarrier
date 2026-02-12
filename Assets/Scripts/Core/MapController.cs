@@ -18,6 +18,12 @@ public class MapController : MonoBehaviour
     [SerializeField] private int currentMapId = 1;
     [Tooltip("Map 1 zone: used for map center and Map 1 radius (e.g. central tower attack range = radius * 0.5).")]
     [SerializeField] private MapZone map1Zone;
+    [SerializeField] private MapZone map2Zone;
+    [SerializeField] private MapZone map3Zone;
+
+    [Header("Progressive unlock (by Tower level)")]
+    [Tooltip("Tower reference for unlock: Map 2 at level >= 2, Map 3 at level 3.")]
+    [SerializeField] private Tower tower;
 
     [Header("Toxic Gas (central drive)")]
     [Tooltip("If true, MapController drives toxic gas periods; otherwise each HealthSystem uses its own timer.")]
@@ -72,6 +78,30 @@ public class MapController : MonoBehaviour
     }
 
     public int GetMapId() => currentMapId;
+
+    /// <summary> Whether this map ring is unlocked (Map 1 always; Map 2 when Tower >= 2; Map 3 when Tower level 3). </summary>
+    public bool IsMapUnlocked(int mapId)
+    {
+        if (mapId <= 1) return true;
+        if (tower == null) return false;
+        if (mapId == 2) return tower.CurrentLevel >= 2;
+        if (mapId == 3) return tower.CurrentLevel >= 3;
+        return false;
+    }
+
+    /// <summary> Max radius the player is allowed to move (outer edge of highest unlocked map). </summary>
+    public float GetMaxAllowedRadius()
+    {
+        if (map1Zone == null) return 5f;
+        map1Zone.GetRingParams(out _, out _, out float r1);
+        if (!IsMapUnlocked(2)) return r1;
+        if (map2Zone == null) return r1;
+        map2Zone.GetRingParams(out _, out _, out float r2);
+        if (!IsMapUnlocked(3)) return r2;
+        if (map3Zone == null) return r2;
+        map3Zone.GetRingParams(out _, out _, out float r3);
+        return r3;
+    }
 
     /// <summary> World position of map center (from Map 1 zone). </summary>
     public Vector2 GetMapCenter()
