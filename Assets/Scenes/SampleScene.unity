@@ -228,6 +228,10 @@ MonoBehaviour:
   radius: 5
   useColliderForOuterRadius: 1
   playerTag: Player
+  fogOverlay: {fileID: 0}
+  fogColor: {r: 0.1, g: 0.1, b: 0.15, a: 0.85}
+  hideMapVisualWhenLocked: 1
+  contentRootToHideWhenLocked: {fileID: 0}
 --- !u!114 &14555993
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -402,6 +406,10 @@ MonoBehaviour:
   radius: 5
   useColliderForOuterRadius: 1
   playerTag: Player
+  fogOverlay: {fileID: 0}
+  fogColor: {r: 0.1, g: 0.1, b: 0.15, a: 0.85}
+  hideMapVisualWhenLocked: 1
+  contentRootToHideWhenLocked: {fileID: 0}
 --- !u!114 &103427036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -909,6 +917,10 @@ MonoBehaviour:
   radius: 5
   useColliderForOuterRadius: 1
   playerTag: Player
+  fogOverlay: {fileID: 0}
+  fogColor: {r: 0.1, g: 0.1, b: 0.15, a: 0.85}
+  hideMapVisualWhenLocked: 1
+  contentRootToHideWhenLocked: {fileID: 0}
 --- !u!114 &754029413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1140,6 +1152,7 @@ MonoBehaviour:
   laserStartWidth: 0.15
   laserEndWidth: 0.05
   laserColor: {r: 1, g: 0.3, b: 0.2, a: 0.9}
+  lockTarget: 1
 --- !u!1 &1086416031
 GameObject:
   m_ObjectHideFlags: 0
@@ -1548,22 +1561,11 @@ MonoBehaviour:
   mapScale: {fileID: 0}
   currentMapId: 1
   map1Zone: {fileID: 14555992}
+  map2Zone: {fileID: 0}
+  map3Zone: {fileID: 0}
+  tower: {fileID: 0}
   driveToxicGasCentrally: 1
   toxicGasPeriodSeconds: 60
---- !u!114 &2055405489
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2055405486}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  virtualCameraComponent: {fileID: 0}
-  boundsShapeObject: {fileID: 0}
 --- !u!4 &2055405488
 Transform:
   m_ObjectHideFlags: 0
@@ -1579,6 +1581,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2055405489
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2055405486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  virtualCameraComponent: {fileID: 0}
+  boundsShapeObject: {fileID: 0}
+  circleSegments: 64
 --- !u!1001 &5430933769718651287
 PrefabInstance:
   m_ObjectHideFlags: 0
