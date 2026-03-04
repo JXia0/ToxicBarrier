@@ -20,6 +20,12 @@ public class TowerAttackBehavior : MonoBehaviour
     private LineRenderer _lineRenderer;
     private float _laserHideTime;
 
+    [Header("Targeting")]
+    [Tooltip("若为 true，塔会锁定一个目标敌人，直到其死亡或离开攻击范围才重新选择。")]
+    [SerializeField] private bool lockTarget = true;
+
+    private Enemy _currentTarget;
+
     private void Awake()
     {
         _tower = GetComponent<Tower>();
@@ -51,28 +57,31 @@ public class TowerAttackBehavior : MonoBehaviour
         _attackCooldown -= Time.deltaTime;
         if (_attackCooldown > 0f) return;
 
-        Enemy target = FindNearestEnemyInRange();
+        Enemy target = GetTargetEnemy();
         if (target == null) return;
 
         DealDamage(target);
         _attackCooldown = 1f / Mathf.Max(0.001f, _health.Ats);
     }
 
-    private Enemy FindNearestEnemyInRange()
+    private Enemy GetTargetEnemy()
     {
         float range = _tower.AttackRange;
         if (range <= 0f) return null;
 
+        float rangeSqr = range * range;
+
+        // 若启用锁定并且当前目标仍在范围内且存活，则继续攻击同一目标
+        if (lockTarget && IsEnemyValidInRange(_currentTarget, rangeSqr))
+            return _currentTarget;
+
         Vector2 pos = transform.position;
         Enemy nearest = null;
-        float nearestSqr = range * range;
+        float nearestSqr = rangeSqr;
 
         foreach (Enemy e in FindObjectsOfType<Enemy>())
         {
-            if (e == null || !e.gameObject.activeInHierarchy) continue;
-
-            HealthSystem h = e.GetComponent<HealthSystem>();
-            if (h == null || h.CurrentHp <= 0f) continue;
+            if (!IsEnemyValidInRange(e, rangeSqr)) continue;
 
             float sqrDist = ((Vector2)e.transform.position - pos).sqrMagnitude;
             if (sqrDist <= nearestSqr)
@@ -82,7 +91,19 @@ public class TowerAttackBehavior : MonoBehaviour
             }
         }
 
+        _currentTarget = lockTarget ? nearest : null;
         return nearest;
+    }
+
+    private bool IsEnemyValidInRange(Enemy e, float rangeSqr)
+    {
+        if (e == null || !e.gameObject.activeInHierarchy) return false;
+
+        HealthSystem h = e.GetComponent<HealthSystem>();
+        if (h == null || h.CurrentHp <= 0f) return false;
+
+        float sqrDist = ((Vector2)e.transform.position - (Vector2)transform.position).sqrMagnitude;
+        return sqrDist <= rangeSqr;
     }
 
     private void DealDamage(Enemy target)

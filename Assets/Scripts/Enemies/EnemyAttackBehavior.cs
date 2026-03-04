@@ -1,8 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 敌人攻击逻辑。开局默认攻击塔；若角色在仇恨范围内则优先攻击角色。
-/// 一旦确认目标后不会更换（直到目标死亡），即使玩家进入仇恨范围也不会转火。
+/// 敌人攻击逻辑。开局默认攻击塔；若角色在仇恨范围内则优先攻击角色（可随时切换仇恨）。
 /// 靠近目标后按 ATS 造成 ATK 伤害。需要 Rigidbody2D 用于移动。
 /// </summary>
 [RequireComponent(typeof(Enemy))]
@@ -20,6 +19,12 @@ public class EnemyAttackBehavior : MonoBehaviour
     [Tooltip("角色在此范围内时，敌人优先攻击角色；否则默认攻击塔。")]
     [SerializeField] private float agroRange = 5f;
 
+    [Header("Debug Target Line")]
+    [Tooltip("是否用 LineRenderer 显示当期攻击目标（从怪物连到目标）。")]
+    [SerializeField] private bool showTargetLine = true;
+    [Tooltip("可选：指定用于绘制目标连线的 LineRenderer；留空则在运行时自动创建一个简单的。")]
+    [SerializeField] private LineRenderer lineRenderer;
+
     private HealthSystem _health;
     private Rigidbody2D _rb;
     private Transform _target;
@@ -29,6 +34,24 @@ public class EnemyAttackBehavior : MonoBehaviour
     {
         _health = GetComponent<HealthSystem>();
         _rb = GetComponent<Rigidbody2D>();
+
+        if (showTargetLine)
+        {
+            if (lineRenderer == null)
+                lineRenderer = GetComponent<LineRenderer>();
+
+            if (lineRenderer == null)
+            {
+                lineRenderer = gameObject.AddComponent<LineRenderer>();
+                lineRenderer.useWorldSpace = true;
+                lineRenderer.positionCount = 0;
+                lineRenderer.startWidth = 0.03f;
+                lineRenderer.endWidth = 0.03f;
+                lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+                lineRenderer.startColor = Color.red;
+                lineRenderer.endColor = Color.red;
+            }
+        }
     }
 
     private void Update()
@@ -67,6 +90,29 @@ public class EnemyAttackBehavior : MonoBehaviour
             if (_rb != null)
                 _rb.velocity = dir * GetMoveSpeed();
         }
+
+        UpdateTargetLine();
+    }
+
+    private void UpdateTargetLine()
+    {
+        if (!showTargetLine || lineRenderer == null)
+            return;
+
+        if (_target == null || !_target.gameObject.activeInHierarchy)
+        {
+            if (lineRenderer.enabled)
+            {
+                lineRenderer.positionCount = 0;
+                lineRenderer.enabled = false;
+            }
+            return;
+        }
+
+        lineRenderer.enabled = true;
+        lineRenderer.positionCount = 2;
+        lineRenderer.SetPosition(0, transform.position);
+        lineRenderer.SetPosition(1, _target.position);
     }
 
     /// <summary> 怪物移速 = 玩家移速 × 1/2；无玩家时用 baseMoveSpeed。 </summary>
@@ -82,14 +128,9 @@ public class EnemyAttackBehavior : MonoBehaviour
 
     private void UpdateTarget()
     {
-        // 已有目标且仍有效时，不更换目标（无论玩家是否进入仇恨范围）。
-        if (_target != null && IsTargetValid(_target))
-            return;
-
-        _target = null;
         Vector2 pos = transform.position;
 
-        // 默认攻塔；若角色在仇恨范围内则优先攻击角色。
+        // 默认攻塔；若角色在仇恨范围内则优先攻击角色（每帧可重新判定目标）。
         Transform playerInRange = GetPlayerInAgroRange(pos);
         if (playerInRange != null)
         {
@@ -103,15 +144,8 @@ public class EnemyAttackBehavior : MonoBehaviour
             _target = tower.transform;
             return;
         }
-    }
 
-    private bool IsTargetValid(Transform t)
-    {
-        if (t == null || !t.gameObject.activeInHierarchy) return false;
-
-        HealthSystem h = t.GetComponent<HealthSystem>();
-        if (h == null) return true;
-        return h.CurrentHp > 0f;
+        _target = null;
     }
 
     /// <summary> 若角色在仇恨范围内且存活，返回玩家 Transform；否则 null。 </summary>

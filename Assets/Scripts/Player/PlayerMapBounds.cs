@@ -27,7 +27,5 @@ public class PlayerMapBounds : MonoBehaviour
 
         Vector2 clamped = center + (pos - center).normalized * maxR;
         transform.position = new Vector3(clamped.x, clamped.y, transform.position.z);
-        if (_rb != null)
-            _rb.velocity = Vector2.zero;
     }
 }
