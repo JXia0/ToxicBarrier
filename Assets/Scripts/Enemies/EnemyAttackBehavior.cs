@@ -20,9 +20,9 @@ public class EnemyAttackBehavior : MonoBehaviour
     [SerializeField] private float agroRange = 5f;
 
     [Header("Debug Target Line")]
-    [Tooltip("是否用 LineRenderer 显示当期攻击目标（从怪物连到目标）。")]
-    [SerializeField] private bool showTargetLine = true;
-    [Tooltip("可选：指定用于绘制目标连线的 LineRenderer；留空则在运行时自动创建一个简单的。")]
+    [Tooltip("敌人目标连线已禁用；保留字段仅为兼容已有 Prefab。")]
+    [SerializeField] private bool showTargetLine = false;
+    [Tooltip("敌人目标连线已禁用；保留字段仅为兼容已有 Prefab。")]
     [SerializeField] private LineRenderer lineRenderer;
 
     private HealthSystem _health;
@@ -35,22 +35,13 @@ public class EnemyAttackBehavior : MonoBehaviour
         _health = GetComponent<HealthSystem>();
         _rb = GetComponent<Rigidbody2D>();
 
-        if (showTargetLine)
+        // 强制禁用敌人目标连线：不再创建也不再显示。
+        if (lineRenderer == null)
+            lineRenderer = GetComponent<LineRenderer>();
+        if (lineRenderer != null)
         {
-            if (lineRenderer == null)
-                lineRenderer = GetComponent<LineRenderer>();
-
-            if (lineRenderer == null)
-            {
-                lineRenderer = gameObject.AddComponent<LineRenderer>();
-                lineRenderer.useWorldSpace = true;
-                lineRenderer.positionCount = 0;
-                lineRenderer.startWidth = 0.03f;
-                lineRenderer.endWidth = 0.03f;
-                lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-                lineRenderer.startColor = Color.red;
-                lineRenderer.endColor = Color.red;
-            }
+            lineRenderer.positionCount = 0;
+            lineRenderer.enabled = false;
         }
     }
 
@@ -91,28 +82,17 @@ public class EnemyAttackBehavior : MonoBehaviour
                 _rb.velocity = dir * GetMoveSpeed();
         }
 
-        UpdateTargetLine();
+        // 敌人目标连线功能已禁用（只保留塔的红线）。
     }
 
     private void UpdateTargetLine()
     {
-        if (!showTargetLine || lineRenderer == null)
-            return;
-
-        if (_target == null || !_target.gameObject.activeInHierarchy)
+        // 已停用：保留方法签名避免影响外部引用。
+        if (lineRenderer != null)
         {
-            if (lineRenderer.enabled)
-            {
-                lineRenderer.positionCount = 0;
-                lineRenderer.enabled = false;
-            }
-            return;
+            lineRenderer.positionCount = 0;
+            lineRenderer.enabled = false;
         }
-
-        lineRenderer.enabled = true;
-        lineRenderer.positionCount = 2;
-        lineRenderer.SetPosition(0, transform.position);
-        lineRenderer.SetPosition(1, _target.position);
     }
 
     /// <summary> 怪物移速 = 玩家移速 × 1/2；无玩家时用 baseMoveSpeed。 </summary>

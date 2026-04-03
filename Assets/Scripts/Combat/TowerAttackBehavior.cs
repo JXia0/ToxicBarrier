@@ -8,17 +8,26 @@ using UnityEngine;
 [RequireComponent(typeof(HealthSystem))]
 public class TowerAttackBehavior : MonoBehaviour
 {
-    [Header("Laser (LineRenderer)")]
-    [SerializeField] private float laserDisplayDuration = 0.08f;
-    [SerializeField] private float laserStartWidth = 0.15f;
-    [SerializeField] private float laserEndWidth = 0.05f;
-    [SerializeField] private Color laserColor = new Color(1f, 0.3f, 0.2f, 0.9f);
+    [Header("Attack Flash Line (Black)")]
+    [SerializeField] private float attackLineDisplayDuration = 0.08f;
+    [SerializeField] private float attackLineStartWidth = 0.15f;
+    [SerializeField] private float attackLineEndWidth = 0.05f;
+    [SerializeField] private Color attackLineColor = new Color(0f, 0f, 0f, 0.9f);
+    [SerializeField] private int attackLineSortingOrder = 5;
+    [SerializeField] private LineRenderer attackLineRenderer;
+
+    [Header("Lock Target Line (Red)")]
+    [SerializeField] private bool showLockTargetLine = true;
+    [SerializeField] private float lockLineStartWidth = 0.03f;
+    [SerializeField] private float lockLineEndWidth = 0.015f;
+    [SerializeField] private Color lockLineColor = new Color(1f, 0.2f, 0.2f, 0.9f);
+    [SerializeField] private int lockLineSortingOrder = 10;
+    [SerializeField] private LineRenderer lockLineRenderer;
 
     private Tower _tower;
     private HealthSystem _health;
     private float _attackCooldown;
-    private LineRenderer _lineRenderer;
-    private float _laserHideTime;
+    private float _attackLineHideTime;
 
     [Header("Targeting")]
     [Tooltip("若为 true，塔会锁定一个目标敌人，直到其死亡或离开攻击范围才重新选择。")]
@@ -31,36 +40,49 @@ public class TowerAttackBehavior : MonoBehaviour
         _tower = GetComponent<Tower>();
         _health = GetComponent<HealthSystem>();
 
-        _lineRenderer = GetComponent<LineRenderer>();
-        if (_lineRenderer == null)
-            _lineRenderer = gameObject.AddComponent<LineRenderer>();
+        if (attackLineRenderer == null)
+            attackLineRenderer = GetComponent<LineRenderer>();
+        if (attackLineRenderer == null)
+            attackLineRenderer = gameObject.AddComponent<LineRenderer>();
 
-        _lineRenderer.enabled = false;
-        _lineRenderer.useWorldSpace = true;
-        _lineRenderer.positionCount = 2;
-        _lineRenderer.startWidth = laserStartWidth;
-        _lineRenderer.endWidth = laserEndWidth;
+        if (showLockTargetLine && lockLineRenderer == null)
+        {
+            GameObject lockLineObject = new GameObject("TowerLockTargetLine");
+            lockLineObject.transform.SetParent(transform, false);
+            lockLineRenderer = lockLineObject.AddComponent<LineRenderer>();
+        }
+        else if (lockLineRenderer == attackLineRenderer)
+        {
+            // 防止两条线意外引用同一个 LineRenderer，导致颜色/宽度完全一致。
+            GameObject lockLineObject = new GameObject("TowerLockTargetLine");
+            lockLineObject.transform.SetParent(transform, false);
+            lockLineRenderer = lockLineObject.AddComponent<LineRenderer>();
+        }
+
         Shader lineShader = Shader.Find("Sprites/Default");
-        if (lineShader != null && _lineRenderer.material == null)
-            _lineRenderer.material = new Material(lineShader);
-        _lineRenderer.startColor = laserColor;
-        _lineRenderer.endColor = new Color(laserColor.r, laserColor.g, laserColor.b, 0.4f);
+        SetupLineRenderer(attackLineRenderer, attackLineStartWidth, attackLineEndWidth, attackLineColor, lineShader, attackLineSortingOrder);
+        if (lockLineRenderer != null)
+            SetupLineRenderer(lockLineRenderer, lockLineStartWidth, lockLineEndWidth, lockLineColor, lineShader, lockLineSortingOrder);
     }
 
     private void Update()
     {
-        if (_tower == null || _health == null || _health.CurrentHp <= 0f) return;
+        if (_tower == null || _health == null || _health.CurrentHp <= 0f)
+        {
+            DisableAllLines();
+            return;
+        }
 
-        if (_lineRenderer != null && _lineRenderer.enabled && Time.time >= _laserHideTime)
-            _lineRenderer.enabled = false;
+        Enemy target = GetTargetEnemy();
+        UpdateLockTargetLine(target);
+        HideAttackLineIfNeeded();
 
         _attackCooldown -= Time.deltaTime;
         if (_attackCooldown > 0f) return;
-
-        Enemy target = GetTargetEnemy();
         if (target == null) return;
 
         DealDamage(target);
+        ShowAttackFlashLine(target);
         _attackCooldown = 1f / Mathf.Max(0.001f, _health.Ats);
     }
 
@@ -114,15 +136,57 @@ public class TowerAttackBehavior : MonoBehaviour
 
         float damage = _health.Atk;
         targetHealth.TakeDamage(damage, gameObject);
+    }
 
-        if (_lineRenderer != null)
-        {
-            Vector3 start = transform.position;
-            Vector3 end = target.transform.position;
-            _lineRenderer.SetPosition(0, start);
-            _lineRenderer.SetPosition(1, end);
-            _lineRenderer.enabled = true;
-            _laserHideTime = Time.time + laserDisplayDuration;
-        }
+    private void SetupLineRenderer(LineRenderer lr, float startWidth, float endWidth, Color color, Shader lineShader, int sortingOrder)
+    {
+        if (lr == null) return;
+        lr.enabled = false;
+        lr.useWorldSpace = true;
+        lr.positionCount = 2;
+        lr.startWidth = startWidth;
+        lr.endWidth = endWidth;
+        if (lineShader != null)
+            lr.material = new Material(lineShader);
+        if (lr.material != null)
+            lr.material.color = Color.white;
+        lr.sortingOrder = sortingOrder;
+        lr.startColor = color;
+        lr.endColor = new Color(color.r, color.g, color.b, 0.4f);
+    }
+
+    private void ShowAttackFlashLine(Enemy target)
+    {
+        if (attackLineRenderer == null || target == null) return;
+        attackLineRenderer.SetPosition(0, transform.position);
+        attackLineRenderer.SetPosition(1, target.transform.position);
+        attackLineRenderer.enabled = true;
+        _attackLineHideTime = Time.time + attackLineDisplayDuration;
+    }
+
+    private void HideAttackLineIfNeeded()
+    {
+        if (attackLineRenderer != null && attackLineRenderer.enabled && Time.time >= _attackLineHideTime)
+            attackLineRenderer.enabled = false;
+    }
+
+    private void UpdateLockTargetLine(Enemy target)
+    {
+        if (!showLockTargetLine || lockLineRenderer == null) return;
+
+        bool hasTarget = target != null;
+        lockLineRenderer.enabled = hasTarget;
+        if (!hasTarget) return;
+
+        lockLineRenderer.SetPosition(0, transform.position);
+        lockLineRenderer.SetPosition(1, target.transform.position);
+    }
+
+    private void DisableAllLines()
+    {
+        if (attackLineRenderer != null)
+            attackLineRenderer.enabled = false;
+        if (lockLineRenderer != null)
+            lockLineRenderer.enabled = false;
     }
 }
