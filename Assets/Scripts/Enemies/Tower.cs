@@ -50,6 +50,14 @@ public class Tower : MonoBehaviour
     [Tooltip("When player is within this distance and has enough resources, tower upgrades once per approach.")]
     [SerializeField] private float upgradeTriggerRadius = 2f;
 
+    [Header("Tower sprites by level")]
+    [Tooltip("Level 1 sprite (tower).")]
+    [SerializeField] private Sprite level1Sprite;
+    [Tooltip("Level 2 sprite (tower2).")]
+    [SerializeField] private Sprite level2Sprite;
+    [Tooltip("Level 3 sprite (tower3).")]
+    [SerializeField] private Sprite level3Sprite;
+
     [Header("Map (central tower)")]
     [Tooltip("If true, position at map center on Start.")]
     [SerializeField] private bool placeAtMapCenter = true;
@@ -59,6 +67,7 @@ public class Tower : MonoBehaviour
     [SerializeField] private float manualAttackRange = 2.5f;
 
     private HealthSystem _health;
+    private SpriteRenderer _spriteRenderer;
     private bool _playerWasInUpgradeRange;
 
     /// <summary> 攻击范围（Map 1 半径一半或 manualAttackRange）. 供攻击逻辑使用。 </summary>
@@ -73,11 +82,13 @@ public class Tower : MonoBehaviour
     private void Awake()
     {
         _health = GetComponent<HealthSystem>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Start()
     {
         ApplyLevelStats();
+        ApplyLevelSprite();
 
         if (MapController.Instance != null)
         {
@@ -143,6 +154,28 @@ public class Tower : MonoBehaviour
             _health.SetStats(s.atk, s.ats, s.hp);
     }
 
+    private void ApplyLevelSprite()
+    {
+        if (_spriteRenderer == null) return;
+
+        Sprite target = null;
+        switch (currentLevel)
+        {
+            case 1:
+                target = level1Sprite;
+                break;
+            case 2:
+                target = level2Sprite;
+                break;
+            case 3:
+                target = level3Sprite;
+                break;
+        }
+
+        if (target != null)
+            _spriteRenderer.sprite = target;
+    }
+
     private TowerLevelStats GetLevelStats(int level)
     {
         int index = Mathf.Clamp(level, 0, 3);
@@ -156,6 +189,7 @@ public class Tower : MonoBehaviour
     {
         currentLevel = Mathf.Clamp(level, 0, 3);
         ApplyLevelStats();
+        ApplyLevelSprite();
     }
 
     /// <summary> 升到某一级所需资源。targetLevel 为 1、2、3；0 为初始无升级。 </summary>

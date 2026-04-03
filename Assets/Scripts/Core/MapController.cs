@@ -8,6 +8,12 @@ public class MapController : MonoBehaviour
 {
     public static MapController Instance { get; private set; }
 
+    /// <summary>
+    /// Fired when CurrentMapId changes. Args: previousMapId, newMapId.
+    /// Kept here so other systems (e.g. wave spawner) can react without MapZone coupling.
+    /// </summary>
+    public event System.Action<int, int> OnMapIdChanged;
+
     [Header("Player")]
     [SerializeField] private PlayerController playerController;
     [SerializeField] private HealthSystem playerHealth;
@@ -74,7 +80,12 @@ public class MapController : MonoBehaviour
     // —— Map ID (for LootManager environmental spawns) ——
     public void SetMapId(int mapId)
     {
-        currentMapId = Mathf.Max(1, mapId);
+        int next = Mathf.Max(1, mapId);
+        if (next == currentMapId) return;
+
+        int prev = currentMapId;
+        currentMapId = next;
+        OnMapIdChanged?.Invoke(prev, currentMapId);
     }
 
     public int GetMapId() => currentMapId;
