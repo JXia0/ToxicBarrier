@@ -602,6 +602,13 @@ MonoBehaviour:
   bugPrefab: {fileID: 2160710590865165501, guid: e0dcda9373df1f343b404b5469aed9af, type: 3}
   leaderPrefab: {fileID: 793480216881341300, guid: c313524598815ad40aba778c73c606b1, type: 3}
   bossPrefab: {fileID: 680548063062773762, guid: e43f9b57cb82e104291cc9babdcf993e, type: 3}
+  spawnMode: 1
+  waveConfigSelector: {fileID: 1945138769}
+  overrideLevelWaves: {fileID: 0}
+  restartOnWaveConfigChanged: 1
+  loopConfiguredWaves: 0
+  easyWaveCount: 3
+  normalWaveCount: 6
   bugWeight: 0.7
   leaderWeight: 0.25
   bossWeight: 0.05
@@ -661,6 +668,13 @@ MonoBehaviour:
   bugPrefab: {fileID: 2160710590865165501, guid: e0dcda9373df1f343b404b5469aed9af, type: 3}
   leaderPrefab: {fileID: 793480216881341300, guid: c313524598815ad40aba778c73c606b1, type: 3}
   bossPrefab: {fileID: 680548063062773762, guid: e43f9b57cb82e104291cc9babdcf993e, type: 3}
+  spawnMode: 1
+  waveConfigSelector: {fileID: 1945138769}
+  overrideLevelWaves: {fileID: 0}
+  restartOnWaveConfigChanged: 1
+  loopConfiguredWaves: 0
+  easyWaveCount: 3
+  normalWaveCount: 6
   bugWeight: 0.7
   leaderWeight: 0.25
   bossWeight: 0.05
@@ -1037,6 +1051,9 @@ MonoBehaviour:
     gel: 95
     teeth: 50
   upgradeTriggerRadius: 2
+  level1Sprite: {fileID: 0}
+  level2Sprite: {fileID: 0}
+  level3Sprite: {fileID: 0}
   placeAtMapCenter: 1
   attackRangeFromMap1Half: 1
   manualAttackRange: 2.5
@@ -1129,7 +1146,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 953627943}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1148,10 +1165,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7686d3f068adfc8439fce91c1b06f54c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  laserDisplayDuration: 0.08
-  laserStartWidth: 0.15
-  laserEndWidth: 0.05
-  laserColor: {r: 1, g: 0.3, b: 0.2, a: 0.9}
+  attackLineDisplayDuration: 0.08
+  attackLineStartWidth: 0.15
+  attackLineEndWidth: 0.05
+  attackLineColor: {r: 0, g: 0, b: 0, a: 0.9}
+  attackLineSortingOrder: 5
+  attackLineRenderer: {fileID: 0}
+  showLockTargetLine: 1
+  lockLineStartWidth: 0.03
+  lockLineEndWidth: 0.015
+  lockLineColor: {r: 1, g: 0.2, b: 0.2, a: 0.9}
+  lockLineSortingOrder: 10
+  lockLineRenderer: {fileID: 0}
   lockTarget: 1
 --- !u!1 &1086416031
 GameObject:
@@ -1429,6 +1454,13 @@ MonoBehaviour:
   bugPrefab: {fileID: 2160710590865165501, guid: e0dcda9373df1f343b404b5469aed9af, type: 3}
   leaderPrefab: {fileID: 793480216881341300, guid: c313524598815ad40aba778c73c606b1, type: 3}
   bossPrefab: {fileID: 680548063062773762, guid: e43f9b57cb82e104291cc9babdcf993e, type: 3}
+  spawnMode: 1
+  waveConfigSelector: {fileID: 1945138769}
+  overrideLevelWaves: {fileID: 0}
+  restartOnWaveConfigChanged: 1
+  loopConfiguredWaves: 0
+  easyWaveCount: 3
+  normalWaveCount: 6
   bugWeight: 0.7
   leaderWeight: 0.25
   bossWeight: 0.05
@@ -1447,6 +1479,52 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -8.153271, y: 3.2715442, z: -0.07508512}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1945138768
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1945138770}
+  - component: {fileID: 1945138769}
+  m_Layer: 0
+  m_Name: MapWaveConfigSelector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1945138769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1945138768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb4cc0ce292ce544aba9d059e687ed8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelConfigs: []
+  logSelection: 0
+--- !u!4 &1945138770
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1945138768}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.8752668, y: -0.51882595, z: -0.10833776}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1682,3 +1760,4 @@ SceneRoots:
   - {fileID: 504954042}
   - {fileID: 1912571414}
   - {fileID: 1086416033}
+  - {fileID: 1945138770}
