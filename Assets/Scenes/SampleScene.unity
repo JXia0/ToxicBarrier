@@ -222,12 +222,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56ab198cda0d7e34b9e7ad25ab278592, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapId: 1
+  mapLevel: 1
   innerZone: {fileID: 0}
   innerRadius: 0
   radius: 5
   useColliderForOuterRadius: 1
-  playerTag: Player
   fogOverlay: {fileID: 0}
   fogColor: {r: 0.1, g: 0.1, b: 0.15, a: 0.85}
   hideMapVisualWhenLocked: 1
@@ -245,13 +244,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapZone: {fileID: 14555992}
-  spawnAreaMin: {x: -10, y: -10}
-  spawnAreaMax: {x: 10, y: 10}
   spawnCount: 40
   spawnIntervalSeconds: 5
   resourceFilter: 0
   minDistanceBetween: 0.5
-  mapController: {fileID: 0}
   lootManager: {fileID: 1263805882}
 --- !u!58 &14555994
 CircleCollider2D:
@@ -400,14 +396,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56ab198cda0d7e34b9e7ad25ab278592, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapId: 2
+  mapLevel: 2
   innerZone: {fileID: 14555992}
   innerRadius: 0
   radius: 5
   useColliderForOuterRadius: 1
-  playerTag: Player
   fogOverlay: {fileID: 0}
-  fogColor: {r: 0.1, g: 0.1, b: 0.15, a: 0.85}
+  fogColor: {r: 1, g: 1, b: 1, a: 0.03137255}
   hideMapVisualWhenLocked: 1
   contentRootToHideWhenLocked: {fileID: 0}
 --- !u!114 &103427036
@@ -423,13 +418,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapZone: {fileID: 103427035}
-  spawnAreaMin: {x: -10, y: -10}
-  spawnAreaMax: {x: 10, y: 10}
   spawnCount: 40
   spawnIntervalSeconds: 5
   resourceFilter: 0
   minDistanceBetween: 0.5
-  mapController: {fileID: 0}
   lootManager: {fileID: 1263805882}
 --- !u!58 &103427037
 CircleCollider2D:
@@ -596,25 +588,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapZone: {fileID: 14555992}
-  spawnAreaMin: {x: -10, y: -10}
-  spawnAreaMax: {x: 10, y: 10}
   towerToExclude: {fileID: 0}
   bugPrefab: {fileID: 2160710590865165501, guid: e0dcda9373df1f343b404b5469aed9af, type: 3}
   leaderPrefab: {fileID: 793480216881341300, guid: c313524598815ad40aba778c73c606b1, type: 3}
   bossPrefab: {fileID: 680548063062773762, guid: e43f9b57cb82e104291cc9babdcf993e, type: 3}
-  spawnMode: 1
-  waveConfigSelector: {fileID: 1945138769}
-  overrideLevelWaves: {fileID: 0}
-  restartOnWaveConfigChanged: 1
-  loopConfiguredWaves: 0
-  easyWaveCount: 3
-  normalWaveCount: 6
-  bugWeight: 0.7
-  leaderWeight: 0.25
-  bossWeight: 0.05
-  spawnCount: 10
+  levelWaves: {fileID: 11400000, guid: 7af59ec3de103ce48993e576025cb96f, type: 2}
+  loopWaves: 0
+  leaderStartWave: 3
+  bossStartWave: 6
+  bugCost: 50
+  leaderCost: 120
+  bossCost: 320
   spawnIntervalSeconds: 0.8
-  continuousWaves: 0
   minDistanceBetween: 1
   drawGizmos: 1
 --- !u!4 &358622608
@@ -648,7 +633,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &504954041
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -662,25 +647,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapZone: {fileID: 103427035}
-  spawnAreaMin: {x: -10, y: -10}
-  spawnAreaMax: {x: 10, y: 10}
   towerToExclude: {fileID: 0}
   bugPrefab: {fileID: 2160710590865165501, guid: e0dcda9373df1f343b404b5469aed9af, type: 3}
   leaderPrefab: {fileID: 793480216881341300, guid: c313524598815ad40aba778c73c606b1, type: 3}
   bossPrefab: {fileID: 680548063062773762, guid: e43f9b57cb82e104291cc9babdcf993e, type: 3}
-  spawnMode: 1
-  waveConfigSelector: {fileID: 1945138769}
-  overrideLevelWaves: {fileID: 0}
-  restartOnWaveConfigChanged: 1
-  loopConfiguredWaves: 0
-  easyWaveCount: 3
-  normalWaveCount: 6
-  bugWeight: 0.7
-  leaderWeight: 0.25
-  bossWeight: 0.05
-  spawnCount: 10
+  levelWaves: {fileID: 11400000, guid: ecf1c49a43dc8ee459788de0973302b1, type: 2}
+  loopWaves: 0
+  leaderStartWave: 3
+  bossStartWave: 6
+  bugCost: 50
+  leaderCost: 120
+  bossCost: 320
   spawnIntervalSeconds: 0.8
-  continuousWaves: 0
   minDistanceBetween: 1
   drawGizmos: 1
 --- !u!4 &504954042
@@ -760,7 +738,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 3.8
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -785,7 +763,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.53852, y: -1.6954387, z: -10}
+  m_LocalPosition: {x: -2.62, y: -1.329, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -925,12 +903,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56ab198cda0d7e34b9e7ad25ab278592, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapId: 3
+  mapLevel: 3
   innerZone: {fileID: 103427035}
   innerRadius: 0
   radius: 5
   useColliderForOuterRadius: 1
-  playerTag: Player
   fogOverlay: {fileID: 0}
   fogColor: {r: 0.1, g: 0.1, b: 0.15, a: 0.85}
   hideMapVisualWhenLocked: 1
@@ -948,13 +925,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapZone: {fileID: 754029412}
-  spawnAreaMin: {x: -10, y: -10}
-  spawnAreaMax: {x: 10, y: 10}
   spawnCount: 40
   spawnIntervalSeconds: 5
   resourceFilter: 0
   minDistanceBetween: 0.5
-  mapController: {fileID: 0}
   lootManager: {fileID: 1263805882}
 --- !u!58 &754029414
 CircleCollider2D:
@@ -1023,19 +997,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52b8bfd6f5ca5cd408cf21923f33727e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelStats:
-  - atk: 50
-    ats: 2
-    hp: 1000
-  - atk: 150
-    ats: 4
-    hp: 2500
-  - atk: 500
-    ats: 8
-    hp: 5000
-  - atk: 750
-    ats: 12
-    hp: 8000
+  levelStats: []
   currentLevel: 0
   upgradeCosts:
   - wood: 30
@@ -1317,13 +1279,13 @@ MonoBehaviour:
     gelChance: 0.1
     teethChance: 0.6
   mapSpawnConfigs:
-  - mapId: 1
+  - mapLevel: 1
     woodRate: 0.8
     stoneRate: 0
-  - mapId: 2
+  - mapLevel: 2
     woodRate: 0.5
     stoneRate: 0.3
-  - mapId: 3
+  - mapLevel: 3
     woodRate: 0.2
     stoneRate: 0.6
   gelPrefab: {fileID: 7928149295920071784, guid: 65515283389f1d942bf54b229b69a2e5, type: 3}
@@ -1401,7 +1363,7 @@ MonoBehaviour:
   m_Follow: {fileID: 2052098703}
   m_Lens:
     FieldOfView: 60
-    OrthographicSize: 5
+    OrthographicSize: 3.8
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -1434,7 +1396,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1912571413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1448,25 +1410,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapZone: {fileID: 754029412}
-  spawnAreaMin: {x: -10, y: -10}
-  spawnAreaMax: {x: 10, y: 10}
   towerToExclude: {fileID: 0}
   bugPrefab: {fileID: 2160710590865165501, guid: e0dcda9373df1f343b404b5469aed9af, type: 3}
   leaderPrefab: {fileID: 793480216881341300, guid: c313524598815ad40aba778c73c606b1, type: 3}
   bossPrefab: {fileID: 680548063062773762, guid: e43f9b57cb82e104291cc9babdcf993e, type: 3}
-  spawnMode: 1
-  waveConfigSelector: {fileID: 1945138769}
-  overrideLevelWaves: {fileID: 0}
-  restartOnWaveConfigChanged: 1
-  loopConfiguredWaves: 0
-  easyWaveCount: 3
-  normalWaveCount: 6
-  bugWeight: 0.7
-  leaderWeight: 0.25
-  bossWeight: 0.05
-  spawnCount: 10
+  levelWaves: {fileID: 11400000, guid: 622e3969a317d8d49ada130f3bbc1aaf, type: 2}
+  loopWaves: 0
+  leaderStartWave: 3
+  bossStartWave: 6
+  bugCost: 50
+  leaderCost: 120
+  bossCost: 320
   spawnIntervalSeconds: 0.8
-  continuousWaves: 0
   minDistanceBetween: 1
   drawGizmos: 1
 --- !u!4 &1912571414
@@ -1479,52 +1434,6 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -8.153271, y: 3.2715442, z: -0.07508512}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1945138768
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1945138770}
-  - component: {fileID: 1945138769}
-  m_Layer: 0
-  m_Name: MapWaveConfigSelector
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1945138769
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1945138768}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb4cc0ce292ce544aba9d059e687ed8f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  levelConfigs: []
-  logSelection: 0
---- !u!4 &1945138770
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1945138768}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.8752668, y: -0.51882595, z: -0.10833776}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1635,13 +1544,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerController: {fileID: 2052098700}
   playerHealth: {fileID: 2052098699}
-  lootManager: {fileID: 1263805882}
-  mapScale: {fileID: 0}
-  currentMapId: 1
   map1Zone: {fileID: 14555992}
-  map2Zone: {fileID: 0}
-  map3Zone: {fileID: 0}
-  tower: {fileID: 0}
+  map2Zone: {fileID: 103427035}
+  map3Zone: {fileID: 754029412}
+  tower: {fileID: 953627944}
   driveToxicGasCentrally: 1
   toxicGasPeriodSeconds: 60
 --- !u!4 &2055405488
@@ -1692,11 +1598,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4730358428299957265, guid: be34b45c25dc7274b866d768d7fa546b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.53852
+      value: -2.62
       objectReference: {fileID: 0}
     - target: {fileID: 4730358428299957265, guid: be34b45c25dc7274b866d768d7fa546b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.6954387
+      value: -1.329
       objectReference: {fileID: 0}
     - target: {fileID: 4730358428299957265, guid: be34b45c25dc7274b866d768d7fa546b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1760,4 +1666,3 @@ SceneRoots:
   - {fileID: 504954042}
   - {fileID: 1912571414}
   - {fileID: 1086416033}
-  - {fileID: 1945138770}

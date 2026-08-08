@@ -13,12 +13,12 @@ You are in the **Map Control** tab. Your responsibility is limited to map-relate
 
 ## You OWN and may freely change
 - `Assets/Scripts/Core/MapController.cs`
-- `Assets/Scripts/Map/` (MapZone, EnvironmentalResourceSpawner, MapScale, MAP_CONTROL_SCOPE.md)
+- `Assets/Scripts/Map/` (MapZone, EnvironmentalResourceSpawner, MAP_CONTROL_SCOPE.md)
 
 ## You do NOT own (other tabs)
 - **Loot/drops**: LootManager, ResourcePickup, drop rates, RollEnemyLoot
 - **Monster spawn**: Enemy spawning, waves, spawn points
-- **Player**: PlayerController, PlayerMovement, input
+- **Player**: PlayerController, input
 - **Health**: HealthSystem, toxic gas formula, healing, death flow
 - **Towers/combat**: Tower, aggro, combat
 

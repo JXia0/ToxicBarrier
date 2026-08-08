@@ -172,8 +172,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49e46f52a4d0b6d4aacc9d6b303995a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
   inputDeadZone: 0.1
+  map1Radius: 12.5
+  map2Radius: 22.5
+  map1MoveSpeed: 2.0833
+  map2MoveSpeed: 1.1765
+  map3MoveSpeed: 0.9615
 --- !u!114 &699895196781327770
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -230,4 +234,4 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:

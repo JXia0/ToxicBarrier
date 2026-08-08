@@ -12,49 +12,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c5a63a95d8fc00439a42a62b738c3b9, type: 3}
   m_Name: LevelWaves_Map3
   m_EditorClassIdentifier: 
-  mapId: 3
-  enemyTypes:
-  - {fileID: 11400000, guid: a92a1cc84cbcc634ca2b974bc0cd9cc4, type: 2}
-  - {fileID: 11400000, guid: 47747d1f66384e74f995227dbb6b9244, type: 2}
-  - {fileID: 11400000, guid: 1bf19aec6bbecf64faabbec33cc315a4, type: 2}
   waves:
   - budget: 500
     minDelayBeforeNext: 4
     maxDelayBeforeNext: 10
     minRemainingEnemiesToSpeedUp: 2
-    laneBalanceStrength: 0.5
   - budget: 680
     minDelayBeforeNext: 4
     maxDelayBeforeNext: 11
     minRemainingEnemiesToSpeedUp: 2
-    laneBalanceStrength: 0.5
   - budget: 860
     minDelayBeforeNext: 4.5
     maxDelayBeforeNext: 12
     minRemainingEnemiesToSpeedUp: 2
-    laneBalanceStrength: 0.5
   - budget: 1080
     minDelayBeforeNext: 5
     maxDelayBeforeNext: 13
     minRemainingEnemiesToSpeedUp: 2
-    laneBalanceStrength: 0.5
   - budget: 1320
     minDelayBeforeNext: 5
     maxDelayBeforeNext: 14
     minRemainingEnemiesToSpeedUp: 3
-    laneBalanceStrength: 0.5
   - budget: 1620
     minDelayBeforeNext: 5.5
     maxDelayBeforeNext: 15
     minRemainingEnemiesToSpeedUp: 3
-    laneBalanceStrength: 0.5
   - budget: 1960
     minDelayBeforeNext: 5.5
     maxDelayBeforeNext: 16
     minRemainingEnemiesToSpeedUp: 3
-    laneBalanceStrength: 0.5
   - budget: 2360
     minDelayBeforeNext: 6
     maxDelayBeforeNext: 17
     minRemainingEnemiesToSpeedUp: 4
-    laneBalanceStrength: 0.5

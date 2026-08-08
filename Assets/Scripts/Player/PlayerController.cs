@@ -10,8 +10,19 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float inputDeadZone = 0.1f;
+
+    [Header("Movement speed by map ring")]
+    [Tooltip("Current scene: Map 1 outer radius.")]
+    [SerializeField] private float map1Radius = 12.5f;
+    [Tooltip("Current scene: Map 2 outer radius.")]
+    [SerializeField] private float map2Radius = 22.5f;
+    [Tooltip("12.5 units in 6 seconds.")]
+    [SerializeField] private float map1MoveSpeed = 2.0833f;
+    [Tooltip("10 units in 8.5 seconds.")]
+    [SerializeField] private float map2MoveSpeed = 1.1765f;
+    [Tooltip("12.5 units in 13 seconds.")]
+    [SerializeField] private float map3MoveSpeed = 0.9615f;
 
     [Header("Rendering (crossing map edge)")]
     [Tooltip("Sorting order for player sprite so it stays in front of map zone sprites when crossing edges. Map zones use 0.")]
@@ -60,7 +71,7 @@ public class PlayerController : MonoBehaviour
         if (moveDir.sqrMagnitude > 1f)
             moveDir.Normalize();
 
-        _rb.velocity = moveDir * moveSpeed;
+        _rb.velocity = moveDir * GetMoveSpeed();
     }
 
     private void FaceMovementDirection()
@@ -81,11 +92,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void SetMoveSpeed(float speed)
+    public float GetMoveSpeed()
     {
-        if (speed < 0f) speed = 0f;
-        moveSpeed = speed;
+        float distanceFromCenter = ((Vector2)transform.position).magnitude;
+        if (distanceFromCenter <= map1Radius) return map1MoveSpeed;
+        if (distanceFromCenter <= map2Radius) return map2MoveSpeed;
+        return map3MoveSpeed;
     }
-
-    public float GetMoveSpeed() => moveSpeed;
 }

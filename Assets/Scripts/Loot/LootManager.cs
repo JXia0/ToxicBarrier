@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// Handles enemy loot drops (Gel, Teeth) and map-based environmental resource spawn rates.
-/// Rates are modular and editable in the Inspector. Use via MapController or LootManager.Instance.
+/// Rates are modular and editable in the Inspector. Use via LootManager.Instance.
 /// </summary>
 public class LootManager : MonoBehaviour
 {
@@ -18,9 +18,9 @@ public class LootManager : MonoBehaviour
     [Header("Map environmental spawn rates (0–1). Map 1: 0.8 Wood; Map 2: 0.5 Wood 0.3 Stone; Map 3: 0.2 Wood 0.6 Stone")]
     [SerializeField] private List<MapSpawnConfig> mapSpawnConfigs = new List<MapSpawnConfig>
     {
-        new MapSpawnConfig { mapId = 1, woodRate = 0.8f, stoneRate = 0f },
-        new MapSpawnConfig { mapId = 2, woodRate = 0.5f, stoneRate = 0.3f },
-        new MapSpawnConfig { mapId = 3, woodRate = 0.2f, stoneRate = 0.6f }
+        new MapSpawnConfig { mapLevel = 1, woodRate = 0.8f, stoneRate = 0f },
+        new MapSpawnConfig { mapLevel = 2, woodRate = 0.5f, stoneRate = 0.3f },
+        new MapSpawnConfig { mapLevel = 3, woodRate = 0.2f, stoneRate = 0.6f }
     };
 
     [Header("Drop prefabs (assign in Inspector)")]
@@ -42,7 +42,7 @@ public class LootManager : MonoBehaviour
     [Serializable]
     public struct MapSpawnConfig
     {
-        public int mapId;
+        public int mapLevel;
         [Range(0f, 1f)] public float woodRate;
         [Range(0f, 1f)] public float stoneRate;
     }
@@ -106,13 +106,13 @@ public class LootManager : MonoBehaviour
         }
     }
 
-    public void GetMapSpawnRates(int mapId, out float woodRate, out float stoneRate)
+    public void GetMapSpawnRates(int mapLevel, out float woodRate, out float stoneRate)
     {
         woodRate = 0f;
         stoneRate = 0f;
         foreach (var config in mapSpawnConfigs)
         {
-            if (config.mapId == mapId)
+            if (config.mapLevel == mapLevel)
             {
                 woodRate = config.woodRate;
                 stoneRate = config.stoneRate;
@@ -121,9 +121,9 @@ public class LootManager : MonoBehaviour
         }
     }
 
-    public void SpawnEnvironmentalResource(int mapId, Vector2 position)
+    public void SpawnEnvironmentalResource(int mapLevel, Vector2 position)
     {
-        GetMapSpawnRates(mapId, out float woodRate, out float stoneRate);
+        GetMapSpawnRates(mapLevel, out float woodRate, out float stoneRate);
         float r = UnityEngine.Random.value;
         if (r < woodRate)
             SpawnResource(ResourceType.Wood, position, addRandomOffset: false);
@@ -131,10 +131,4 @@ public class LootManager : MonoBehaviour
             SpawnResource(ResourceType.Stone, position, addRandomOffset: false);
     }
 
-    public MapSpawnConfig? GetMapConfig(int mapId)
-    {
-        foreach (var config in mapSpawnConfigs)
-            if (config.mapId == mapId) return config;
-        return null;
-    }
 }

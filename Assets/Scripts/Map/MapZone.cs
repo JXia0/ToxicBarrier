@@ -2,15 +2,14 @@ using UnityEngine;
 
 /// <summary>
 /// Attach to each of the three circle objects representing Map 1, Map 2, and Map 3.
-/// When the player enters the trigger, MapController's current map ID is set to this zone's ID (only if zone is unlocked).
 /// Map 2/3 show a fog overlay when locked (progressive unlock by Tower level). Use with EnvironmentalResourceSpawner for spawn rates.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class MapZone : MonoBehaviour
 {
-    [Header("Zone identity")]
-    [Tooltip("Map 1, 2, or 3. Drives spawn rates: Map 1 = 0.8 Wood; Map 2 = 0.5 Wood, 0.3 Stone; Map 3 = 0.2 Wood, 0.6 Stone.")]
-    [SerializeField] private int mapId = 1;
+    [Header("Map level")]
+    [Tooltip("1, 2, or 3. This also matches the Tower level required to unlock the ring.")]
+    [SerializeField] private int mapLevel = 1;
 
     [Header("Ring spawn area")]
     [Tooltip("If set, inner radius = this zone's outer radius. Use for concentric rings: Map 2 → Map 1, Map 3 → Map 2.")]
@@ -22,9 +21,6 @@ public class MapZone : MonoBehaviour
     [Tooltip("Use CircleCollider2D bounds for outer radius so it matches the visual circle.")]
     [SerializeField] private bool useColliderForOuterRadius = true;
 
-    [Header("Player detection")]
-    [SerializeField] private string playerTag = "Player";
-
     [Header("Fog of War (Map 2 & 3 when locked)")]
     [Tooltip("Optional. When locked, this overlay is shown (fog). Assign a child with SpriteRenderer; or leave empty to auto-create from this zone's sprite.")]
     [SerializeField] private GameObject fogOverlay;
@@ -35,10 +31,10 @@ public class MapZone : MonoBehaviour
     [Tooltip("Optional. When locked, this object (and its children) are disabled so no features (spawns, etc.) of the locked map are visible. Assign a child that contains spawners or content.")]
     [SerializeField] private GameObject contentRootToHideWhenLocked;
 
-    public int MapId => Mathf.Clamp(mapId, 1, 3);
+    public int MapLevel => mapLevel;
 
     /// <summary> True if this zone is unlocked (Map 1 always; Map 2/3 by Tower level). </summary>
-    public bool IsUnlocked => MapController.Instance != null && MapController.Instance.IsMapUnlocked(MapId);
+    public bool IsUnlocked => MapController.Instance.IsMapUnlocked(mapLevel);
 
     private void Start()
     {
@@ -88,18 +84,9 @@ public class MapZone : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (!IsPlayer(other)) return;
-        if (MapController.Instance == null) return;
-        if (!MapController.Instance.IsMapUnlocked(MapId)) return;
-
-        MapController.Instance.SetMapId(MapId);
-    }
-
     private void EnsureFogOverlay()
     {
-        if (mapId <= 1) return;
+        if (mapLevel <= 1) return;
         if (fogOverlay != null) return;
 
         Transform fogT = transform.Find("Fog");
@@ -126,7 +113,7 @@ public class MapZone : MonoBehaviour
 
     private void RefreshFogVisibility()
     {
-        if (mapId <= 1) return;
+        if (mapLevel <= 1) return;
 
         bool locked = !IsUnlocked;
 
@@ -142,23 +129,6 @@ public class MapZone : MonoBehaviour
 
         if (contentRootToHideWhenLocked != null && contentRootToHideWhenLocked.activeSelf == locked)
             contentRootToHideWhenLocked.SetActive(!locked);
-    }
-
-    private bool IsPlayer(Collider2D other)
-    {
-        if (!string.IsNullOrEmpty(playerTag) && other.CompareTag(playerTag))
-            return true;
-        if (other.GetComponent<PlayerController>() != null)
-            return true;
-        return false;
-    }
-
-    /// <summary> Legacy rect mode. Prefer GetRingParams for ring spawning. </summary>
-    public void GetSpawnArea(out Vector2 min, out Vector2 max)
-    {
-        Vector2 center = transform.position;
-        min = new Vector2(center.x - radius, center.y - radius);
-        max = new Vector2(center.x + radius, center.y + radius);
     }
 
     private void OnDrawGizmosSelected()

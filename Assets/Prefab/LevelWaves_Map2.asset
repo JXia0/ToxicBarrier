@@ -12,6 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c5a63a95d8fc00439a42a62b738c3b9, type: 3}
   m_Name: LevelWaves_Map2
   m_EditorClassIdentifier: 
-  mapId: 2
-  enemyTypes: []
   waves: []
