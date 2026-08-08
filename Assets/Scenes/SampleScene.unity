@@ -978,6 +978,7 @@ GameObject:
   - component: {fileID: 953627945}
   - component: {fileID: 953627944}
   - component: {fileID: 953627948}
+  - component: {fileID: 953627949}
   m_Layer: 0
   m_Name: Tower
   m_TagString: Untagged
@@ -997,7 +998,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52b8bfd6f5ca5cd408cf21923f33727e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelStats: []
+  levelStats:
+  - atk: 50
+    ats: 2
+    hp: 1000
+  - atk: 150
+    ats: 4
+    hp: 2500
+  - atk: 500
+    ats: 8
+    hp: 5000
+  - atk: 750
+    ats: 12
+    hp: 8000
   currentLevel: 0
   upgradeCosts:
   - wood: 30
@@ -1019,6 +1032,41 @@ MonoBehaviour:
   placeAtMapCenter: 1
   attackRangeFromMap1Half: 1
   manualAttackRange: 2.5
+--- !u!58 &953627949
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 953627943}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.6666667
 --- !u!114 &953627945
 MonoBehaviour:
   m_ObjectHideFlags: 0

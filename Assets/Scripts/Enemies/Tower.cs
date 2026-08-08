@@ -7,6 +7,7 @@ using UnityEngine;
 /// 等级 0–3 对应表格数值（ATK, ATS, HP）；DPS = ATK * ATS。
 /// </summary>
 [RequireComponent(typeof(HealthSystem))]
+[RequireComponent(typeof(CircleCollider2D))]
 public class Tower : MonoBehaviour
 {
     [Serializable]
@@ -46,8 +47,8 @@ public class Tower : MonoBehaviour
         new TowerUpgradeCost { wood = 15, stone = 30, gel = 95, teeth = 50 }  // → Level 3
     };
 
-    [Header("Auto upgrade (player near)")]
-    [Tooltip("When player is within this distance and has enough resources, tower upgrades once per approach.")]
+    [Header("Upgrade interaction")]
+    [Tooltip("World-space distance that shows the upgrade button.")]
     [SerializeField] private float upgradeTriggerRadius = 2f;
 
     [Header("Tower sprites by level")]
@@ -68,13 +69,18 @@ public class Tower : MonoBehaviour
 
     private HealthSystem _health;
     private SpriteRenderer _spriteRenderer;
-    private bool _playerWasInUpgradeRange;
+    private CircleCollider2D _upgradeTrigger;
+    private bool _playerInUpgradeRange;
+
+    public event Action<bool> OnUpgradeRangeChanged;
+    public event Action OnLevelChanged;
 
     /// <summary> 攻击范围（Map 1 半径一半或 manualAttackRange）. 供攻击逻辑使用。 </summary>
     public float AttackRange { get; private set; }
 
     /// <summary> 当前塔等级 (0–3). </summary>
     public int CurrentLevel => currentLevel;
+    public bool IsPlayerInUpgradeRange => _playerInUpgradeRange;
 
     /// <summary> 当前等级数值（ATK, ATS, HP）. 供攻击逻辑使用。 </summary>
     public TowerLevelStats CurrentStats => GetLevelStats(currentLevel);
@@ -83,6 +89,13 @@ public class Tower : MonoBehaviour
     {
         _health = GetComponent<HealthSystem>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
+
+        _upgradeTrigger = GetComponent<CircleCollider2D>();
+        if (_upgradeTrigger == null)
+            _upgradeTrigger = gameObject.AddComponent<CircleCollider2D>();
+
+        _upgradeTrigger.isTrigger = true;
+        _upgradeTrigger.radius = upgradeTriggerRadius / Mathf.Abs(transform.lossyScale.x);
     }
 
     private void Start()
@@ -104,54 +117,58 @@ public class Tower : MonoBehaviour
             AttackRange = manualAttackRange;
     }
 
-    private void Update()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        TryAutoUpgradeWhenPlayerNear();
+        if (other.GetComponentInParent<PlayerController>() != null)
+            SetPlayerInUpgradeRange(true);
     }
 
-    private void TryAutoUpgradeWhenPlayerNear()
+    private void OnTriggerExit2D(Collider2D other)
     {
-        if (currentLevel >= 3) return;
-        if (MapController.Instance == null) return;
+        if (other.GetComponentInParent<PlayerController>() != null)
+            SetPlayerInUpgradeRange(false);
+    }
 
-        Transform playerTransform = MapController.Instance.Player != null ? MapController.Instance.Player.transform : null;
-        if (playerTransform == null) return;
+    private void SetPlayerInUpgradeRange(bool inRange)
+    {
+        if (_playerInUpgradeRange == inRange) return;
+        _playerInUpgradeRange = inRange;
+        OnUpgradeRangeChanged?.Invoke(inRange);
+    }
 
-        float dist = Vector2.Distance(transform.position, playerTransform.position);
-        bool inRange = dist <= upgradeTriggerRadius;
-
-        if (!inRange)
-        {
-            _playerWasInUpgradeRange = false;
-            return;
-        }
-
-        if (_playerWasInUpgradeRange) return;
-        _playerWasInUpgradeRange = true;
-
-        PlayerInventory inventory = MapController.Instance.Player.GetComponent<PlayerInventory>();
-        if (inventory == null) return;
+    /// <summary>Checks and consumes materials only when the player presses the upgrade button.</summary>
+    public bool TryUpgrade(PlayerInventory inventory)
+    {
+        if (!_playerInUpgradeRange || currentLevel >= 3 || inventory == null)
+            return false;
 
         TowerUpgradeCost cost = GetUpgradeCostForNextLevel();
         if (inventory.GetCount(LootManager.ResourceType.Wood) < cost.wood ||
             inventory.GetCount(LootManager.ResourceType.Stone) < cost.stone ||
             inventory.GetCount(LootManager.ResourceType.Gel) < cost.gel ||
             inventory.GetCount(LootManager.ResourceType.Teeth) < cost.teeth)
-            return;
+            return false;
 
-        if (!inventory.TryConsume(LootManager.ResourceType.Wood, cost.wood)) return;
-        if (!inventory.TryConsume(LootManager.ResourceType.Stone, cost.stone)) return;
-        if (!inventory.TryConsume(LootManager.ResourceType.Gel, cost.gel)) return;
-        if (!inventory.TryConsume(LootManager.ResourceType.Teeth, cost.teeth)) return;
+        inventory.TryConsume(LootManager.ResourceType.Wood, cost.wood);
+        inventory.TryConsume(LootManager.ResourceType.Stone, cost.stone);
+        inventory.TryConsume(LootManager.ResourceType.Gel, cost.gel);
+        inventory.TryConsume(LootManager.ResourceType.Teeth, cost.teeth);
 
         SetLevel(currentLevel + 1);
+        return true;
     }
 
     private void ApplyLevelStats()
     {
         TowerLevelStats s = GetLevelStats(currentLevel);
         if (_health != null)
+        {
             _health.SetStats(s.atk, s.ats, s.hp);
+            _health.RestoreFullHealth();
+        }
+
+        if (MapController.Instance != null && MapController.Instance.PlayerHealth != null)
+            MapController.Instance.PlayerHealth.RestoreFullHealth();
     }
 
     private void ApplyLevelSprite()
@@ -187,9 +204,13 @@ public class Tower : MonoBehaviour
     /// <summary> 升级到指定等级并刷新 ATK/ATS/HP. </summary>
     public void SetLevel(int level)
     {
-        currentLevel = Mathf.Clamp(level, 0, 3);
+        int nextLevel = Mathf.Clamp(level, 0, 3);
+        if (nextLevel == currentLevel) return;
+
+        currentLevel = nextLevel;
         ApplyLevelStats();
         ApplyLevelSprite();
+        OnLevelChanged?.Invoke();
     }
 
     /// <summary> 升到某一级所需资源。targetLevel 为 1、2、3；0 为初始无升级。 </summary>
@@ -218,6 +239,7 @@ public class Tower : MonoBehaviour
     {
         if (_health != null)
             _health.OnDeath.RemoveListener(OnDeath);
+        SetPlayerInUpgradeRange(false);
     }
 
     private void OnDeath()

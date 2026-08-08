@@ -123,6 +123,13 @@ public class HealthSystem : MonoBehaviour
         OnHpChanged?.Invoke(_currentHp, maxHp);
     }
 
+    public void RestoreFullHealth()
+    {
+        _hasDied = false;
+        _currentHp = maxHp;
+        OnHpChanged?.Invoke(_currentHp, maxHp);
+    }
+
     public void SetToxicGasPeriodsElapsed(int periods)
     {
         _toxicGasPeriodsElapsed = Mathf.Max(0, periods);

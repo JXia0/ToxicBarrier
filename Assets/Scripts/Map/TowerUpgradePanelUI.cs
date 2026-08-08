@@ -1,63 +1,87 @@
-using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 /// <summary>
-/// 在屏幕上方居中显示：当前 Tower 等级 + 升到下一级所需资源。
-/// 使用 TextMesh Pro 显示文字。挂到任意物体上；若不指定引用，会在运行时自动查找 Tower 与 PlayerInventory。
+/// Shows the tower upgrade panel only while the player is inside the tower trigger.
+/// Materials are checked and consumed only when the upgrade button is pressed.
 /// </summary>
 public class TowerUpgradePanelUI : MonoBehaviour
 {
-    [Header("References (optional)")]
+    [Header("References")]
     [SerializeField] private Tower tower;
     [SerializeField] private PlayerInventory inventory;
 
-    [Header("Optional: existing UI")]
-    [Tooltip("若不指定，会在运行时自动创建上方居中的 Canvas 与面板。")]
+    [Header("Optional existing UI")]
     [SerializeField] private RectTransform panelRoot;
-    [Tooltip("第 1 行：等级与下一级。")]
     [SerializeField] private TextMeshProUGUI textLine1;
-    [Tooltip("第 2 行：Wood 和 Stone。")]
     [SerializeField] private TextMeshProUGUI textLine2;
-    [Tooltip("第 3 行：Teeth 和 Gel。")]
     [SerializeField] private TextMeshProUGUI textLine3;
-
-    private int _lastLevel = -999;
+    [SerializeField] private Button upgradeButton;
+    [SerializeField] private TextMeshProUGUI upgradeButtonText;
+    [SerializeField] private TextMeshProUGUI statusText;
 
     private void Start()
     {
         if (tower == null)
             tower = FindObjectOfType<Tower>();
-
         if (inventory == null)
             inventory = FindObjectOfType<PlayerInventory>();
 
-        if (tower == null)
+        if (tower == null || inventory == null)
         {
-            Debug.LogWarning("TowerUpgradePanelUI: 未找到 Tower。请指定或确保场景中存在 Tower。");
+            Debug.LogWarning("TowerUpgradePanelUI requires a Tower and PlayerInventory.", this);
             return;
         }
 
         if (panelRoot == null || textLine1 == null)
             CreateDefaultUI();
+        else if (upgradeButton == null)
+            CreateUpgradeButton(panelRoot);
 
-        if (inventory != null)
-            inventory.OnResourceCountChanged.AddListener(OnInventoryChanged);
+        EnsureEventSystem();
+
+        tower.OnUpgradeRangeChanged += HandleUpgradeRangeChanged;
+        tower.OnLevelChanged += RefreshAll;
+        inventory.OnResourceCountChanged.AddListener(OnInventoryChanged);
+        upgradeButton.onClick.AddListener(HandleUpgradeClicked);
 
         RefreshAll();
+        SetPanelVisible(tower.IsPlayerInUpgradeRange);
     }
 
     private void OnDestroy()
     {
+        if (tower != null)
+        {
+            tower.OnUpgradeRangeChanged -= HandleUpgradeRangeChanged;
+            tower.OnLevelChanged -= RefreshAll;
+        }
+
         if (inventory != null)
             inventory.OnResourceCountChanged.RemoveListener(OnInventoryChanged);
+        if (upgradeButton != null)
+            upgradeButton.onClick.RemoveListener(HandleUpgradeClicked);
     }
 
-    private void Update()
+    private void HandleUpgradeRangeChanged(bool isNear)
     {
-        if (tower == null) return;
-        if (tower.CurrentLevel != _lastLevel)
+        if (isNear)
+        {
+            if (statusText != null) statusText.text = string.Empty;
             RefreshAll();
+        }
+        SetPanelVisible(isNear);
+    }
+
+    private void HandleUpgradeClicked()
+    {
+        bool upgraded = tower.TryUpgrade(inventory);
+        RefreshAll();
+
+        if (statusText != null)
+            statusText.text = upgraded ? "Upgrade successful" : "Not enough materials";
     }
 
     private void OnInventoryChanged(LootManager.ResourceType type, int count)
@@ -67,30 +91,30 @@ public class TowerUpgradePanelUI : MonoBehaviour
 
     private void RefreshAll()
     {
-        if (tower == null) return;
-
-        _lastLevel = tower.CurrentLevel;
         int nextLevel = Mathf.Min(3, tower.CurrentLevel + 1);
         bool isMax = tower.CurrentLevel >= 3;
         Tower.TowerUpgradeCost cost = tower.GetUpgradeCostForNextLevel();
 
-        if (textLine1 != null)
-            textLine1.text = isMax ? $"Tower Level: {tower.CurrentLevel}  |  Next: MAX" : $"Tower Level: {tower.CurrentLevel}  |  Next: Level {nextLevel}";
+        textLine1.text = isMax
+            ? $"Tower Level: {tower.CurrentLevel}  |  MAX"
+            : $"Tower Level: {tower.CurrentLevel}  |  Next: Level {nextLevel}";
+        textLine2.text = FormatPair(LootManager.ResourceType.Wood, cost.wood, LootManager.ResourceType.Stone, cost.stone);
+        textLine3.text = FormatPair(LootManager.ResourceType.Teeth, cost.teeth, LootManager.ResourceType.Gel, cost.gel);
 
-        if (textLine2 != null)
-            textLine2.text = FormatPair(LootManager.ResourceType.Wood, cost.wood, LootManager.ResourceType.Stone, cost.stone);
+        upgradeButton.interactable = !isMax;
+        upgradeButtonText.text = isMax ? "MAX LEVEL" : "Upgrade";
+    }
 
-        if (textLine3 != null)
-            textLine3.text = FormatPair(LootManager.ResourceType.Teeth, cost.teeth, LootManager.ResourceType.Gel, cost.gel);
+    private void SetPanelVisible(bool visible)
+    {
+        if (panelRoot != null)
+            panelRoot.gameObject.SetActive(visible);
     }
 
     private string FormatPair(LootManager.ResourceType typeA, int needA, LootManager.ResourceType typeB, int needB)
     {
-        int haveA = inventory != null ? inventory.GetCount(typeA) : 0;
-        int haveB = inventory != null ? inventory.GetCount(typeB) : 0;
-        if (inventory != null)
-            return $"{TypeName(typeA)}: {haveA}/{needA}    {TypeName(typeB)}: {haveB}/{needB}";
-        return $"{TypeName(typeA)}: {needA}    {TypeName(typeB)}: {needB}";
+        return $"{TypeName(typeA)}: {inventory.GetCount(typeA)}/{needA}    " +
+               $"{TypeName(typeB)}: {inventory.GetCount(typeB)}/{needB}";
     }
 
     private static string TypeName(LootManager.ResourceType type)
@@ -107,26 +131,36 @@ public class TowerUpgradePanelUI : MonoBehaviour
 
     private void CreateDefaultUI()
     {
-        var canvasGo = new GameObject("TowerUpgradeCanvas");
-        var canvas = canvasGo.AddComponent<Canvas>();
+        var canvasGo = new GameObject(
+            "TowerUpgradeCanvas",
+            typeof(RectTransform),
+            typeof(Canvas),
+            typeof(CanvasScaler),
+            typeof(GraphicRaycaster));
+        var canvas = canvasGo.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvasGo.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        canvasGo.GetComponent<CanvasScaler>().referenceResolution = new Vector2(1920, 1080);
-        canvasGo.AddComponent<GraphicRaycaster>();
+        var scaler = canvasGo.GetComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920, 1080);
 
-        var panelGo = new GameObject("TowerUpgradePanel");
+        var panelGo = new GameObject(
+            "TowerUpgradePanel",
+            typeof(RectTransform),
+            typeof(CanvasRenderer),
+            typeof(Image),
+            typeof(VerticalLayoutGroup));
         panelGo.transform.SetParent(canvasGo.transform, false);
-        var panelRect = panelGo.AddComponent<RectTransform>();
-        panelRect.anchorMin = new Vector2(0.5f, 1f);
-        panelRect.anchorMax = new Vector2(0.5f, 1f);
-        panelRect.pivot = new Vector2(0.5f, 1f);
-        panelRect.anchoredPosition = new Vector2(0f, -20f);
-        panelRect.sizeDelta = new Vector2(420f, 120f);
+        panelRoot = panelGo.GetComponent<RectTransform>();
+        panelRoot.anchorMin = new Vector2(0.5f, 1f);
+        panelRoot.anchorMax = new Vector2(0.5f, 1f);
+        panelRoot.pivot = new Vector2(0.5f, 1f);
+        panelRoot.anchoredPosition = new Vector2(0f, -20f);
+        panelRoot.sizeDelta = new Vector2(420f, 220f);
 
-        var img = panelGo.AddComponent<Image>();
-        img.color = new Color(0.08f, 0.08f, 0.12f, 0.92f);
+        var image = panelGo.GetComponent<Image>();
+        image.color = new Color(0.08f, 0.08f, 0.12f, 0.92f);
 
-        var layout = panelGo.AddComponent<VerticalLayoutGroup>();
+        var layout = panelGo.GetComponent<VerticalLayoutGroup>();
         layout.padding = new RectOffset(14, 14, 14, 14);
         layout.spacing = 6f;
         layout.childAlignment = TextAnchor.UpperCenter;
@@ -135,29 +169,69 @@ public class TowerUpgradePanelUI : MonoBehaviour
         layout.childForceExpandWidth = true;
         layout.childForceExpandHeight = false;
 
-        textLine1 = CreateRow(panelGo.transform, "Tower Level: 0  |  Next: Level 1", 24, TextAlignmentOptions.Center);
-        textLine2 = CreateRow(panelGo.transform, "Wood: 0/0    Stone: 0/0", 22, TextAlignmentOptions.Center);
-        textLine3 = CreateRow(panelGo.transform, "Teeth: 0/0    Gel: 0/0", 22, TextAlignmentOptions.Center);
-
-        panelRoot = panelRect;
+        textLine1 = CreateRow(panelGo.transform, 24);
+        textLine2 = CreateRow(panelGo.transform, 22);
+        textLine3 = CreateRow(panelGo.transform, 22);
+        CreateUpgradeButton(panelRoot);
+        statusText = CreateRow(panelGo.transform, 20);
+        statusText.color = new Color(1f, 0.85f, 0.25f);
     }
 
-    private static TextMeshProUGUI CreateRow(Transform parent, string label, int fontSize, TextAlignmentOptions align)
+    private void CreateUpgradeButton(Transform parent)
     {
-        var go = new GameObject("TMP_Text_" + label);
-        go.transform.SetParent(parent, false);
-        var tmp = go.AddComponent<TextMeshProUGUI>();
-        tmp.text = label;
-        if (TMP_Settings.defaultFontAsset != null)
-            tmp.font = TMP_Settings.defaultFontAsset;
-        tmp.fontSize = fontSize;
-        tmp.alignment = align;
-        tmp.color = Color.white;
-        tmp.fontStyle = FontStyles.Bold;
+        var buttonGo = new GameObject(
+            "UpgradeButton",
+            typeof(RectTransform),
+            typeof(CanvasRenderer),
+            typeof(Image),
+            typeof(Button),
+            typeof(LayoutElement));
+        buttonGo.transform.SetParent(parent, false);
 
-        var rect = go.GetComponent<RectTransform>();
-        rect.sizeDelta = new Vector2(0f, 28f);
-        return tmp;
+        var image = buttonGo.GetComponent<Image>();
+        image.color = new Color(0.15f, 0.55f, 0.25f, 1f);
+        upgradeButton = buttonGo.GetComponent<Button>();
+        buttonGo.GetComponent<LayoutElement>().preferredHeight = 38f;
+
+        var textGo = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+        textGo.transform.SetParent(buttonGo.transform, false);
+        upgradeButtonText = textGo.GetComponent<TextMeshProUGUI>();
+        upgradeButtonText.text = "Upgrade";
+        if (TMP_Settings.defaultFontAsset != null)
+            upgradeButtonText.font = TMP_Settings.defaultFontAsset;
+        upgradeButtonText.fontSize = 22f;
+        upgradeButtonText.fontStyle = FontStyles.Bold;
+        upgradeButtonText.alignment = TextAlignmentOptions.Center;
+        upgradeButtonText.color = Color.white;
+
+        RectTransform textRect = textGo.GetComponent<RectTransform>();
+        textRect.anchorMin = Vector2.zero;
+        textRect.anchorMax = Vector2.one;
+        textRect.offsetMin = Vector2.zero;
+        textRect.offsetMax = Vector2.zero;
+    }
+
+    private static TextMeshProUGUI CreateRow(Transform parent, int fontSize)
+    {
+        var go = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+        go.transform.SetParent(parent, false);
+        var text = go.GetComponent<TextMeshProUGUI>();
+        if (TMP_Settings.defaultFontAsset != null)
+            text.font = TMP_Settings.defaultFontAsset;
+        text.fontSize = fontSize;
+        text.alignment = TextAlignmentOptions.Center;
+        text.color = Color.white;
+        text.fontStyle = FontStyles.Bold;
+        go.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, 28f);
+        return text;
+    }
+
+    private static void EnsureEventSystem()
+    {
+        if (FindObjectOfType<EventSystem>() != null) return;
+
+        var eventSystem = new GameObject("EventSystem");
+        eventSystem.AddComponent<EventSystem>();
+        eventSystem.AddComponent<StandaloneInputModule>();
     }
 }
-
