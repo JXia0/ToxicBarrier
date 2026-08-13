@@ -91,8 +91,8 @@ public class TowerUpgradePanelUI : MonoBehaviour
 
     private void RefreshAll()
     {
-        int nextLevel = Mathf.Min(3, tower.CurrentLevel + 1);
-        bool isMax = tower.CurrentLevel >= 3;
+        int nextLevel = tower.NextLevel;
+        bool isMax = tower.IsMaxLevel;
         Tower.TowerUpgradeCost cost = tower.GetUpgradeCostForNextLevel();
 
         textLine1.text = isMax

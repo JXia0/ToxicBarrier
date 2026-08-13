@@ -32,6 +32,16 @@ public class LootManager : MonoBehaviour
     [Header("Spawn")]
     [SerializeField] private float dropSpawnRadius = 0.5f;
 
+    [Header("Disguised parasite")]
+    [Tooltip("Independent chance that any spawned Bug, Leader, or Boss carries a parasite.")]
+    [Range(0f, 1f)] [SerializeField] private float parasiteInfectionChance = 0.2f;
+    [Tooltip("Damage dealt whenever the player remains on the disguised parasite for one tick.")]
+    [Min(0f)] [SerializeField] private float parasiteDamagePerTick = 10f;
+    [Tooltip("Seconds between damage ticks while the player is standing on the disguised parasite.")]
+    [Min(0.05f)] [SerializeField] private float parasiteDamageInterval = 0.7f;
+    [Tooltip("Distance at which the red screen-edge warning begins to appear.")]
+    [Min(0f)] [SerializeField] private float parasiteWarningRadius = 3.5f;
+
     [Serializable]
     public struct EnemyLootConfig
     {
@@ -74,6 +84,34 @@ public class LootManager : MonoBehaviour
             SpawnResource(ResourceType.Teeth, position);
     }
 
+    public bool RollParasiteInfection()
+    {
+        return UnityEngine.Random.value < parasiteInfectionChance;
+    }
+
+    public void SpawnDisguisedParasite(HealthSystem.EnemyType hostType, Vector2 position)
+    {
+        GameObject disguisePrefab = GetDisguisePrefab(hostType);
+        if (disguisePrefab == null)
+        {
+            Debug.LogWarning("A disguised parasite needs either the Gel or Teeth drop prefab.", this);
+            return;
+        }
+
+        GameObject parasiteObject = UnityEngine.Object.Instantiate(disguisePrefab, position, Quaternion.identity);
+        parasiteObject.name = $"DisguisedParasite ({disguisePrefab.name})";
+
+        ResourcePickup pickup = parasiteObject.GetComponent<ResourcePickup>();
+        if (pickup != null)
+        {
+            pickup.enabled = false;
+            UnityEngine.Object.Destroy(pickup);
+        }
+
+        DisguisedParasite parasite = parasiteObject.AddComponent<DisguisedParasite>();
+        parasite.Configure(parasiteDamagePerTick, parasiteDamageInterval, parasiteWarningRadius);
+    }
+
     public EnemyLootConfig GetEnemyLootConfig(HealthSystem.EnemyType enemyType)
     {
         switch (enemyType)
@@ -104,6 +142,19 @@ public class LootManager : MonoBehaviour
             case ResourceType.Stone: return stonePrefab;
             default: return null;
         }
+    }
+
+    private GameObject GetDisguisePrefab(HealthSystem.EnemyType hostType)
+    {
+        EnemyLootConfig config = GetEnemyLootConfig(hostType);
+        float gelWeight = gelPrefab != null ? config.gelChance : 0f;
+        float teethWeight = teethPrefab != null ? config.teethChance : 0f;
+        float totalWeight = gelWeight + teethWeight;
+
+        if (totalWeight <= 0f)
+            return gelPrefab != null ? gelPrefab : teethPrefab;
+
+        return UnityEngine.Random.value * totalWeight < gelWeight ? gelPrefab : teethPrefab;
     }
 
     public void GetMapSpawnRates(int mapLevel, out float woodRate, out float stoneRate)

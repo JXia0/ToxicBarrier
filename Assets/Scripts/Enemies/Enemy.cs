@@ -8,10 +8,19 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     private HealthSystem _health;
+    private bool _isParasiteHost;
+
+    public bool IsParasiteHost => _isParasiteHost;
 
     private void Awake()
     {
         _health = GetComponent<HealthSystem>();
+    }
+
+    private void Start()
+    {
+        if (LootManager.Instance != null)
+            _isParasiteHost = LootManager.Instance.RollParasiteInfection();
     }
 
     private void OnEnable()
@@ -31,7 +40,11 @@ public class Enemy : MonoBehaviour
         Vector2 deathPosition = transform.position;
         HealthSystem.EnemyType enemyType = _health.CurrentEnemyType;
         if (LootManager.Instance != null)
+        {
             LootManager.Instance.RollEnemyLoot(enemyType, deathPosition);
+            if (_isParasiteHost)
+                LootManager.Instance.SpawnDisguisedParasite(enemyType, deathPosition);
+        }
         Destroy(gameObject);
     }
 }

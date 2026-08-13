@@ -10,6 +10,19 @@ using UnityEngine;
 [RequireComponent(typeof(CircleCollider2D))]
 public class Tower : MonoBehaviour
 {
+    public const int InitialLevel = 0;
+    public const int MaxLevel = 3;
+
+    private const int FirstUpgradeLevel = InitialLevel + 1;
+
+    private static readonly LootManager.ResourceType[] UpgradeResourceTypes =
+    {
+        LootManager.ResourceType.Wood,
+        LootManager.ResourceType.Stone,
+        LootManager.ResourceType.Gel,
+        LootManager.ResourceType.Teeth
+    };
+
     [Serializable]
     public struct TowerLevelStats
     {
@@ -26,6 +39,18 @@ public class Tower : MonoBehaviour
         public int stone;
         public int gel;
         public int teeth;
+
+        public int GetAmount(LootManager.ResourceType resourceType)
+        {
+            switch (resourceType)
+            {
+                case LootManager.ResourceType.Wood: return wood;
+                case LootManager.ResourceType.Stone: return stone;
+                case LootManager.ResourceType.Gel: return gel;
+                case LootManager.ResourceType.Teeth: return teeth;
+                default: return 0;
+            }
+        }
     }
 
     [Header("Tower level stats (Level 0–3)")]
@@ -37,9 +62,10 @@ public class Tower : MonoBehaviour
         new TowerLevelStats { atk = 750f, ats = 12f, hp = 8000f } // L3: DPS 9000
     };
 
-    [SerializeField] private int currentLevel = 0;
+    [SerializeField] private int currentLevel = InitialLevel;
 
     [Header("Upgrade cost (to reach Level 1 / 2 / 3)")]
+    [Tooltip("Array index 0/1/2 is the cost to reach Tower Level 1/2/3.")]
     [SerializeField] private TowerUpgradeCost[] upgradeCosts = new TowerUpgradeCost[]
     {
         new TowerUpgradeCost { wood = 30, stone = 0, gel = 20, teeth = 0 },    // → Level 1
@@ -80,6 +106,8 @@ public class Tower : MonoBehaviour
 
     /// <summary> 当前塔等级 (0–3). </summary>
     public int CurrentLevel => currentLevel;
+    public int NextLevel => Mathf.Min(currentLevel + 1, MaxLevel);
+    public bool IsMaxLevel => currentLevel >= MaxLevel;
     public bool IsPlayerInUpgradeRange => _playerInUpgradeRange;
 
     /// <summary> 当前等级数值（ATK, ATS, HP）. 供攻击逻辑使用。 </summary>
@@ -139,22 +167,29 @@ public class Tower : MonoBehaviour
     /// <summary>Checks and consumes materials only when the player presses the upgrade button.</summary>
     public bool TryUpgrade(PlayerInventory inventory)
     {
-        if (!_playerInUpgradeRange || currentLevel >= 3 || inventory == null)
+        if (!_playerInUpgradeRange || IsMaxLevel || inventory == null)
             return false;
 
+        int targetLevel = NextLevel;
         TowerUpgradeCost cost = GetUpgradeCostForNextLevel();
-        if (inventory.GetCount(LootManager.ResourceType.Wood) < cost.wood ||
-            inventory.GetCount(LootManager.ResourceType.Stone) < cost.stone ||
-            inventory.GetCount(LootManager.ResourceType.Gel) < cost.gel ||
-            inventory.GetCount(LootManager.ResourceType.Teeth) < cost.teeth)
+        if (!TryPayUpgradeCost(inventory, cost))
             return false;
 
-        inventory.TryConsume(LootManager.ResourceType.Wood, cost.wood);
-        inventory.TryConsume(LootManager.ResourceType.Stone, cost.stone);
-        inventory.TryConsume(LootManager.ResourceType.Gel, cost.gel);
-        inventory.TryConsume(LootManager.ResourceType.Teeth, cost.teeth);
+        SetLevel(targetLevel);
+        return true;
+    }
 
-        SetLevel(currentLevel + 1);
+    private static bool TryPayUpgradeCost(PlayerInventory inventory, TowerUpgradeCost cost)
+    {
+        foreach (LootManager.ResourceType resourceType in UpgradeResourceTypes)
+        {
+            if (inventory.GetCount(resourceType) < cost.GetAmount(resourceType))
+                return false;
+        }
+
+        foreach (LootManager.ResourceType resourceType in UpgradeResourceTypes)
+            inventory.TryConsume(resourceType, cost.GetAmount(resourceType));
+
         return true;
     }
 
@@ -195,7 +230,7 @@ public class Tower : MonoBehaviour
 
     private TowerLevelStats GetLevelStats(int level)
     {
-        int index = Mathf.Clamp(level, 0, 3);
+        int index = Mathf.Clamp(level, InitialLevel, MaxLevel);
         if (levelStats != null && levelStats.Length > index)
             return levelStats[index];
         return new TowerLevelStats { atk = 50f, ats = 2f, hp = 1000f };
@@ -204,7 +239,7 @@ public class Tower : MonoBehaviour
     /// <summary> 升级到指定等级并刷新 ATK/ATS/HP. </summary>
     public void SetLevel(int level)
     {
-        int nextLevel = Mathf.Clamp(level, 0, 3);
+        int nextLevel = Mathf.Clamp(level, InitialLevel, MaxLevel);
         if (nextLevel == currentLevel) return;
 
         currentLevel = nextLevel;
@@ -213,20 +248,20 @@ public class Tower : MonoBehaviour
         OnLevelChanged?.Invoke();
     }
 
-    /// <summary> 升到某一级所需资源。targetLevel 为 1、2、3；0 为初始无升级。 </summary>
+    /// <summary>升级费用的统一查询入口。targetLevel 1/2/3 分别读取 upgradeCosts 0/1/2。</summary>
     public TowerUpgradeCost GetUpgradeCostToLevel(int targetLevel)
     {
-        int index = Mathf.Clamp(targetLevel, 1, 3) - 1;
+        int clampedTargetLevel = Mathf.Clamp(targetLevel, FirstUpgradeLevel, MaxLevel);
+        int index = clampedTargetLevel - FirstUpgradeLevel;
         if (upgradeCosts != null && upgradeCosts.Length > index)
             return upgradeCosts[index];
-        return new TowerUpgradeCost();
+        return default;
     }
 
     /// <summary> 下一级所需资源；若已是满级则返回全 0。 </summary>
     public TowerUpgradeCost GetUpgradeCostForNextLevel()
     {
-        if (currentLevel >= 3) return new TowerUpgradeCost();
-        return GetUpgradeCostToLevel(currentLevel + 1);
+        return IsMaxLevel ? default : GetUpgradeCostToLevel(NextLevel);
     }
 
     private void OnEnable()

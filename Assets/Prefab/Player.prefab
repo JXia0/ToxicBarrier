@@ -200,7 +200,7 @@ MonoBehaviour:
   toxicGasBaseDamagePerSecond: 5
   toxicGasPeriodSeconds: 60
   toxicGasDamageIncreasePerPeriod: 3
-  playerInvincibleForDebug: 1
+  playerInvincibleForDebug: 0
   OnHpChanged:
     m_PersistentCalls:
       m_Calls: []
