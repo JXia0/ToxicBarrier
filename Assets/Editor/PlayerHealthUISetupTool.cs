@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using UnityEditor;
+using UnityEditor.Events;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,30 +10,6 @@ using UnityEngine.UI;
 public static class PlayerHealthUISetupTool
 {
     private const string GameplayScenePath = "Assets/Scenes/GameScene.unity";
-    private const string SetupRequestPath = "Assets/Editor/PlayerHealthUISetup.request";
-
-    [InitializeOnLoadMethod]
-    private static void RunRequestedSetupAfterCompile()
-    {
-        string requestPath = Path.Combine(Application.dataPath, "Editor/PlayerHealthUISetup.request");
-        if (!File.Exists(requestPath)) return;
-
-        EditorApplication.delayCall += () =>
-        {
-            try
-            {
-                SetupPlayerHealthUI();
-                AssetDatabase.DeleteAsset(SetupRequestPath);
-                Debug.Log("Player health UI setup request completed and removed.");
-            }
-            catch (Exception exception)
-            {
-                Debug.LogWarning(
-                    $"Player health UI automatic setup is waiting: {exception.Message} " +
-                    "Save GameScene and run Tools/Toxic Barrier/Setup Player Health UI if needed.");
-            }
-        };
-    }
 
     [MenuItem("Tools/Toxic Barrier/Setup Player Health UI")]
     public static void SetupPlayerHealthUI()
@@ -73,31 +49,37 @@ public static class PlayerHealthUISetupTool
         if (healthControl == null)
             healthControl = healthCanvasObject.AddComponent<HealthControl>();
 
+        RectTransform healthBar = healthBarObject.GetComponent<RectTransform>();
         SerializedObject serializedControl = new SerializedObject(healthControl);
-        serializedControl.FindProperty("playerHealth").objectReferenceValue = playerHealth;
-        serializedControl.FindProperty("healthBarFill").objectReferenceValue = healthBarFill;
+        serializedControl.FindProperty("healthBar").objectReferenceValue = healthBar;
         serializedControl.ApplyModifiedPropertiesWithoutUndo();
 
-        healthBarFill.type = Image.Type.Filled;
-        healthBarFill.fillMethod = Image.FillMethod.Horizontal;
-        healthBarFill.fillOrigin = (int)Image.OriginHorizontal.Left;
-        healthBarFill.fillAmount = 1f;
+        for (int i = playerHealth.OnHpChanged.GetPersistentEventCount() - 1; i >= 0; i--)
+        {
+            if (playerHealth.OnHpChanged.GetPersistentTarget(i) == healthControl)
+                UnityEventTools.RemovePersistentListener(playerHealth.OnHpChanged, i);
+        }
+        UnityEventTools.AddPersistentListener(playerHealth.OnHpChanged, healthControl.UpdateHealthBar);
+
+        healthBarFill.type = Image.Type.Simple;
         healthBarFill.raycastTarget = false;
 
         RectTransform healthCanvasRect = healthCanvasObject.GetComponent<RectTransform>();
         if (healthCanvasRect != null)
             healthCanvasRect.localScale = Vector3.one;
 
-        RectTransform fillRect = healthBarObject.GetComponent<RectTransform>();
+        RectTransform fillRect = healthBar;
         RectTransform backgroundRect = backgroundObject != null ? backgroundObject.GetComponent<RectTransform>() : null;
         if (fillRect != null && backgroundRect != null)
-            CopyRectTransform(backgroundRect, fillRect);
+            AlignHealthBarToBackground(backgroundRect, fillRect);
 
         Image background = backgroundObject != null ? backgroundObject.GetComponent<Image>() : null;
         if (background != null)
             background.raycastTarget = false;
 
         EditorUtility.SetDirty(healthControl);
+        EditorUtility.SetDirty(playerHealth);
+        PrefabUtility.RecordPrefabInstancePropertyModifications(playerHealth);
         EditorUtility.SetDirty(healthBarFill);
         if (healthCanvasRect != null) EditorUtility.SetDirty(healthCanvasRect);
         if (fillRect != null) EditorUtility.SetDirty(fillRect);
@@ -113,7 +95,7 @@ public static class PlayerHealthUISetupTool
             EditorSceneManager.CloseScene(gameplayScene, true);
 
         AssetDatabase.SaveAssets();
-        Debug.Log("Player Health UI setup complete. HealthCanvas is linked to the player's HealthSystem and HealthBar Image.");
+        Debug.Log("Player Health UI setup complete. OnHpChanged now drives the HealthBar RectTransform width.");
     }
 
     private static HealthSystem FindPlayerHealth(Scene scene)
@@ -145,14 +127,16 @@ public static class PlayerHealthUISetupTool
         return null;
     }
 
-    private static void CopyRectTransform(RectTransform source, RectTransform target)
+    private static void AlignHealthBarToBackground(RectTransform background, RectTransform healthBar)
     {
-        target.anchorMin = source.anchorMin;
-        target.anchorMax = source.anchorMax;
-        target.pivot = source.pivot;
-        target.anchoredPosition = source.anchoredPosition;
-        target.sizeDelta = source.sizeDelta;
-        target.localRotation = source.localRotation;
-        target.localScale = source.localScale;
+        healthBar.anchorMin = background.anchorMin;
+        healthBar.anchorMax = background.anchorMax;
+        healthBar.pivot = new Vector2(0f, background.pivot.y);
+        healthBar.anchoredPosition = new Vector2(
+            background.anchoredPosition.x - background.rect.width * background.pivot.x,
+            background.anchoredPosition.y);
+        healthBar.sizeDelta = background.sizeDelta;
+        healthBar.localRotation = background.localRotation;
+        healthBar.localScale = background.localScale;
     }
 }

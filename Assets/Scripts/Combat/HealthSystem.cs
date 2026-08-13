@@ -99,6 +99,9 @@ public class HealthSystem : MonoBehaviour
 
     private void ApplyToxicGasDamage(float deltaTime)
     {
+        if (isPlayer && MapController.Instance != null && MapController.Instance.IsPlayerInMap1())
+            return;
+
         float damagePerSecond = toxicGasBaseDamagePerSecond + _toxicGasPeriodsElapsed * toxicGasDamageIncreasePerPeriod;
         TakeDamage(damagePerSecond * deltaTime, null);
     }
@@ -114,13 +117,6 @@ public class HealthSystem : MonoBehaviour
             _hasDied = true;
             OnDeath?.Invoke();
         }
-    }
-
-    public void Heal(float amount)
-    {
-        if (amount <= 0f) return;
-        _currentHp = Mathf.Min(maxHp, _currentHp + amount);
-        OnHpChanged?.Invoke(_currentHp, maxHp);
     }
 
     public void RestoreFullHealth()

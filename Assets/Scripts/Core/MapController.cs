@@ -26,6 +26,8 @@ public class MapController : MonoBehaviour
 
     private float _toxicGasTimer;
     private int _toxicGasPeriodsElapsed;
+    private Vector2 _map1Center;
+    private float _map1RadiusSquared;
 
     public int ToxicGasPeriodsElapsed => _toxicGasPeriodsElapsed;
     public PlayerController Player => playerController;
@@ -40,6 +42,9 @@ public class MapController : MonoBehaviour
         }
 
         Instance = this;
+        map1Zone.GetRingParams(out _map1Center, out _, out float map1Radius);
+        _map1RadiusSquared = map1Radius * map1Radius;
+
         if (driveToxicGasCentrally && playerHealth != null)
             playerHealth.SetToxicGasDrivenCentrally(true);
     }
@@ -87,6 +92,11 @@ public class MapController : MonoBehaviour
     {
         map1Zone.GetRingParams(out _, out _, out float radius);
         return radius;
+    }
+
+    public bool IsPlayerInMap1()
+    {
+        return ((Vector2)playerHealth.transform.position - _map1Center).sqrMagnitude <= _map1RadiusSquared;
     }
 
     public void SetToxicGasPeriods(int periods)
