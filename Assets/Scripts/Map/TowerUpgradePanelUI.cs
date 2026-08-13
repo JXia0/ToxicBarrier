@@ -77,6 +77,9 @@ public class TowerUpgradePanelUI : MonoBehaviour
 
     private void HandleUpgradeClicked()
     {
+        if (GameFlowManager.Instance != null && !GameFlowManager.Instance.IsPlaying)
+            return;
+
         bool upgraded = tower.TryUpgrade(inventory);
         RefreshAll();
 

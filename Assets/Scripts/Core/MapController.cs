@@ -89,11 +89,6 @@ public class MapController : MonoBehaviour
         return radius;
     }
 
-    public void SetPlayerControlEnabled(bool enabled)
-    {
-        playerController.enabled = enabled;
-    }
-
     public void SetToxicGasPeriods(int periods)
     {
         _toxicGasPeriodsElapsed = Mathf.Max(0, periods);

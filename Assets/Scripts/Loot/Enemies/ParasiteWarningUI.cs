@@ -60,6 +60,12 @@ public class ParasiteWarningUI : MonoBehaviour
     {
         if (_canvasGroup == null) return;
 
+        if (GameFlowManager.Instance != null && !GameFlowManager.Instance.IsPlaying)
+        {
+            _canvasGroup.alpha = 0f;
+            return;
+        }
+
         if (_player == null)
         {
             if (MapController.Instance != null && MapController.Instance.Player != null)

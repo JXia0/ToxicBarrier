@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody2D _rb;
     private float _lastHorizontal;
+    private bool _controlEnabled = true;
 
     /// <summary> Fired when player presses 1-5. Parameter is slot index (0-4). </summary>
     public System.Action<int> OnInventorySlotPressed;
@@ -49,11 +50,29 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (_rb == null) return;
+        if (_rb == null || !_controlEnabled) return;
 
         HandleMovementInput();
         FaceMovementDirection();
         HandleInventoryInput();
+    }
+
+    public void SetControlEnabled(bool enabled)
+    {
+        _controlEnabled = enabled;
+        if (!enabled)
+            StopMovement();
+    }
+
+    public void StopMovement()
+    {
+        if (_rb != null)
+            _rb.velocity = Vector2.zero;
+    }
+
+    private void OnDisable()
+    {
+        StopMovement();
     }
 
     private void HandleMovementInput()
