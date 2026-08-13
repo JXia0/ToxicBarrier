@@ -8,3 +8,5 @@
 - `PlayerMapBounds`：读取 `MapController` 的已解锁半径并限制玩家位置。
 
 当前场景是以世界原点为中心的三层同心圆。移动速度直接放在 `PlayerController`，不再经过备用移动脚本、`MapScale` 或 `MapController` 转发。
+
+游戏开始、暂停、玩家死亡、重新开始和返回主界面属于 `GameFlowManager`，不放入 `PlayerController` 或 `PlayerMapBounds`。玩家模块只提供“允许/禁止控制并停止移动”的接口供流程层调用。

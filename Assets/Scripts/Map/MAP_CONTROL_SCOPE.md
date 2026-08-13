@@ -13,3 +13,5 @@
 - 不维护“玩家当前 Map ID”，也不通过全局事件动态切换波次配置。
 
 场景固定为三层同心圆：Map 1 始终解锁，Map 2 / 3 分别在塔达到等级 2 / 3 时解锁。
+
+游戏开始、暂停、玩家死亡、重新开始和返回主界面不属于地图控制。`MapController.SetPlayerControlEnabled()` 是待迁移的旧转发入口；下一阶段由 `GameFlowManager` 直接协调玩家控制，`MapController` 继续只负责地图解锁与毒气规则。
