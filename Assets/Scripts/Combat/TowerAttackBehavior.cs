@@ -8,6 +8,9 @@ using UnityEngine;
 [RequireComponent(typeof(HealthSystem))]
 public class TowerAttackBehavior : MonoBehaviour
 {
+    private const int AttackEffectPoolSize = 4;
+    private static readonly int AttackEffectStateHash = Animator.StringToHash("Base Layer.Explosion 1 Animation");
+
     [Header("Attack Flash Line (Black)")]
     [SerializeField] private float attackLineDisplayDuration = 0.08f;
     [SerializeField] private float attackLineStartWidth = 0.15f;
@@ -24,10 +27,19 @@ public class TowerAttackBehavior : MonoBehaviour
     [SerializeField] private int lockLineSortingOrder = 10;
     [SerializeField] private LineRenderer lockLineRenderer;
 
+    [Header("Attack Effect (visual only)")]
+    [SerializeField] private RuntimeAnimatorController attackEffectController;
+    [SerializeField, Min(0.1f)] private float attackEffectScale = 0.75f;
+    [SerializeField, Min(0.05f)] private float attackEffectDuration = 0.36f;
+    [SerializeField, Min(0.1f)] private float attackEffectPlaybackSpeed = 2.5f;
+
     private Tower _tower;
     private HealthSystem _health;
     private float _attackCooldown;
     private float _attackLineHideTime;
+    private readonly Animator[] _attackEffects = new Animator[AttackEffectPoolSize];
+    private readonly float[] _attackEffectHideTimes = new float[AttackEffectPoolSize];
+    private int _nextAttackEffect;
 
     [Header("Targeting")]
     [Tooltip("若为 true，塔会锁定一个目标敌人，直到其死亡或离开攻击范围才重新选择。")]
@@ -63,10 +75,13 @@ public class TowerAttackBehavior : MonoBehaviour
         SetupLineRenderer(attackLineRenderer, attackLineStartWidth, attackLineEndWidth, attackLineColor, lineShader, attackLineSortingOrder);
         if (lockLineRenderer != null)
             SetupLineRenderer(lockLineRenderer, lockLineStartWidth, lockLineEndWidth, lockLineColor, lineShader, lockLineSortingOrder);
+        SetupAttackEffectPool();
     }
 
     private void Update()
     {
+        HideFinishedAttackEffects();
+
         if (_tower == null || _health == null || _health.CurrentHp <= 0f)
         {
             DisableAllLines();
@@ -83,6 +98,7 @@ public class TowerAttackBehavior : MonoBehaviour
 
         DealDamage(target);
         ShowAttackFlashLine(target);
+        PlayAttackEffect(target.transform.position);
         _attackCooldown = 1f / Mathf.Max(0.001f, _health.Ats);
     }
 
@@ -165,6 +181,53 @@ public class TowerAttackBehavior : MonoBehaviour
         _attackLineHideTime = Time.time + attackLineDisplayDuration;
     }
 
+    private void SetupAttackEffectPool()
+    {
+        if (attackEffectController == null) return;
+
+        float parentScale = Mathf.Max(0.001f, Mathf.Abs(transform.lossyScale.x));
+        for (int i = 0; i < AttackEffectPoolSize; i++)
+        {
+            GameObject effectObject = new GameObject($"TowerAttackEffect_{i + 1}");
+            effectObject.transform.SetParent(transform, false);
+            effectObject.transform.localScale = Vector3.one * (attackEffectScale / parentScale);
+
+            SpriteRenderer effectRenderer = effectObject.AddComponent<SpriteRenderer>();
+            effectRenderer.sortingLayerName = SortingLayerNames.Characters;
+            effectRenderer.sortingOrder = 20;
+
+            Animator animator = effectObject.AddComponent<Animator>();
+            animator.runtimeAnimatorController = attackEffectController;
+            animator.speed = attackEffectPlaybackSpeed;
+            _attackEffects[i] = animator;
+            effectObject.SetActive(false);
+        }
+    }
+
+    private void PlayAttackEffect(Vector3 worldPosition)
+    {
+        Animator effect = _attackEffects[_nextAttackEffect];
+        if (effect == null) return;
+
+        int index = _nextAttackEffect;
+        _nextAttackEffect = (_nextAttackEffect + 1) % AttackEffectPoolSize;
+        effect.transform.position = worldPosition;
+        effect.gameObject.SetActive(true);
+        effect.Play(AttackEffectStateHash, 0, 0f);
+        effect.Update(0f);
+        _attackEffectHideTimes[index] = Time.time + attackEffectDuration;
+    }
+
+    private void HideFinishedAttackEffects()
+    {
+        for (int i = 0; i < AttackEffectPoolSize; i++)
+        {
+            Animator effect = _attackEffects[i];
+            if (effect != null && effect.gameObject.activeSelf && Time.time >= _attackEffectHideTimes[i])
+                effect.gameObject.SetActive(false);
+        }
+    }
+
     private void HideAttackLineIfNeeded()
     {
         if (attackLineRenderer != null && attackLineRenderer.enabled && Time.time >= _attackLineHideTime)
@@ -189,5 +252,15 @@ public class TowerAttackBehavior : MonoBehaviour
             attackLineRenderer.enabled = false;
         if (lockLineRenderer != null)
             lockLineRenderer.enabled = false;
+    }
+
+    private void OnDisable()
+    {
+        DisableAllLines();
+        for (int i = 0; i < AttackEffectPoolSize; i++)
+        {
+            if (_attackEffects[i] != null)
+                _attackEffects[i].gameObject.SetActive(false);
+        }
     }
 }

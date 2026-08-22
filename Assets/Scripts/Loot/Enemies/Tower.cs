@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -85,6 +86,12 @@ public class Tower : MonoBehaviour
     [Tooltip("Level 3 sprite (tower3).")]
     [SerializeField] private Sprite level3Sprite;
 
+    [Header("Upgrade presentation")]
+    [SerializeField, Min(1f)] private float upgradePulseScale = 1.2f;
+    [SerializeField, Min(0.05f)] private float upgradePulseDuration = 0.28f;
+    [SerializeField, Min(0f)] private float cameraShakeDuration = 0.16f;
+    [SerializeField, Min(0f)] private float cameraShakeMagnitude = 0.18f;
+
     [Header("Map (central tower)")]
     [Tooltip("If true, position at map center on Start.")]
     [SerializeField] private bool placeAtMapCenter = true;
@@ -97,6 +104,8 @@ public class Tower : MonoBehaviour
     private SpriteRenderer _spriteRenderer;
     private CircleCollider2D _upgradeTrigger;
     private bool _playerInUpgradeRange;
+    private Vector3 _restingScale;
+    private Coroutine _upgradePulseRoutine;
 
     public event Action<bool> OnUpgradeRangeChanged;
     public event Action OnLevelChanged;
@@ -117,6 +126,7 @@ public class Tower : MonoBehaviour
     {
         _health = GetComponent<HealthSystem>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
+        _restingScale = transform.localScale;
 
         _upgradeTrigger = GetComponent<CircleCollider2D>();
         if (_upgradeTrigger == null)
@@ -213,6 +223,7 @@ public class Tower : MonoBehaviour
         Sprite target = null;
         switch (currentLevel)
         {
+            case 0:
             case 1:
                 target = level1Sprite;
                 break;
@@ -245,7 +256,44 @@ public class Tower : MonoBehaviour
         currentLevel = nextLevel;
         ApplyLevelStats();
         ApplyLevelSprite();
+        PlayUpgradeFeedback();
         OnLevelChanged?.Invoke();
+    }
+
+    private void PlayUpgradeFeedback()
+    {
+        if (_upgradePulseRoutine != null)
+            StopCoroutine(_upgradePulseRoutine);
+
+        transform.localScale = _restingScale;
+        _upgradePulseRoutine = StartCoroutine(UpgradePulse());
+        CameraShake2D.Play(UnityEngine.Camera.main, cameraShakeDuration, cameraShakeMagnitude);
+    }
+
+    private IEnumerator UpgradePulse()
+    {
+        float halfDuration = Mathf.Max(0.025f, upgradePulseDuration * 0.5f);
+        Vector3 peakScale = new Vector3(
+            _restingScale.x * upgradePulseScale,
+            _restingScale.y * upgradePulseScale,
+            _restingScale.z);
+
+        for (float elapsed = 0f; elapsed < halfDuration; elapsed += Time.deltaTime)
+        {
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / halfDuration);
+            transform.localScale = Vector3.LerpUnclamped(_restingScale, peakScale, t);
+            yield return null;
+        }
+
+        for (float elapsed = 0f; elapsed < halfDuration; elapsed += Time.deltaTime)
+        {
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / halfDuration);
+            transform.localScale = Vector3.LerpUnclamped(peakScale, _restingScale, t);
+            yield return null;
+        }
+
+        transform.localScale = _restingScale;
+        _upgradePulseRoutine = null;
     }
 
     /// <summary>升级费用的统一查询入口。targetLevel 1/2/3 分别读取 upgradeCosts 0/1/2。</summary>
@@ -274,6 +322,12 @@ public class Tower : MonoBehaviour
     {
         if (_health != null)
             _health.OnDeath.RemoveListener(OnDeath);
+        if (_upgradePulseRoutine != null)
+        {
+            StopCoroutine(_upgradePulseRoutine);
+            _upgradePulseRoutine = null;
+        }
+        transform.localScale = _restingScale;
         SetPlayerInUpgradeRange(false);
     }
 
@@ -311,5 +365,56 @@ public class Tower : MonoBehaviour
                 Gizmos.DrawLine(center + new Vector2(Mathf.Cos(a0), Mathf.Sin(a0)) * upgradeTriggerRadius, center + new Vector2(Mathf.Cos(a1), Mathf.Sin(a1)) * upgradeTriggerRadius);
             }
         }
+    }
+}
+
+/// <summary>Short render-time camera offset that does not fight Cinemachine's transform updates.</summary>
+[DisallowMultipleComponent]
+internal sealed class CameraShake2D : MonoBehaviour
+{
+    private float _endTime;
+    private float _duration;
+    private float _magnitude;
+    private Vector3 _appliedOffset;
+
+    public static void Play(UnityEngine.Camera targetCamera, float duration, float magnitude)
+    {
+        if (targetCamera == null || duration <= 0f || magnitude <= 0f) return;
+
+        CameraShake2D shake = targetCamera.GetComponent<CameraShake2D>();
+        if (shake == null)
+            shake = targetCamera.gameObject.AddComponent<CameraShake2D>();
+
+        shake._duration = duration;
+        shake._magnitude = magnitude;
+        shake._endTime = Time.unscaledTime + duration;
+    }
+
+    private void OnPreCull()
+    {
+        RestoreCameraPosition();
+        if (Time.unscaledTime >= _endTime) return;
+
+        float strength = Mathf.Clamp01((_endTime - Time.unscaledTime) / Mathf.Max(0.001f, _duration));
+        Vector2 randomOffset = UnityEngine.Random.insideUnitCircle * (_magnitude * strength);
+        _appliedOffset = new Vector3(randomOffset.x, randomOffset.y, 0f);
+        transform.position += _appliedOffset;
+    }
+
+    private void OnPostRender()
+    {
+        RestoreCameraPosition();
+    }
+
+    private void OnDisable()
+    {
+        RestoreCameraPosition();
+    }
+
+    private void RestoreCameraPosition()
+    {
+        if (_appliedOffset == Vector3.zero) return;
+        transform.position -= _appliedOffset;
+        _appliedOffset = Vector3.zero;
     }
 }

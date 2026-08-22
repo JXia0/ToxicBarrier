@@ -23,6 +23,7 @@
 - 自动从 Tower 读取 AttackRange、CurrentStats
 - 从 HealthSystem 读取 Atk、Ats（与 Tower 等级同步）
 - 目标选择：范围内最近的敌人
+- 每次现有攻击造成伤害后重播一次已配置的 Explosion 动画；该动画只负责表现，不计算伤害
 
 ### EnemyAttackBehavior
 

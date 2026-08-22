@@ -2073,9 +2073,13 @@ MonoBehaviour:
     gel: 95
     teeth: 50
   upgradeTriggerRadius: 2
-  level1Sprite: {fileID: 0}
-  level2Sprite: {fileID: 0}
-  level3Sprite: {fileID: 0}
+  level1Sprite: {fileID: 21300000, guid: 4a5a2d54b82ed5744be76f31120e7378, type: 3}
+  level2Sprite: {fileID: 21300000, guid: b5d0e6ade63e06f40ad71785f4eee64b, type: 3}
+  level3Sprite: {fileID: 21300000, guid: f941787da3f821c4ea14213d1fd09026, type: 3}
+  upgradePulseScale: 1.2
+  upgradePulseDuration: 0.28
+  cameraShakeDuration: 0.16
+  cameraShakeMagnitude: 0.18
   placeAtMapCenter: 1
   attackRangeFromMap1Half: 1
   manualAttackRange: 2.5
@@ -2199,6 +2203,10 @@ MonoBehaviour:
   lockLineColor: {r: 1, g: 0.2, b: 0.2, a: 0.9}
   lockLineSortingOrder: 10
   lockLineRenderer: {fileID: 0}
+  attackEffectController: {fileID: 9100000, guid: 16b7a4e4fd8484de18c7680a2ac5b91c, type: 2}
+  attackEffectScale: 0.75
+  attackEffectDuration: 0.36
+  attackEffectPlaybackSpeed: 2.5
   lockTarget: 1
 --- !u!58 &953627949
 CircleCollider2D:
@@ -3248,7 +3256,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.69696, y: 0.48745707, z: 0.69696}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1803922252}
@@ -3352,7 +3360,7 @@ Tilemap:
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.74509805}
   m_Origin: {x: -2, y: 0, z: 0}
   m_Size: {x: 2, y: 3, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
@@ -4534,7 +4542,7 @@ GameObject:
   - component: {fileID: 1803922252}
   - component: {fileID: 1803922251}
   m_Layer: 0
-  m_Name: Grid
+  m_Name: Fog
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5440,7 +5448,7 @@ PrefabInstance:
       objectReference: {fileID: 519420031}
     - target: {fileID: 699895196781327770, guid: be34b45c25dc7274b866d768d7fa546b, type: 3}
       propertyPath: playerInvincibleForDebug
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 699895196781327770, guid: be34b45c25dc7274b866d768d7fa546b, type: 3}
       propertyPath: OnHpChanged.m_PersistentCalls.m_Calls.Array.size
