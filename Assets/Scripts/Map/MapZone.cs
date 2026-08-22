@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Attach to each of the three circle objects representing Map 1, Map 2, and Map 3.
-/// Map 2/3 show a fog overlay when locked (progressive unlock by Tower level). Use with EnvironmentalResourceSpawner for spawn rates.
+/// Map 2/3 move above the global ToxicFog Tilemap when unlocked by Tower level.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class MapZone : MonoBehaviour
@@ -21,15 +21,16 @@ public class MapZone : MonoBehaviour
     [Tooltip("Use CircleCollider2D bounds for outer radius so it matches the visual circle.")]
     [SerializeField] private bool useColliderForOuterRadius = true;
 
-    [Header("Fog of War (Map 2 & 3 when locked)")]
-    [Tooltip("Optional. When locked, this overlay is shown (fog). Assign a child with SpriteRenderer; or leave empty to auto-create from this zone's sprite.")]
-    [SerializeField] private GameObject fogOverlay;
-    [Tooltip("Fog color when zone is locked.")]
-    [SerializeField] private Color fogColor = new Color(0.1f, 0.1f, 0.15f, 0.85f);
-    [Tooltip("When true, hide this zone's map graphic (SpriteRenderer) when locked so only fog is visible. Unlocked = show map, hide fog.")]
-    [SerializeField] private bool hideMapVisualWhenLocked = true;
+    [Header("Rendering around global ToxicFog (Ground order 0)")]
+    [Tooltip("Sorting order while this map is locked and must stay below ToxicFog.")]
+    [SerializeField] private int lockedSortingOrder = -20;
+    [Tooltip("Sorting order after unlock, when this map must render above ToxicFog.")]
+    [SerializeField] private int unlockedSortingOrder = 20;
     [Tooltip("Optional. When locked, this object (and its children) are disabled so no features (spawns, etc.) of the locked map are visible. Assign a child that contains spawners or content.")]
     [SerializeField] private GameObject contentRootToHideWhenLocked;
+
+    private SpriteRenderer _zoneRenderer;
+    private bool? _lastUnlockedState;
 
     public int MapLevel => mapLevel;
 
@@ -38,12 +39,13 @@ public class MapZone : MonoBehaviour
 
     private void Start()
     {
-        EnsureFogOverlay();
+        _zoneRenderer = GetComponent<SpriteRenderer>();
+        RefreshUnlockVisuals();
     }
 
     private void Update()
     {
-        RefreshFogVisibility();
+        RefreshUnlockVisuals();
     }
 
     /// <summary> Ring params: center, inner radius (min), outer radius (max). Resources spawn only inside this ring. </summary>
@@ -84,51 +86,17 @@ public class MapZone : MonoBehaviour
         }
     }
 
-    private void EnsureFogOverlay()
+    private void RefreshUnlockVisuals()
     {
-        if (mapLevel <= 1) return;
-        if (fogOverlay != null) return;
+        bool unlocked = mapLevel <= 1 || IsUnlocked;
+        if (_lastUnlockedState == unlocked) return;
 
-        Transform fogT = transform.Find("Fog");
-        if (fogT != null) { fogOverlay = fogT.gameObject; return; }
+        _lastUnlockedState = unlocked;
+        if (_zoneRenderer != null)
+            _zoneRenderer.sortingOrder = unlocked ? unlockedSortingOrder : lockedSortingOrder;
 
-        SpriteRenderer zoneSr = GetComponent<SpriteRenderer>();
-        if (zoneSr == null || zoneSr.sprite == null) return;
-
-        GameObject fog = new GameObject("Fog");
-        fog.transform.SetParent(transform, false);
-        fog.transform.localPosition = Vector3.zero;
-        fog.transform.localScale = Vector3.one;
-        fog.transform.localRotation = Quaternion.identity;
-
-        SpriteRenderer sr = fog.AddComponent<SpriteRenderer>();
-        sr.sprite = zoneSr.sprite;
-        sr.color = fogColor;
-        sr.sortingOrder = zoneSr.sortingOrder + 1;
-        sr.sortingLayerID = zoneSr.sortingLayerID;
-        sr.maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
-
-        fogOverlay = fog;
-    }
-
-    private void RefreshFogVisibility()
-    {
-        if (mapLevel <= 1) return;
-
-        bool locked = !IsUnlocked;
-
-        if (fogOverlay != null && fogOverlay.activeSelf != locked)
-            fogOverlay.SetActive(locked);
-
-        if (hideMapVisualWhenLocked)
-        {
-            SpriteRenderer zoneSr = GetComponent<SpriteRenderer>();
-            if (zoneSr != null && zoneSr.enabled == locked)
-                zoneSr.enabled = !locked;
-        }
-
-        if (contentRootToHideWhenLocked != null && contentRootToHideWhenLocked.activeSelf == locked)
-            contentRootToHideWhenLocked.SetActive(!locked);
+        if (contentRootToHideWhenLocked != null && contentRootToHideWhenLocked.activeSelf != unlocked)
+            contentRootToHideWhenLocked.SetActive(unlocked);
     }
 
     private void OnDrawGizmosSelected()

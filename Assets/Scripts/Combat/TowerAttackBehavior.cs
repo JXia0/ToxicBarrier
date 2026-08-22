@@ -150,6 +150,7 @@ public class TowerAttackBehavior : MonoBehaviour
             lr.material = new Material(lineShader);
         if (lr.material != null)
             lr.material.color = Color.white;
+        lr.sortingLayerName = SortingLayerNames.Characters;
         lr.sortingOrder = sortingOrder;
         lr.startColor = color;
         lr.endColor = new Color(color.r, color.g, color.b, 0.4f);
