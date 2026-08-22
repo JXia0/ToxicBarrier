@@ -177,7 +177,7 @@ public class Tower : MonoBehaviour
     /// <summary>Checks and consumes materials only when the player presses the upgrade button.</summary>
     public bool TryUpgrade(PlayerInventory inventory)
     {
-        if (!_playerInUpgradeRange || IsMaxLevel || inventory == null)
+        if (!CanUpgrade(inventory))
             return false;
 
         int targetLevel = NextLevel;
@@ -186,6 +186,22 @@ public class Tower : MonoBehaviour
             return false;
 
         SetLevel(targetLevel);
+        return true;
+    }
+
+    /// <summary>Checks range, level, and materials without consuming anything.</summary>
+    public bool CanUpgrade(PlayerInventory inventory)
+    {
+        if (!_playerInUpgradeRange || IsMaxLevel || inventory == null)
+            return false;
+
+        TowerUpgradeCost cost = GetUpgradeCostForNextLevel();
+        foreach (LootManager.ResourceType resourceType in UpgradeResourceTypes)
+        {
+            if (inventory.GetCount(resourceType) < cost.GetAmount(resourceType))
+                return false;
+        }
+
         return true;
     }
 

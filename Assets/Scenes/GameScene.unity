@@ -2105,7 +2105,7 @@ MonoBehaviour:
   toxicGasBaseDamagePerSecond: 5
   toxicGasPeriodSeconds: 60
   toxicGasDamageIncreasePerPeriod: 3
-  playerInvincibleForDebug: 1
+  playerInvincibleForDebug: 0
   OnHpChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -5209,9 +5209,9 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.03, y: 0}
+  m_Offset: {x: 0, y: -0.06}
   serializedVersion: 2
-  m_Radius: 0.4
+  m_Radius: 0.28
 --- !u!1 &2055405486
 GameObject:
   m_ObjectHideFlags: 0
@@ -5448,7 +5448,7 @@ PrefabInstance:
       objectReference: {fileID: 519420031}
     - target: {fileID: 699895196781327770, guid: be34b45c25dc7274b866d768d7fa546b, type: 3}
       propertyPath: playerInvincibleForDebug
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 699895196781327770, guid: be34b45c25dc7274b866d768d7fa546b, type: 3}
       propertyPath: OnHpChanged.m_PersistentCalls.m_Calls.Array.size

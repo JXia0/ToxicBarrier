@@ -22,12 +22,20 @@ public class TowerUpgradePanelUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI upgradeButtonText;
     [SerializeField] private TextMeshProUGUI statusText;
 
+    private PlayerController _playerController;
+    private bool _upgradeInProgress;
+
     private void Start()
     {
         if (tower == null)
             tower = FindObjectOfType<Tower>();
         if (inventory == null)
             inventory = FindObjectOfType<PlayerInventory>();
+
+        if (inventory != null)
+            _playerController = inventory.GetComponent<PlayerController>();
+        if (_playerController == null)
+            _playerController = FindObjectOfType<PlayerController>();
 
         if (tower == null || inventory == null)
         {
@@ -77,14 +85,35 @@ public class TowerUpgradePanelUI : MonoBehaviour
 
     private void HandleUpgradeClicked()
     {
-        if (GameFlowManager.Instance != null && !GameFlowManager.Instance.IsPlaying)
+        if (_upgradeInProgress || (GameFlowManager.Instance != null && !GameFlowManager.Instance.IsPlaying))
             return;
 
-        bool upgraded = tower.TryUpgrade(inventory);
+        if (!tower.CanUpgrade(inventory))
+        {
+            RefreshAll();
+            if (statusText != null)
+                statusText.text = tower.IsMaxLevel ? "Tower is already max level" : "Not enough materials";
+            return;
+        }
+
+        _upgradeInProgress = true;
+        RefreshAll();
+        if (statusText != null)
+            statusText.text = "Upgrading...";
+
+        if (_playerController == null ||
+            !_playerController.PlayTowerUpgradeAnimation(tower.transform.position, CompleteUpgrade))
+            CompleteUpgrade();
+    }
+
+    private void CompleteUpgrade()
+    {
+        bool upgraded = tower != null && tower.TryUpgrade(inventory);
+        _upgradeInProgress = false;
         RefreshAll();
 
         if (statusText != null)
-            statusText.text = upgraded ? "Upgrade successful" : "Not enough materials";
+            statusText.text = upgraded ? "Upgrade successful" : "Upgrade cancelled";
     }
 
     private void OnInventoryChanged(LootManager.ResourceType type, int count)
@@ -104,8 +133,8 @@ public class TowerUpgradePanelUI : MonoBehaviour
         textLine2.text = FormatPair(LootManager.ResourceType.Wood, cost.wood, LootManager.ResourceType.Stone, cost.stone);
         textLine3.text = FormatPair(LootManager.ResourceType.Teeth, cost.teeth, LootManager.ResourceType.Gel, cost.gel);
 
-        upgradeButton.interactable = !isMax;
-        upgradeButtonText.text = isMax ? "MAX LEVEL" : "Upgrade";
+        upgradeButton.interactable = !isMax && !_upgradeInProgress;
+        upgradeButtonText.text = isMax ? "MAX LEVEL" : (_upgradeInProgress ? "UPGRADING..." : "Upgrade");
     }
 
     private void SetPanelVisible(bool visible)

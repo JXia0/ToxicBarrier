@@ -27,7 +27,7 @@ public class HealthSystem : MonoBehaviour
 
     [Header("Debug")]
     [Tooltip("勾选后玩家不扣血、不会死亡（仅调试用，发布前请关闭）。")]
-    [SerializeField] private bool playerInvincibleForDebug = true;
+    [SerializeField] private bool playerInvincibleForDebug = false;
 
     private float _currentHp;
     private float _toxicGasTimer;
