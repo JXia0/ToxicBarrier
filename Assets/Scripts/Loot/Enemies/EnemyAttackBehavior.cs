@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 /// <summary>
 /// 敌人攻击逻辑。开局默认攻击塔；若角色在仇恨范围内则优先攻击角色（可随时切换仇恨）。
@@ -9,6 +10,7 @@ using UnityEngine;
 [RequireComponent(typeof(HealthSystem))]
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAttackBehavior : MonoBehaviour
 {
     private static readonly HashSet<EnemyAttackBehavior> ActiveEnemies =
@@ -26,6 +28,12 @@ public class EnemyAttackBehavior : MonoBehaviour
     [Tooltip("角色在此范围内时，敌人优先攻击角色；否则默认攻击塔。")]
     [SerializeField] private float agroRange = 5f;
 
+    [Header("Navigation")]
+    [Tooltip("移动目标的 NavMesh 路径刷新间隔。塔不移动，只有追玩家时需要定期刷新。")]
+    [Min(0.1f)] [SerializeField] private float pathRefreshInterval = 0.25f;
+    [Tooltip("敌人生成点偏离 NavMesh 时，允许吸附到附近网格的距离。")]
+    [Min(0.1f)] [SerializeField] private float navMeshSampleDistance = 1f;
+
     [Header("Debug Target Line")]
     [Tooltip("敌人目标连线已禁用；保留字段仅为兼容已有 Prefab。")]
     [SerializeField] private bool showTargetLine = false;
@@ -37,9 +45,12 @@ public class EnemyAttackBehavior : MonoBehaviour
 
     private HealthSystem _health;
     private Rigidbody2D _rb;
+    private NavMeshAgent _agent;
     private SpriteRenderer _spriteRenderer;
     private Collider2D[] _colliders;
     private Transform _target;
+    private Vector3 _lastDestination;
+    private float _nextPathRefreshTime;
     private float _attackCooldown;
     private bool _playerCollisionIgnored;
 
@@ -47,8 +58,10 @@ public class EnemyAttackBehavior : MonoBehaviour
     {
         _health = GetComponent<HealthSystem>();
         _rb = GetComponent<Rigidbody2D>();
+        _agent = GetComponent<NavMeshAgent>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _colliders = GetComponents<Collider2D>();
+        ConfigureNavigationAgent();
         if (animator == null)
             animator = GetComponent<Animator>();
         if (_rb != null)
@@ -83,7 +96,7 @@ public class EnemyAttackBehavior : MonoBehaviour
         if (_health == null || _health.CurrentHp <= 0f)
         {
             _target = null;
-            if (_rb != null) _rb.velocity = Vector2.zero;
+            StopNavigation();
             SetMovingAnimation(false);
             return;
         }
@@ -91,7 +104,7 @@ public class EnemyAttackBehavior : MonoBehaviour
         UpdateTarget();
         if (_target == null)
         {
-            if (_rb != null) _rb.velocity = Vector2.zero;
+            StopNavigation();
             SetMovingAnimation(false);
             return;
         }
@@ -99,11 +112,11 @@ public class EnemyAttackBehavior : MonoBehaviour
         Vector2 pos = transform.position;
         Vector2 targetPos = _target.position;
         float dist = Vector2.Distance(pos, targetPos);
-        FaceTarget(targetPos);
 
         if (dist <= attackRange)
         {
-            if (_rb != null) _rb.velocity = Vector2.zero;
+            StopNavigation();
+            FaceTarget(targetPos);
             SetMovingAnimation(false);
             _attackCooldown -= Time.deltaTime;
             if (_attackCooldown <= 0f)
@@ -115,10 +128,7 @@ public class EnemyAttackBehavior : MonoBehaviour
         }
         else
         {
-            Vector2 dir = (targetPos - pos).normalized;
-            if (_rb != null)
-                _rb.velocity = dir * GetMoveSpeed();
-            SetMovingAnimation(true);
+            MoveAlongNavMesh(targetPos);
         }
 
         // 敌人目标连线功能已禁用（只保留塔的红线）。
@@ -128,8 +138,7 @@ public class EnemyAttackBehavior : MonoBehaviour
     {
         ActiveEnemies.Remove(this);
         _playerCollisionIgnored = false;
-        if (_rb != null)
-            _rb.velocity = Vector2.zero;
+        StopNavigation();
         SetMovingAnimation(false);
     }
 
@@ -163,6 +172,85 @@ public class EnemyAttackBehavior : MonoBehaviour
                     Physics2D.IgnoreCollision(ownCollider, otherCollider, true);
             }
         }
+    }
+
+    private void ConfigureNavigationAgent()
+    {
+        if (_agent == null) return;
+
+        _agent.updatePosition = false;
+        _agent.updateRotation = false;
+        _agent.updateUpAxis = false;
+        _agent.autoBraking = true;
+        _agent.autoRepath = true;
+        _agent.radius = 0.25f;
+        _agent.height = 0.6f;
+        _agent.baseOffset = 0f;
+        _agent.acceleration = 40f;
+        _agent.angularSpeed = 0f;
+        _agent.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
+    }
+
+    private void MoveAlongNavMesh(Vector2 targetPosition)
+    {
+        if (_agent == null || _rb == null || !EnsureAgentOnNavMesh())
+        {
+            if (_rb != null)
+                _rb.velocity = Vector2.zero;
+            SetMovingAnimation(false);
+            return;
+        }
+
+        _agent.nextPosition = transform.position;
+        _agent.speed = GetMoveSpeed();
+        _agent.stoppingDistance = attackRange;
+        _agent.isStopped = false;
+
+        Vector3 destination = new Vector3(targetPosition.x, targetPosition.y, transform.position.z);
+        if (Time.time >= _nextPathRefreshTime ||
+            (destination - _lastDestination).sqrMagnitude > 0.25f)
+        {
+            _agent.SetDestination(destination);
+            _lastDestination = destination;
+            _nextPathRefreshTime = Time.time + pathRefreshInterval;
+        }
+
+        Vector3 desiredVelocity = _agent.desiredVelocity;
+        Vector2 velocity2D = new Vector2(desiredVelocity.x, desiredVelocity.y);
+        _rb.velocity = velocity2D;
+        if (velocity2D.sqrMagnitude > 0.0001f)
+            FaceTarget((Vector2)transform.position + velocity2D);
+        SetMovingAnimation(velocity2D.sqrMagnitude > 0.0001f);
+    }
+
+    private bool EnsureAgentOnNavMesh()
+    {
+        if (_agent.isOnNavMesh)
+            return true;
+
+        if (!NavMesh.SamplePosition(
+                transform.position,
+                out NavMeshHit hit,
+                navMeshSampleDistance,
+                NavMesh.AllAreas))
+        {
+            return false;
+        }
+
+        return _agent.Warp(hit.position);
+    }
+
+    private void StopNavigation()
+    {
+        if (_rb != null)
+            _rb.velocity = Vector2.zero;
+
+        if (_agent == null || !_agent.isOnNavMesh)
+            return;
+
+        _agent.isStopped = true;
+        if (_agent.hasPath)
+            _agent.ResetPath();
     }
 
     private void SetMovingAnimation(bool isMoving)
