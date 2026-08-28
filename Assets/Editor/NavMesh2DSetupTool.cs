@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Unity.AI.Navigation;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -12,6 +13,7 @@ public static class NavMesh2DSetupTool
         "Assets/PeterRadiant/Tiny Swords/Buildings/";
     private const string ScenePath = "Assets/Scenes/GameScene.unity";
     private const string NavMeshAssetPath = "Assets/Scenes/NavMesh-Navigation2D.asset";
+    private const string SetupRequestPath = "Assets/Editor/NavMesh2DSetup.request";
     private const string ObstacleLayerName = "Obstacle";
     private const string NavigationLayerName = "Navigation";
 
@@ -22,34 +24,75 @@ public static class NavMesh2DSetupTool
         "Assets/Prefab/Boss.prefab"
     };
 
+    [InitializeOnLoadMethod]
+    private static void RunRequestedSetupAfterCompile()
+    {
+        string absoluteRequestPath =
+            Path.Combine(Application.dataPath, "Editor/NavMesh2DSetup.request");
+        if (!File.Exists(absoluteRequestPath))
+            return;
+
+        EditorApplication.delayCall += () =>
+        {
+            try
+            {
+                SetupActiveScene();
+                AssetDatabase.DeleteAsset(SetupRequestPath);
+                Debug.Log("2D NavMesh setup request completed and removed.");
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError(
+                    $"2D NavMesh automatic setup failed: {exception.Message}. " +
+                    "The request remains available for a retry.");
+            }
+        };
+    }
+
     [MenuItem("Tools/Toxic Barrier/Setup 2D NavMesh")]
     public static void SetupActiveScene()
     {
-        Scene scene = SceneManager.GetActiveScene();
-        if (!scene.IsValid() || !scene.isLoaded)
-            return;
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+            throw new InvalidOperationException("Exit Play Mode before setting up 2D NavMesh.");
 
-        int obstacleLayer = EnsureLayerExists(ObstacleLayerName);
-        int navigationLayer = EnsureLayerExists(NavigationLayerName);
-        if (obstacleLayer < 0 || navigationLayer < 0)
+        Scene previousScene = SceneManager.GetActiveScene();
+        Scene scene = SceneManager.GetSceneByPath(ScenePath);
+        bool wasAlreadyLoaded = scene.IsValid() && scene.isLoaded;
+        if (!wasAlreadyLoaded)
+            scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);
+        SceneManager.SetActiveScene(scene);
+
+        try
         {
-            Debug.LogError("No free User Layer is available for 2D navigation.");
-            return;
+            int obstacleLayer = EnsureLayerExists(ObstacleLayerName);
+            int navigationLayer = EnsureLayerExists(NavigationLayerName);
+            if (obstacleLayer < 0 || navigationLayer < 0)
+                throw new InvalidOperationException(
+                    "No free User Layer is available for 2D navigation.");
+
+            int buildingCount = SetupBuildingObstacles(scene, obstacleLayer);
+            SetupNavigationGround(scene, navigationLayer);
+            NavMeshSurface surface = SetupNavigationSurface(
+                scene,
+                navigationLayer,
+                obstacleLayer);
+            SetupEnemyPrefabs();
+            BakeNavigation(surface);
+
+            EditorSceneManager.MarkSceneDirty(scene);
+            if (!EditorSceneManager.SaveScene(scene, ScenePath))
+                throw new InvalidOperationException($"Could not save '{ScenePath}'.");
+            AssetDatabase.SaveAssets();
+            Debug.Log(
+                $"2D NavMesh setup complete: {buildingCount} building obstacle(s) baked.");
         }
-
-        int buildingCount = SetupBuildingObstacles(scene, obstacleLayer);
-        SetupNavigationGround(scene, navigationLayer);
-        NavMeshSurface surface = SetupNavigationSurface(
-            scene,
-            navigationLayer,
-            obstacleLayer);
-        SetupEnemyPrefabs();
-        BakeNavigation(surface);
-
-        EditorSceneManager.MarkSceneDirty(scene);
-        EditorSceneManager.SaveScene(scene);
-        AssetDatabase.SaveAssets();
-        Debug.Log($"2D NavMesh setup complete: {buildingCount} building obstacle(s) baked.");
+        finally
+        {
+            if (previousScene.IsValid() && previousScene.isLoaded)
+                SceneManager.SetActiveScene(previousScene);
+            if (!wasAlreadyLoaded && scene.IsValid() && scene.isLoaded)
+                EditorSceneManager.CloseScene(scene, true);
+        }
     }
 
     private static int SetupBuildingObstacles(Scene scene, int obstacleLayer)
@@ -196,7 +239,6 @@ public static class NavMesh2DSetupTool
         agent.speed = 2.5f;
         agent.acceleration = 40f;
         agent.angularSpeed = 0f;
-        agent.stoppingDistance = 0.75f;
         agent.autoBraking = true;
         agent.autoRepath = true;
         agent.updatePosition = false;
@@ -207,21 +249,24 @@ public static class NavMesh2DSetupTool
 
     private static void BakeNavigation(NavMeshSurface surface)
     {
-        if (surface.navMeshData != null)
-            surface.RemoveData();
-        surface.navMeshData = null;
+        NavMeshData previousData = surface.navMeshData;
+        surface.BuildNavMesh();
+        NavMeshData bakedData = surface.navMeshData;
+        if (bakedData == null || bakedData == previousData)
+            throw new InvalidOperationException("2D NavMesh bake produced no new data.");
+
+        string temporaryAssetPath = AssetDatabase.GenerateUniqueAssetPath(
+            "Assets/Scenes/NavMesh-Navigation2D.rebuild.asset");
+        AssetDatabase.CreateAsset(bakedData, temporaryAssetPath);
+        AssetDatabase.SaveAssets();
 
         if (AssetDatabase.LoadAssetAtPath<NavMeshData>(NavMeshAssetPath) != null)
             AssetDatabase.DeleteAsset(NavMeshAssetPath);
 
-        surface.BuildNavMesh();
-        if (surface.navMeshData == null)
-        {
-            Debug.LogError("2D NavMesh bake produced no data.", surface);
-            return;
-        }
+        string moveError = AssetDatabase.MoveAsset(temporaryAssetPath, NavMeshAssetPath);
+        if (!string.IsNullOrEmpty(moveError))
+            throw new InvalidOperationException($"Could not save NavMesh data: {moveError}");
 
-        AssetDatabase.CreateAsset(surface.navMeshData, NavMeshAssetPath);
         EditorUtility.SetDirty(surface);
     }
 
