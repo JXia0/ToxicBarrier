@@ -119,10 +119,15 @@ public static class NavMesh2DSetupTool
 
             BoxCollider2D collider2D = building.GetComponent<BoxCollider2D>();
             if (collider2D == null)
+            {
                 collider2D = Undo.AddComponent<BoxCollider2D>(building);
+                FitFootprintCollider(collider2D, spriteRenderer.sprite);
+            }
             else
-                Undo.RecordObject(collider2D, "Fit building collider");
-            FitFootprintCollider(collider2D, spriteRenderer.sprite);
+            {
+                Undo.RecordObject(collider2D, "Sync building collider to NavMesh");
+            }
+            collider2D.isTrigger = false;
 
             Transform proxyTransform = building.transform.Find("NavigationObstacle");
             GameObject proxy;
@@ -250,20 +255,25 @@ public static class NavMesh2DSetupTool
     private static void BakeNavigation(NavMeshSurface surface)
     {
         NavMeshData previousData = surface.navMeshData;
+        string targetAssetPath = AssetDatabase.GetAssetPath(previousData);
+        if (string.IsNullOrEmpty(targetAssetPath))
+            targetAssetPath = NavMeshAssetPath;
+
         surface.BuildNavMesh();
         NavMeshData bakedData = surface.navMeshData;
         if (bakedData == null || bakedData == previousData)
             throw new InvalidOperationException("2D NavMesh bake produced no new data.");
 
+        string targetFolder = Path.GetDirectoryName(targetAssetPath).Replace('\\', '/');
         string temporaryAssetPath = AssetDatabase.GenerateUniqueAssetPath(
-            "Assets/Scenes/NavMesh-Navigation2D.rebuild.asset");
+            $"{targetFolder}/NavMesh-Navigation2D.rebuild.asset");
         AssetDatabase.CreateAsset(bakedData, temporaryAssetPath);
         AssetDatabase.SaveAssets();
 
-        if (AssetDatabase.LoadAssetAtPath<NavMeshData>(NavMeshAssetPath) != null)
-            AssetDatabase.DeleteAsset(NavMeshAssetPath);
+        if (AssetDatabase.LoadAssetAtPath<NavMeshData>(targetAssetPath) != null)
+            AssetDatabase.DeleteAsset(targetAssetPath);
 
-        string moveError = AssetDatabase.MoveAsset(temporaryAssetPath, NavMeshAssetPath);
+        string moveError = AssetDatabase.MoveAsset(temporaryAssetPath, targetAssetPath);
         if (!string.IsNullOrEmpty(moveError))
             throw new InvalidOperationException($"Could not save NavMesh data: {moveError}");
 
