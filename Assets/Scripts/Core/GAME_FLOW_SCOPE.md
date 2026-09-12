@@ -1,5 +1,7 @@
 # Game Flow 职责与状态整理
 
+> 2026-09-12 收尾更新：新增 Won 状态与胜利结算；塔毁也进入 Dead 并显示塔毁原因。胜利要求塔满级、三区全部波次生成完毕且存活敌人归零。新版界面与修改入口见 `Assets/Documentation/UICompletion.md`；旧 GameFlow UI 和 Player Health UI 工具菜单转到新版生成器。
+
 本文记录 `GameFlowManager` 的已实施流程、状态边界和职责归属，作为后续扩展流程 UI 或场景时的统一依据。
 
 ## 实施后的项目现状
