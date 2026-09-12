@@ -62,6 +62,7 @@ public class EnemyAttackBehavior : MonoBehaviour
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _colliders = GetComponents<Collider2D>();
         ConfigureNavigationAgent();
+        FitCollisionFootprintToNavigation();
         if (animator == null)
             animator = GetComponent<Animator>();
         if (_rb != null)
@@ -90,6 +91,7 @@ public class EnemyAttackBehavior : MonoBehaviour
 
     private void Update()
     {
+        if (Time.timeScale <= 0f) return;
         if (!_playerCollisionIgnored)
             IgnorePlayerCollisions();
 
@@ -189,6 +191,21 @@ public class EnemyAttackBehavior : MonoBehaviour
         _agent.acceleration = 40f;
         _agent.angularSpeed = 0f;
         _agent.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
+    }
+
+    private void FitCollisionFootprintToNavigation()
+    {
+        // Art is scaled x3, but navigation is baked for a 0.25-unit radius. A sprite-sized
+        // physics box blocks routes the agent considers traversable and leaves waves uncleared.
+        foreach (Collider2D collider in _colliders)
+        {
+            if (collider.isTrigger || !(collider is BoxCollider2D box)) continue;
+            Vector3 scale = box.transform.lossyScale;
+            Vector2 worldSize = Vector2.Scale(box.size, new Vector2(Mathf.Abs(scale.x), Mathf.Abs(scale.y)));
+            float radius = worldSize.magnitude * .5f;
+            box.size *= Mathf.Min(1f, (_agent.radius * .9f) / Mathf.Max(.001f, radius));
+            box.offset = Vector2.zero;
+        }
     }
 
     private void MoveAlongNavMesh(Vector2 targetPosition)
@@ -365,6 +382,10 @@ public class EnemyAttackBehavior : MonoBehaviour
         if (targetHealth == null || targetHealth.CurrentHp <= 0f) return;
 
         float damage = _health.Atk;
+        // Tower damage retains the authored siege balance; the survivor gets an escape window.
+        if (targetHealth.IsPlayer)
+            damage = _health.CurrentEnemyType == HealthSystem.EnemyType.Boss ? 40f :
+                _health.CurrentEnemyType == HealthSystem.EnemyType.Leader ? 12f : 18f;
         targetHealth.TakeDamage(damage, gameObject);
     }
 }
