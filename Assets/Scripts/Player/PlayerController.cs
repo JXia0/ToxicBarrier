@@ -53,6 +53,14 @@ public class PlayerController : MonoBehaviour
 
         transform.rotation = Quaternion.identity;
         _facingScaleMagnitude = Mathf.Max(Mathf.Abs(transform.localScale.x), 0.0001f);
+        // The 3x art scale must not turn the foot collider into an 0.84m navigation obstacle.
+        var feet = GetComponent<CircleCollider2D>();
+        if (feet != null && !feet.isTrigger)
+        {
+            float scale = Mathf.Max(Mathf.Abs(transform.lossyScale.x), Mathf.Abs(transform.lossyScale.y));
+            feet.radius = Mathf.Min(feet.radius, .225f / Mathf.Max(.001f, scale));
+            feet.offset = Vector2.zero;
+        }
         SetMovingAnimation(false);
     }
 
@@ -116,6 +124,9 @@ public class PlayerController : MonoBehaviour
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
+#if UNITY_EDITOR
+        if (_reviewMovement.HasValue) { horizontal = _reviewMovement.Value.x; vertical = _reviewMovement.Value.y; }
+#endif
 
         if (Mathf.Abs(horizontal) < inputDeadZone) horizontal = 0f;
         if (Mathf.Abs(vertical) < inputDeadZone) vertical = 0f;
@@ -203,4 +214,9 @@ public class PlayerController : MonoBehaviour
         if (distanceFromCenter <= map2Radius) return map2MoveSpeed;
         return map3MoveSpeed;
     }
+#if UNITY_EDITOR
+    // Playthrough tooling supplies directional input; normal movement, collisions and animation still run.
+    private Vector2? _reviewMovement;
+    public void SetReviewMovement(Vector2? direction) { _reviewMovement = direction; }
+#endif
 }
