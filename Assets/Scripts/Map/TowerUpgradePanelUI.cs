@@ -21,9 +21,16 @@ public class TowerUpgradePanelUI : MonoBehaviour
     [SerializeField] private Button upgradeButton;
     [SerializeField] private TextMeshProUGUI upgradeButtonText;
     [SerializeField] private TextMeshProUGUI statusText;
+    [SerializeField] private TextMeshProUGUI woodCostText;
+    [SerializeField] private TextMeshProUGUI stoneCostText;
+    [SerializeField] private TextMeshProUGUI gelCostText;
+    [SerializeField] private TextMeshProUGUI teethCostText;
+    [SerializeField] private Image towerPreview;
+    [SerializeField] private Sprite[] towerSprites;
 
     private PlayerController _playerController;
     private bool _upgradeInProgress;
+    private GameFlowManager _flow;
 
     private void Start()
     {
@@ -54,6 +61,8 @@ public class TowerUpgradePanelUI : MonoBehaviour
         tower.OnLevelChanged += RefreshAll;
         inventory.OnResourceCountChanged.AddListener(OnInventoryChanged);
         upgradeButton.onClick.AddListener(HandleUpgradeClicked);
+        _flow = GameFlowManager.Instance;
+        if (_flow != null) _flow.OnStateChanged += HandleFlowChanged;
 
         RefreshAll();
         SetPanelVisible(tower.IsPlayerInUpgradeRange);
@@ -61,6 +70,7 @@ public class TowerUpgradePanelUI : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (_flow != null) _flow.OnStateChanged -= HandleFlowChanged;
         if (tower != null)
         {
             tower.OnUpgradeRangeChanged -= HandleUpgradeRangeChanged;
@@ -73,11 +83,24 @@ public class TowerUpgradePanelUI : MonoBehaviour
             upgradeButton.onClick.RemoveListener(HandleUpgradeClicked);
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E) && upgradeButton != null && upgradeButton.interactable &&
+            panelRoot != null && panelRoot.gameObject.activeInHierarchy)
+            HandleUpgradeClicked();
+    }
+
+    private void HandleFlowChanged(GameState previous, GameState next)
+    {
+        SetPanelVisible(tower != null && tower.IsPlayerInUpgradeRange);
+        if (next == GameState.Playing) RefreshAll();
+    }
+
     private void HandleUpgradeRangeChanged(bool isNear)
     {
         if (isNear)
         {
-            if (statusText != null) statusText.text = string.Empty;
+            if (statusText != null) statusText.text = GameText.Translate(string.Empty);
             RefreshAll();
         }
         SetPanelVisible(isNear);
@@ -92,14 +115,14 @@ public class TowerUpgradePanelUI : MonoBehaviour
         {
             RefreshAll();
             if (statusText != null)
-                statusText.text = tower.IsMaxLevel ? "Tower is already max level" : "Not enough materials";
+                statusText.text = GameText.Translate(tower.IsMaxLevel ? "净化塔已满级" : "材料不足");
             return;
         }
 
         _upgradeInProgress = true;
         RefreshAll();
         if (statusText != null)
-            statusText.text = "Upgrading...";
+            statusText.text = GameText.Translate("正在升级…");
 
         if (_playerController == null ||
             !_playerController.PlayTowerUpgradeAnimation(tower.transform.position, CompleteUpgrade))
@@ -108,12 +131,12 @@ public class TowerUpgradePanelUI : MonoBehaviour
 
     private void CompleteUpgrade()
     {
-        bool upgraded = tower != null && tower.TryUpgrade(inventory);
+        bool upgraded = (_flow == null || _flow.IsPlaying) && tower != null && tower.TryUpgrade(inventory);
         _upgradeInProgress = false;
         RefreshAll();
 
         if (statusText != null)
-            statusText.text = upgraded ? "Upgrade successful" : "Upgrade cancelled";
+            statusText.text = GameText.Translate(upgraded ? "升级成功" : "升级已取消");
     }
 
     private void OnInventoryChanged(LootManager.ResourceType type, int count)
@@ -123,24 +146,52 @@ public class TowerUpgradePanelUI : MonoBehaviour
 
     private void RefreshAll()
     {
+        if (tower == null || inventory == null || textLine1 == null) return;
         int nextLevel = tower.NextLevel;
         bool isMax = tower.IsMaxLevel;
         Tower.TowerUpgradeCost cost = tower.GetUpgradeCostForNextLevel();
 
-        textLine1.text = isMax
-            ? $"Tower Level: {tower.CurrentLevel}  |  MAX"
-            : $"Tower Level: {tower.CurrentLevel}  |  Next: Level {nextLevel}";
-        textLine2.text = FormatPair(LootManager.ResourceType.Wood, cost.wood, LootManager.ResourceType.Stone, cost.stone);
-        textLine3.text = FormatPair(LootManager.ResourceType.Teeth, cost.teeth, LootManager.ResourceType.Gel, cost.gel);
+        textLine1.text = GameText.Translate(isMax
+            ? $"净化塔 {tower.CurrentLevel} 级  |  已满级"
+            : $"净化塔 {tower.CurrentLevel} 级  →  {nextLevel} 级");
+        if (woodCostText != null)
+        {
+            Tower.TowerLevelStats now = tower.CurrentStats;
+            Tower.TowerLevelStats next = tower.GetLevelStats(nextLevel);
+            textLine2.text = GameText.Translate(isMax ? $"攻击 {now.atk:0}    生命 {now.hp:0}" : $"攻击 {now.atk:0} → {next.atk:0}   生命 {now.hp:0} → {next.hp:0}");
+            textLine3.text = GameText.Translate(isMax ? "守住净化塔，清空三区所有波次和敌人。" :
+                (nextLevel >= 2 ? $"解锁第 {nextLevel} 区，恢复玩家与塔的全部生命。" : "强化防御，恢复玩家与塔的全部生命。"));
+            SetCost(woodCostText, LootManager.ResourceType.Wood, cost.wood);
+            SetCost(stoneCostText, LootManager.ResourceType.Stone, cost.stone);
+            SetCost(gelCostText, LootManager.ResourceType.Gel, cost.gel);
+            SetCost(teethCostText, LootManager.ResourceType.Teeth, cost.teeth);
+            if (towerPreview != null && towerSprites != null && towerSprites.Length > nextLevel)
+                towerPreview.sprite = towerSprites[nextLevel];
+        }
+        else
+        {
+            textLine2.text = GameText.Translate(FormatPair(LootManager.ResourceType.Wood, cost.wood, LootManager.ResourceType.Stone, cost.stone));
+            textLine3.text = GameText.Translate(FormatPair(LootManager.ResourceType.Teeth, cost.teeth, LootManager.ResourceType.Gel, cost.gel));
+        }
 
-        upgradeButton.interactable = !isMax && !_upgradeInProgress;
-        upgradeButtonText.text = isMax ? "MAX LEVEL" : (_upgradeInProgress ? "UPGRADING..." : "Upgrade");
+        upgradeButton.interactable = !isMax && !_upgradeInProgress && tower.CanUpgrade(inventory) && (_flow == null || _flow.IsPlaying);
+        upgradeButtonText.text = GameText.Translate(isMax ? "已达满级" : (_upgradeInProgress ? "正在升级…" : "升级净化塔 [E]"));
+        if (statusText != null && !_upgradeInProgress)
+            statusText.text = GameText.Translate(isMax ? "最终防线已就绪" : tower.CanUpgrade(inventory) ? "材料已备齐" : "采集材料，或清区后领取补给");
+    }
+
+    private void SetCost(TextMeshProUGUI label, LootManager.ResourceType type, int required)
+    {
+        if (label == null) return;
+        int held = inventory.GetCount(type);
+        label.text = GameText.Translate(tower.IsMaxLevel ? $"{TypeName(type)}  {held}" : $"{TypeName(type)}  {held} / {required}");
+        label.color = held < required ? new Color(1f, 0.55f, 0.45f) : new Color(0.84f, 0.95f, 0.73f);
     }
 
     private void SetPanelVisible(bool visible)
     {
         if (panelRoot != null)
-            panelRoot.gameObject.SetActive(visible);
+            panelRoot.gameObject.SetActive(visible && (_flow == null || _flow.IsPlaying));
     }
 
     private string FormatPair(LootManager.ResourceType typeA, int needA, LootManager.ResourceType typeB, int needB)
@@ -153,10 +204,10 @@ public class TowerUpgradePanelUI : MonoBehaviour
     {
         switch (type)
         {
-            case LootManager.ResourceType.Gel: return "Gel";
-            case LootManager.ResourceType.Teeth: return "Teeth";
-            case LootManager.ResourceType.Wood: return "Wood";
-            case LootManager.ResourceType.Stone: return "Stone";
+            case LootManager.ResourceType.Gel: return "凝胶";
+            case LootManager.ResourceType.Teeth: return "尖牙";
+            case LootManager.ResourceType.Wood: return "木材";
+            case LootManager.ResourceType.Stone: return "石料";
             default: return type.ToString();
         }
     }
@@ -228,7 +279,7 @@ public class TowerUpgradePanelUI : MonoBehaviour
         var textGo = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
         textGo.transform.SetParent(buttonGo.transform, false);
         upgradeButtonText = textGo.GetComponent<TextMeshProUGUI>();
-        upgradeButtonText.text = "Upgrade";
+        upgradeButtonText.text = GameText.Translate("Upgrade");
         if (TMP_Settings.defaultFontAsset != null)
             upgradeButtonText.font = TMP_Settings.defaultFontAsset;
         upgradeButtonText.fontSize = 22f;
