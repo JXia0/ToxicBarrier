@@ -34,6 +34,14 @@ public class HealthSystem : MonoBehaviour
     private int _toxicGasPeriodsElapsed;
     private bool _hasDied;
     private bool _toxicGasDrivenCentrally;
+    private float _contactProtectionUntil;
+    private float _lastDamageAt = -10;
+    private Tower _refuge;
+    private SpriteRenderer _visual;
+    private Color _baseColor;
+    private float _flashUntil;
+    public bool IsRecovering { get; private set; }
+    public float ToxicDamagePerSecond => Mathf.Min(8f, toxicGasBaseDamagePerSecond + _toxicGasPeriodsElapsed * toxicGasDamageIncreasePerPeriod);
 
     public float CurrentHp => _currentHp;
     public float MaxHp => maxHp;
@@ -56,16 +64,31 @@ public class HealthSystem : MonoBehaviour
     private void Awake()
     {
         _currentHp = maxHp;
+        _visual = GetComponent<SpriteRenderer>();
+        if (_visual != null) _baseColor = _visual.color;
     }
 
     private void Start()
     {
         ApplyEnemyTypeStats();
+        if (isPlayer)
+        {
+            _refuge = FindObjectOfType<Tower>();
+        }
     }
 
     private void Update()
     {
-        if (!isPlayer || !affectedByToxicGas || _currentHp <= 0f) return;
+        if (_visual != null) _visual.color = Time.time < _flashUntil ? new Color(1, .45f, .35f, 1) : _baseColor;
+        IsRecovering = false;
+        if (!isPlayer || _currentHp <= 0f || Time.timeScale <= 0) return;
+        if (_refuge != null && Vector2.Distance(transform.position, _refuge.transform.position) <= 2f &&
+            Time.time - _lastDamageAt >= 3 && _currentHp < maxHp)
+        {
+            IsRecovering = true;
+            Heal(8f * Time.deltaTime);
+        }
+        if (!affectedByToxicGas) return;
 
         if (_toxicGasDrivenCentrally)
             ApplyToxicGasDamage(Time.deltaTime);
@@ -102,14 +125,21 @@ public class HealthSystem : MonoBehaviour
         if (isPlayer && MapController.Instance != null && MapController.Instance.IsPlayerInMap1())
             return;
 
-        float damagePerSecond = toxicGasBaseDamagePerSecond + _toxicGasPeriodsElapsed * toxicGasDamageIncreasePerPeriod;
-        TakeDamage(damagePerSecond * deltaTime, null);
+        TakeDamage(ToxicDamagePerSecond * deltaTime, null);
     }
 
     public void TakeDamage(float amount, GameObject source)
     {
         if (amount <= 0f || _hasDied) return;
         if (isPlayer && playerInvincibleForDebug) return;
+        if (isPlayer && source != null)
+        {
+            if (Time.time < _contactProtectionUntil) return;
+            _contactProtectionUntil = Time.time + .75f;
+            GameAudio.Play("Hurt", .3f);
+        }
+        _lastDamageAt = Time.time;
+        if (source != null) _flashUntil = Time.time + .15f;
         _currentHp = Mathf.Max(0f, _currentHp - amount);
         OnHpChanged?.Invoke(_currentHp, maxHp);
         if (_currentHp <= 0f)
@@ -117,6 +147,13 @@ public class HealthSystem : MonoBehaviour
             _hasDied = true;
             OnDeath?.Invoke();
         }
+    }
+
+    public void Heal(float amount)
+    {
+        if (_hasDied || amount <= 0 || _currentHp >= maxHp) return;
+        _currentHp = Mathf.Min(maxHp, _currentHp + amount);
+        OnHpChanged?.Invoke(_currentHp, maxHp);
     }
 
     public void RestoreFullHealth()
