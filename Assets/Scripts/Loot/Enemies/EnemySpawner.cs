@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 /// <summary>
 /// Spawns the wave config assigned to this map ring.
@@ -35,6 +36,16 @@ public class EnemySpawner : MonoBehaviour
 
     private Coroutine _spawnCoroutine;
     private int _aliveEnemies;
+    public int CurrentWaveNumber { get; private set; }
+    public int TotalWaves => levelWaves != null && levelWaves.waves != null ? levelWaves.waves.Length : 0;
+    public int AliveEnemies => _aliveEnemies;
+    public int DefeatedCount { get; private set; }
+    public bool HasFinishedSpawning { get; private set; }
+    public bool IsWaitingForNextWave { get; private set; }
+    public float NextWaveSeconds { get; private set; }
+    public bool IsCleared => HasFinishedSpawning && _aliveEnemies == 0;
+    public bool IsUnlocked => mapZone != null && mapZone.IsUnlocked;
+    public int RegionLevel => mapZone != null ? mapZone.MapLevel : 0;
 
     private void Start()
     {
@@ -44,6 +55,10 @@ public class EnemySpawner : MonoBehaviour
     public void StartSpawning()
     {
         StopSpawning();
+        HasFinishedSpawning = false;
+        IsWaitingForNextWave = false;
+        NextWaveSeconds = 0;
+        CurrentWaveNumber = 0;
         _spawnCoroutine = StartCoroutine(SpawnWavesCoroutine());
     }
 
@@ -57,7 +72,7 @@ public class EnemySpawner : MonoBehaviour
 
     private IEnumerator SpawnWavesCoroutine()
     {
-        if (mapZone == null || levelWaves == null)
+        if (mapZone == null || levelWaves == null || levelWaves.waves == null)
         {
             Debug.LogWarning("EnemySpawner requires a MapZone and LevelWavesConfig.", this);
             _spawnCoroutine = null;
@@ -70,10 +85,14 @@ public class EnemySpawner : MonoBehaviour
         do
         {
             for (int waveIndex = 0; waveIndex < levelWaves.waves.Length; waveIndex++)
+            {
+                CurrentWaveNumber = waveIndex + 1;
                 yield return SpawnWave(levelWaves.waves[waveIndex], waveIndex);
+            }
         }
         while (loopWaves);
 
+        HasFinishedSpawning = true;
         _spawnCoroutine = null;
     }
 
@@ -89,13 +108,20 @@ public class EnemySpawner : MonoBehaviour
         }
 
         float elapsed = 0f;
+        // A final wave has no next-wave delay; clear status still waits for its living enemies.
+        if (waveIndex == levelWaves.waves.Length - 1 && !loopWaves) yield break;
+        IsWaitingForNextWave = true;
         while (elapsed < wave.maxDelayBeforeNext)
         {
+            float waitUntil = _aliveEnemies <= wave.minRemainingEnemiesToSpeedUp ? wave.minDelayBeforeNext : wave.maxDelayBeforeNext;
+            NextWaveSeconds = Mathf.Max(0, waitUntil - elapsed);
             elapsed += Time.deltaTime;
             if (elapsed >= wave.minDelayBeforeNext && _aliveEnemies <= wave.minRemainingEnemiesToSpeedUp)
                 break;
             yield return null;
         }
+        IsWaitingForNextWave = false;
+        NextWaveSeconds = 0;
     }
 
     private List<GameObject> BuildWave(int budget, int waveIndex)
@@ -141,6 +167,7 @@ public class EnemySpawner : MonoBehaviour
     private void HandleEnemyDeath()
     {
         _aliveEnemies = Mathf.Max(0, _aliveEnemies - 1);
+        DefeatedCount++;
     }
 
     private List<Vector2> BuildSpawnPositions(int count)
@@ -151,16 +178,34 @@ public class EnemySpawner : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             Vector2 position = center;
-            for (int attempt = 0; attempt < 50; attempt++)
+            for (int attempt = 0; attempt < 256; attempt++)
             {
                 position = RandomPointInRing(center, innerRadius, outerRadius);
-                if (IsOutsideTowerRange(position) && IsFarEnough(position, positions))
+                if (TryNavigablePosition(ref position, center, innerRadius, outerRadius) &&
+                    IsOutsideTowerRange(position) && IsFarEnough(position, positions))
                     break;
+                if (attempt == 255)
+                    throw new System.InvalidOperationException("No reachable enemy spawn position in region " + RegionLevel);
             }
             positions.Add(position);
         }
 
         return positions;
+    }
+
+    private bool TryNavigablePosition(ref Vector2 position, Vector2 center, float inner, float outer)
+    {
+        if (!NavMesh.SamplePosition(position, out NavMeshHit hit, 2f, NavMesh.AllAreas)) return false;
+        float radius = Vector2.Distance(hit.position, center);
+        if (radius < inner || radius > outer) return false;
+        if (towerToExclude != null)
+        {
+            var path = new NavMeshPath();
+            if (!NavMesh.CalculatePath(hit.position, towerToExclude.transform.position, NavMesh.AllAreas, path) ||
+                path.status != NavMeshPathStatus.PathComplete) return false;
+        }
+        position = hit.position;
+        return true;
     }
 
     private bool IsOutsideTowerRange(Vector2 position)
