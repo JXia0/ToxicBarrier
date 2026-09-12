@@ -12,6 +12,7 @@ public class TowerAttackBehavior : MonoBehaviour
     private static readonly int AttackEffectStateHash = Animator.StringToHash("Base Layer.Explosion 1 Animation");
 
     [Header("Attack Flash Line (Black)")]
+    [SerializeField] private bool showAttackFlashLine = true;
     [SerializeField] private float attackLineDisplayDuration = 0.08f;
     [SerializeField] private float attackLineStartWidth = 0.15f;
     [SerializeField] private float attackLineEndWidth = 0.05f;
@@ -34,6 +35,7 @@ public class TowerAttackBehavior : MonoBehaviour
     [SerializeField, Min(0.1f)] private float attackEffectPlaybackSpeed = 2.5f;
 
     private Tower _tower;
+    private TowerParticleEffects _particles;
     private HealthSystem _health;
     private float _attackCooldown;
     private float _attackLineHideTime;
@@ -50,6 +52,7 @@ public class TowerAttackBehavior : MonoBehaviour
     private void Awake()
     {
         _tower = GetComponent<Tower>();
+        _particles = GetComponent<TowerParticleEffects>();
         _health = GetComponent<HealthSystem>();
 
         if (attackLineRenderer == null)
@@ -81,6 +84,7 @@ public class TowerAttackBehavior : MonoBehaviour
     private void Update()
     {
         HideFinishedAttackEffects();
+        if (Time.timeScale <= 0f) return;
 
         if (_tower == null || _health == null || _health.CurrentHp <= 0f)
         {
@@ -96,9 +100,12 @@ public class TowerAttackBehavior : MonoBehaviour
         if (_attackCooldown > 0f) return;
         if (target == null) return;
 
-        DealDamage(target);
+        Vector3 hitPosition = target.transform.position;
+        GameAudio.Play("Attack", .18f);
         ShowAttackFlashLine(target);
-        PlayAttackEffect(target.transform.position);
+        DealDamage(target);
+        if (_particles == null || !_particles.PlayAttack(hitPosition, _tower.CurrentLevel))
+            PlayAttackEffect(transform.position + Vector3.up);
         _attackCooldown = 1f / Mathf.Max(0.001f, _health.Ats);
     }
 
@@ -174,7 +181,7 @@ public class TowerAttackBehavior : MonoBehaviour
 
     private void ShowAttackFlashLine(Enemy target)
     {
-        if (attackLineRenderer == null || target == null) return;
+        if (!showAttackFlashLine || attackLineRenderer == null || target == null) return;
         attackLineRenderer.SetPosition(0, transform.position);
         attackLineRenderer.SetPosition(1, target.transform.position);
         attackLineRenderer.enabled = true;
