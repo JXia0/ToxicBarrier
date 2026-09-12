@@ -18,12 +18,15 @@ public class ResourcePickup : MonoBehaviour
 
     /// <summary> (ResourceType, amount). Subscribe from inventory/UI to add resources. </summary>
     public static System.Action<LootManager.ResourceType, int> OnResourceCollected;
+    private bool _collected;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!IsPlayer(other)) return;
+        if (_collected || !IsPlayer(other)) return;
+        _collected = true;
 
         OnResourceCollected?.Invoke(resourceType, amount);
+        GameAudio.Play("Pickup", .12f);
         Destroy(gameObject);
     }
 
