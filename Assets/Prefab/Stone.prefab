@@ -92,7 +92,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resourceType: 3
-  amount: 1
+  amount: 2
   playerTag: Player
 --- !u!212 &7341633647528709320
 SpriteRenderer:
