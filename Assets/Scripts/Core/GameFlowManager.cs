@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -25,6 +26,27 @@ public class GameFlowManager : MonoBehaviour
     private GameFlowUI _flowUI;
     private int _initializedSceneHandle = -1;
     private bool _isQuitting;
+    private Tower _tower;
+    private HealthSystem _towerHealth;
+    private EnemySpawner[] _spawners = new EnemySpawner[0];
+    public float SurvivalSeconds { get; private set; }
+    public string EndReason { get; private set; } = string.Empty;
+    private readonly HashSet<EnemySpawner> _rewardedRegions = new HashSet<EnemySpawner>();
+    public string LatestSupplyNotice { get; private set; } = string.Empty;
+    private float _supplyNoticeUntil;
+    public bool ShowSupplyNotice => SurvivalSeconds < _supplyNoticeUntil && !string.IsNullOrEmpty(LatestSupplyNotice);
+    public RegionSupplyCache ActiveSupplyCache => FindObjectOfType<RegionSupplyCache>();
+    public int DefeatedEnemies
+    {
+        get
+        {
+            int total = 0;
+            foreach (EnemySpawner spawner in _spawners)
+                if (spawner != null) total += spawner.DefeatedCount;
+            return total;
+        }
+    }
+    public string RunSummary => $"用时 {Mathf.FloorToInt(SurvivalSeconds / 60):00}:{Mathf.FloorToInt(SurvivalSeconds % 60):00}    |    击败 {DefeatedEnemies}    |    塔 {(_tower != null ? _tower.CurrentLevel : 0)} 级";
 
     private void Awake()
     {
@@ -36,6 +58,7 @@ public class GameFlowManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        if (GetComponent<GameAudio>() == null) gameObject.AddComponent<GameAudio>();
         SceneManager.sceneLoaded += HandleSceneLoaded;
         Time.timeScale = 1f;
     }
@@ -49,12 +72,24 @@ public class GameFlowManager : MonoBehaviour
 
     private void Update()
     {
+        if (IsPlaying)
+        {
+            SurvivalSeconds += Time.deltaTime;
+            AwardRegionSupplies();
+            CheckVictory();
+        }
         if (!Input.GetKeyDown(KeyCode.Escape)) return;
+        if (GameSettingsUI.CloseIfOpen()) return;
 
         if (CurrentState == GameState.Playing)
             PauseGame();
         else if (CurrentState == GameState.Paused)
             ResumeGame();
+    }
+
+    private void OnApplicationFocus(bool focused)
+    {
+        if (!focused && IsPlaying) PauseGame();
     }
 
     public void StartNewGame()
@@ -119,11 +154,61 @@ public class GameFlowManager : MonoBehaviour
 
     private void HandlePlayerDeath()
     {
-        if (CurrentState != GameState.Playing) return;
+        EndRun(GameState.Dead, "幸存者倒下了。留意血量，及时返塔恢复。");
+    }
 
+    private void HandleTowerDeath()
+    {
+        EndRun(GameState.Dead, "净化塔已被摧毁。升级可以恢复塔的生命。");
+    }
+
+    private void CheckVictory()
+    {
+        if (_tower == null || !_tower.IsMaxLevel || _spawners.Length != 3) return;
+        foreach (EnemySpawner spawner in _spawners)
+            if (spawner == null || !spawner.IsCleared) return;
+        EndRun(GameState.Won, "三区已净化，屏障重新亮起。");
+    }
+
+    // Finite early waves cannot produce all later costs (region 1 has no stone).
+    // A physical cache guarantees missing supplies, but requires an actual collection trip.
+    private void AwardRegionSupplies()
+    {
+        if (_tower == null || _playerController == null) return;
+        PlayerInventory inventory = _playerController.GetComponent<PlayerInventory>();
+        if (inventory == null) return;
+        foreach (EnemySpawner spawner in _spawners)
+        {
+            if (spawner == null || !spawner.IsCleared || spawner.RegionLevel < 1 ||
+                spawner.RegionLevel >= 3 || _rewardedRegions.Contains(spawner)) continue;
+            _rewardedRegions.Add(spawner);
+            RegionSupplyCache.Spawn(_tower, spawner.RegionLevel);
+            LatestSupplyNotice = $"第 {spawner.RegionLevel} 区已清空！前往金色标记领取补给。";
+            _supplyNoticeUntil = SurvivalSeconds + 12f;
+        }
+    }
+
+    public void NotifySupplyCollected(int region)
+    {
+        LatestSupplyNotice = $"已领取第 {region} 区补给并恢复 25 生命，返塔升级！";
+        _supplyNoticeUntil = SurvivalSeconds + 12f;
+    }
+
+    private void EndRun(GameState result, string reason)
+    {
+        if (!IsPlaying) return;
+        EndReason = reason;
+        GameAudio.Play(result == GameState.Won ? "Victory" : "Defeat");
+        if (result == GameState.Won)
+        {
+            float best = PlayerPrefs.GetFloat("BestClearSeconds", float.MaxValue);
+            if (SurvivalSeconds < best) PlayerPrefs.SetFloat("BestClearSeconds", SurvivalSeconds);
+            PlayerPrefs.SetInt("CompletedRuns", PlayerPrefs.GetInt("CompletedRuns", 0) + 1);
+            PlayerPrefs.Save();
+        }
         SetPlayerControl(false);
-        SetState(GameState.Dead);
         Time.timeScale = 0f;
+        SetState(result);
     }
 
     private void BeginSceneTransition(string sceneName)
@@ -162,6 +247,10 @@ public class GameFlowManager : MonoBehaviour
 
         Time.timeScale = 1f;
         UnbindPlayer();
+        SurvivalSeconds = 0f;
+        EndReason = string.Empty;
+        LatestSupplyNotice = string.Empty;
+        _supplyNoticeUntil = 0f;
 
         if (scene.name == MainMenuSceneName)
         {
@@ -177,6 +266,12 @@ public class GameFlowManager : MonoBehaviour
     private void BindPlayer()
     {
         _playerController = FindObjectOfType<PlayerController>();
+        _tower = FindObjectOfType<Tower>();
+        _towerHealth = _tower != null ? _tower.GetComponent<HealthSystem>() : null;
+        if (_towerHealth != null)
+            _towerHealth.OnDeath.AddListener(HandleTowerDeath);
+        _spawners = FindObjectsOfType<EnemySpawner>();
+        Array.Sort(_spawners, (a, b) => string.CompareOrdinal(a.name, b.name));
 
         HealthSystem[] healthSystems = FindObjectsOfType<HealthSystem>();
         foreach (HealthSystem health in healthSystems)
@@ -196,6 +291,12 @@ public class GameFlowManager : MonoBehaviour
 
     private void UnbindPlayer()
     {
+        if (_towerHealth != null)
+            _towerHealth.OnDeath.RemoveListener(HandleTowerDeath);
+        _towerHealth = null;
+        _tower = null;
+        _spawners = new EnemySpawner[0];
+        _rewardedRegions.Clear();
         if (_playerHealth != null)
             _playerHealth.OnDeath.RemoveListener(HandlePlayerDeath);
 
