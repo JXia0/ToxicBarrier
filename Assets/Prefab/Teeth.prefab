@@ -99,7 +99,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resourceType: 1
-  amount: 1
+  amount: 2
   playerTag: Player
 --- !u!61 &1254325019045766373
 BoxCollider2D:
