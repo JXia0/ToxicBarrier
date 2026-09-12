@@ -53,12 +53,7 @@ public static class GameFlowSetupTool
         if (EditorApplication.isPlayingOrWillChangePlaymode)
             throw new InvalidOperationException("Exit Play Mode before setting up GameFlow UI.");
 
-        SetupScene(MainMenuScenePath, true);
-        SetupScene(GameplayScenePath, false);
-        ConfigureBuildSettings();
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
-        Debug.Log("GameFlow UI setup complete. MainMenu and GameScene now contain saved Canvas and Button objects.");
+        ReleaseUISetupTool.SetupAllScenes();
     }
 
     private static void SetupScene(string scenePath, bool isMainMenu)
