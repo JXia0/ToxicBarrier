@@ -255,7 +255,7 @@ public class Tower : MonoBehaviour
             _spriteRenderer.sprite = target;
     }
 
-    private TowerLevelStats GetLevelStats(int level)
+    public TowerLevelStats GetLevelStats(int level)
     {
         int index = Mathf.Clamp(level, InitialLevel, MaxLevel);
         if (levelStats != null && levelStats.Length > index)
@@ -278,6 +278,8 @@ public class Tower : MonoBehaviour
 
     private void PlayUpgradeFeedback()
     {
+        GameAudio.Play("Upgrade");
+        GetComponent<TowerParticleEffects>()?.PlayUpgrade();
         if (_upgradePulseRoutine != null)
             StopCoroutine(_upgradePulseRoutine);
 
