@@ -14,6 +14,12 @@ public static class PlayerHealthUISetupTool
     [MenuItem("Tools/Toxic Barrier/Setup Player Health UI")]
     public static void SetupPlayerHealthUI()
     {
+        // Keep the old menu command compatible with the finished, scene-authored HUD.
+        if (AssetDatabase.LoadAssetAtPath<MonoScript>("Assets/Scripts/Core/GameHudUI.cs") != null)
+        {
+            ReleaseUISetupTool.SetupAllScenes();
+            return;
+        }
         if (EditorApplication.isPlayingOrWillChangePlaymode)
             throw new InvalidOperationException("Exit Play Mode before setting up Player Health UI.");
 
