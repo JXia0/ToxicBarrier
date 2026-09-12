@@ -21,6 +21,7 @@ public class InventoryPanelUI : MonoBehaviour
 
     private void Start()
     {
+        GameText.Changed += RefreshAll;
         if (inventory == null)
             inventory = FindObjectOfType<PlayerInventory>();
 
@@ -39,6 +40,7 @@ public class InventoryPanelUI : MonoBehaviour
 
     private void OnDestroy()
     {
+        GameText.Changed -= RefreshAll;
         if (inventory != null)
             inventory.OnResourceCountChanged.RemoveListener(OnCountChanged);
     }
@@ -61,17 +63,17 @@ public class InventoryPanelUI : MonoBehaviour
     {
         if (text == null) return;
         int count = inventory.GetCount(type);
-        text.text = $"{TypeName(type)}: {count}";
+        text.text = GameText.Translate($"{TypeName(type)}: {count}");
     }
 
     private static string TypeName(LootManager.ResourceType type)
     {
         switch (type)
         {
-            case LootManager.ResourceType.Gel: return "Gel";
-            case LootManager.ResourceType.Teeth: return "Teeth";
-            case LootManager.ResourceType.Wood: return "Wood";
-            case LootManager.ResourceType.Stone: return "Stone";
+            case LootManager.ResourceType.Gel: return "凝胶";
+            case LootManager.ResourceType.Teeth: return "尖牙";
+            case LootManager.ResourceType.Wood: return "木材";
+            case LootManager.ResourceType.Stone: return "石料";
             default: return type.ToString();
         }
     }
@@ -118,7 +120,7 @@ public class InventoryPanelUI : MonoBehaviour
         var go = new GameObject("TMP_Text_" + label);
         go.transform.SetParent(parent, false);
         var tmp = go.AddComponent<TextMeshProUGUI>();
-        tmp.text = label + ": 0";
+        tmp.text = GameText.Translate(label + ": 0");
         if (TMP_Settings.defaultFontAsset != null)
             tmp.font = TMP_Settings.defaultFontAsset;
         tmp.fontSize = 22;
