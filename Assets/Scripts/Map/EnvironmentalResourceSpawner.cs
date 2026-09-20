@@ -94,13 +94,16 @@ public class EnvironmentalResourceSpawner : MonoBehaviour
         for (int i = 0; i < spawnCount; i++)
         {
             Vector2 position = center;
+            bool found = false;
             for (int attempt = 0; attempt < 50; attempt++)
             {
                 position = RandomPointInRing(center, innerRadius, outerRadius);
-                if (IsFarEnough(position, positions))
-                    break;
+                if (!ReachableGround.TryFind(position, .6f, out position)) continue;
+                float radius = Vector2.Distance(position, center);
+                if (radius >= innerRadius && radius <= outerRadius && IsFarEnough(position, positions))
+                { found = true; break; }
             }
-            positions.Add(position);
+            if (found) positions.Add(position);
         }
 
         return positions;

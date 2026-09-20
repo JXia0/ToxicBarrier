@@ -1,0 +1,163 @@
+PASS
+OK  Main menu entry state
+OK  One menu EventSystem
+OK  Main menu contains Start Game, Quit and the language shortcut
+OK  Quit button is bound to game exit
+OK  Simplified menu retains Chinese localization
+OK  English Start Game and Quit labels
+OK  Bundled Chinese font contains game glyphs
+OK  Main menu has one active audio listener
+OK  Background music is connected and playing
+OK  Persistent flow manager has no duplicates
+OK  One gameplay EventSystem
+OK  Pause button is the topmost pointer raycast target
+OK  Player foot collider fits the navigable clearance
+OK  Enemy target registry finds the living tower
+OK  New game begins at tower level zero
+OK  Tower uses the reduced 4.75 metre defense range
+OK  Timer and defeated count share the compact HUD bar
+OK  Four existing and ten new buildings have ground footprints
+OK  Route03_NortheastB navigation uses the actual collision outline
+OK  Route02_EastA navigation uses the actual collision outline
+OK  Route03_SouthwestB navigation uses the actual collision outline
+OK  Archery navigation uses the actual collision outline
+OK  Route03_NortheastA navigation uses the actual collision outline
+OK  Route01_Southeast navigation uses the actual collision outline
+OK  Route01_Northwest navigation uses the actual collision outline
+OK  House1 navigation uses the actual collision outline
+OK  Route02_EastB navigation uses the actual collision outline
+OK  Route02_WestB navigation uses the actual collision outline
+OK  Route02_WestA navigation uses the actual collision outline
+OK  House3 navigation uses the actual collision outline
+OK  Route03_SouthwestA navigation uses the actual collision outline
+OK  Castle navigation uses the actual collision outline
+OK  Central tower base has solid collision and dynamic navigation carving
+OK  Locked outer-ring buildings remain hidden until unlocked
+OK  Expanded second region keeps its correct movement speed at 26 metres
+OK  Navigation bends around the house instead of crossing the wall
+OK  Actual Rigidbody movement reaches the other side of the house
+OK  Reachable resource candidates remain available: 19/Map1
+OK  Reachable resource candidates remain available: 19/Map2
+OK  Reachable resource candidates remain available: 19/Map3
+OK  Reachable resource candidates remain available: 713/Map1
+OK  Reachable resource candidates remain available: 713/Map2
+OK  Reachable resource candidates remain available: 713/Map3
+OK  Reachable resource candidates remain available: 20260919/Map1
+OK  Reachable resource candidates remain available: 20260919/Map2
+OK  Reachable resource candidates remain available: 20260919/Map3
+OK  Resource positions avoid walls and retain complete paths across three random seeds (360)
+OK  A thin wall blocks actual enemy melee damage at close range
+OK  The same melee strike damages the player when cover is removed
+OK  Enemy speed uses its own region and is unaffected by the player's region
+OK  Scene poison budget is 1.2-2 HP per second
+OK  Late-run poison is capped at two HP per second
+OK  Side-route buildings expose finite exploration supplies
+OK  Exploration supplies have a complete navigable route
+OK  Physical exploration pickup awards its finite material reward
+OK  Exploration pickup heals 35 and grants gas protection
+OK  Gas protection actually prevents poison damage
+OK  Pause preserves temporary gas protection duration
+OK  Final boss custom health survives Start and cannot be one-shot by the tower
+OK  Tower prioritizes an escort over the high-health final boss
+OK  Boss telegraph locks to the floor and moving out avoids damage
+OK  Boss telegraph and damage freeze during pause
+OK  Remaining inside the telegraph takes one 30 HP slam
+OK  Boss HUD reference is cleared on despawn
+OK  Player readability shader is included as a runtime resource
+OK  Chinese font has baked glyphs for all new gameplay notices
+OK  Hidden-enemy guidance has an English translation
+OK  Uses assigned tower sprite for level 0
+OK  Uses assigned tower sprite for level 1
+OK  Uses assigned tower sprite for level 2
+OK  Uses assigned tower sprite for level 3
+OK  Tower has configured particle effects
+OK  Level zero uses first attack effect
+OK  Attack effect originates inside the tower sprite, not at the target
+OK  Repeated pickup collision awards one two-unit resource only once
+OK  Disabled parasite disguise cannot award a resource
+OK  Warning has a transparent centre and feathered visible edges
+OK  Warning sits below HUD and never blocks clicks
+OK  Distant hidden enemy produces no warning
+OK  Nearby hidden enemy increases warning strength
+OK  Near warning fades in with capped opacity
+OK  Active warning fades away after leaving danger without pausing
+OK  Pause hides warning and blocks hidden enemy damage
+OK  Warning clears when player leaves the danger radius
+OK  Player damage updates filled health bar
+OK  Health value text updates
+OK  Pause button freezes game
+OK  Enemy physics footprint fits the baked navigation radius
+OK  Ready enemy attack cannot deal damage while paused
+OK  Pause preserves HP and survival timer
+OK  Resume returns to play
+OK  Simple pause has three actions and a language shortcut
+OK  Pause language switch updates Chinese labels without resuming
+OK  Pause language switch restores English without resuming
+OK  Losing application focus pauses gameplay
+OK  Contact protection rejects repeated hits inside 0.75 seconds
+OK  Player recovers after three damage-free seconds beside the tower
+OK  Approaching tower opens saved upgrade panel
+OK  Insufficient resources disables upgrade
+OK  Real tower attack triggers configured particles
+OK  Cleared region does not deposit supplies remotely
+OK  Supply reward creates an actual collection destination
+OK  Region 1 clear guarantees cumulative supplies through tower level 2
+OK  Upgrade enabled when materials ready: 1
+OK  Pause hides upgrade panel
+OK  Pause holds upgrade animation and material payment
+OK  Both upgrade particles play at tower foot: 1
+OK  Tower sprite keeps its base aligned after upgrade: 1
+OK  Attack prefab matches tower level: 1
+OK  Upgrade consumes materials exactly once: 1
+OK  Upgrade restores player and tower: 1
+OK  Upgrade enabled when materials ready: 2
+OK  Both upgrade particles play at tower foot: 2
+OK  Tower sprite keeps its base aligned after upgrade: 2
+OK  Attack prefab matches tower level: 2
+OK  Upgrade consumes materials exactly once: 2
+OK  Upgrade restores player and tower: 2
+OK  Upgrade unlocks region 2
+OK  Cleared region does not deposit supplies remotely
+OK  Supply reward creates an actual collection destination
+OK  Region 2 clear guarantees remaining level 3 supplies
+OK  Upgrade enabled when materials ready: 3
+OK  Both upgrade particles play at tower foot: 3
+OK  Tower sprite keeps its base aligned after upgrade: 3
+OK  Attack prefab matches tower level: 3
+OK  Upgrade consumes materials exactly once: 3
+OK  Upgrade restores player and tower: 3
+OK  Upgrade unlocks region 3
+OK  Max tower alone does not trigger victory
+OK  Rapid attacks have a bounded particle pool
+OK  Pause freezes particle simulation
+OK  Attack and upgrade particles expire automatically
+OK  All eight outer side-route buildings spawn one reachable supply each after unlocking
+OK  Side-route supply is navigable: Side-route supplies 2
+OK  Side-route supply is navigable: Side-route supplies 1
+OK  Side-route supply is navigable: Side-route supplies 2
+OK  Side-route supply is navigable: Side-route supplies 2
+OK  Side-route supply is navigable: Side-route supplies 2
+OK  Side-route supply is navigable: Side-route supplies 3
+OK  Side-route supply is navigable: Side-route supplies 3
+OK  Side-route supply is navigable: Side-route supplies 3
+OK  Side-route supply is navigable: Side-route supplies 3
+OK  Clearing region two actually removes its toxic damage
+OK  Cleared region immunity is enforced by HealthSystem
+OK  Uncleared third region remains toxic
+OK  Uncleared region still damages the player
+OK  Camera remains perpendicular to the 2D world in the outer region
+OK  Outer-region silhouette rim follows the current animated player sprite
+OK  Map retains crisp sprite filtering: Map1
+OK  Map retains crisp sprite filtering: Map2
+OK  Map retains crisp sprite filtering: Map3
+OK  Spawn completion waits for remaining enemies
+OK  One remaining enemy prevents premature victory
+OK  Full clear enters frozen victory result
+OK  Victory cannot resume as gameplay
+OK  Restart restores scene tower level and time scale
+OK  Tower destruction triggers defeat
+OK  Destroyed tower leaves the enemy target registry
+OK  Player death triggers defeat
+OK  Death cannot be resumed
+OK  Return to menu restores time and single manager
+OK  No runtime exceptions or errors

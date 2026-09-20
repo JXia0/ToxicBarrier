@@ -77,8 +77,12 @@ public class DisguisedParasite : MonoBehaviour
 
     private void TryDealDamage()
     {
+        if (!isActiveAndEnabled || Time.timeScale <= 0f ||
+            (GameFlowManager.Instance != null && !GameFlowManager.Instance.IsPlaying)) return;
         if (_playerInside == null || _playerInside.CurrentHp <= 0f || Time.time < _nextDamageTime)
             return;
+
+        if (!ReachableGround.HasLineOfSight(transform.position, _playerInside.transform.position, _playerInside.transform)) return;
 
         _playerInside.TakeDamage(damagePerTick, gameObject);
         _nextDamageTime = Time.time + damageInterval;

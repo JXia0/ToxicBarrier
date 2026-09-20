@@ -48,9 +48,9 @@ public static class ReleasePolishTool
         string characters = string.Concat(Directory.GetFiles("Assets/Scripts", "*.cs", SearchOption.AllDirectories).Select(File.ReadAllText)) + File.ReadAllText("Assets/Editor/ReleasePolishTool.cs");
         _font.TryAddCharacters(new string(characters.Distinct().ToArray()));
         EditorUtility.SetDirty(_font);
-        // Preserve the user's three original central tower designs in the world and UI.
+        // Keep independent level 0–3 artwork in the world and upgrade previews.
         Sprite[] towerSprites = Enumerable.Range(0, 4).Select(i => AssetDatabase.LoadAssetAtPath<Sprite>(
-            "Assets/Sprites/Sprites_tower" + (i < 2 ? "" : i.ToString()) + ".png")).ToArray();
+            "Assets/Sprites/Sprites_tower" + (i == 1 ? "" : i.ToString()) + ".png")).ToArray();
         Sprite supply = CleanSprite("Assets/PeterRadiant/Tiny Swords/UI Elements/Icons/Icon_02.png", "Supply", 64);
         var wood = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/PeterRadiant/Tiny Swords/UI Elements/Icons/Icon_02.png");
         foreach (string path in new[] { "Assets/Scenes/MainMenu.unity", "Assets/Scenes/GameScene.unity" })
@@ -79,7 +79,7 @@ public static class ReleasePolishTool
             {
                 var tower = Objects<Tower>(scene).Single();
                 // Keep the original tower transform, trigger and physics.
-                for (int i = 1; i <= 3; i++) Ref(tower, "level" + i + "Sprite", towerSprites[i]);
+                for (int i = 0; i <= 3; i++) Ref(tower, "level" + i + "Sprite", towerSprites[i]);
                 tower.GetComponent<SpriteRenderer>().sprite = towerSprites[0];
                 var upgrade = new SerializedObject(Objects<TowerUpgradePanelUI>(scene).Single());
                 var sprites = upgrade.FindProperty("towerSprites"); sprites.arraySize = 4;
@@ -96,6 +96,8 @@ public static class ReleasePolishTool
             AddLanguageSwitch(scene);
             BindStaticLanguage(scene);
             foreach (var button in Objects<Button>(scene)) if (button.GetComponent<ButtonSound>() == null) button.gameObject.AddComponent<ButtonSound>();
+            if (scene.name == "MainMenu") SimpleMainMenuTool.Configure(scene);
+            else SimpleMainMenuTool.ConfigurePause(scene);
             EditorSceneManager.MarkSceneDirty(scene); EditorSceneManager.SaveScene(scene);
             File.WriteAllLines("Temp/" + scene.name + "-polished-text.txt", Objects<TextMeshProUGUI>(scene).Select(t => t.name + ": " + t.text));
         }

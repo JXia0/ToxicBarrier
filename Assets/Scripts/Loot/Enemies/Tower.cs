@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -13,6 +14,22 @@ public class Tower : MonoBehaviour
 {
     public const int InitialLevel = 0;
     public const int MaxLevel = 3;
+    private static readonly HashSet<Tower> ActiveTowers = new HashSet<Tower>();
+
+    public static Tower FindClosestLivingTower(Vector2 position)
+    {
+        Tower closest = null;
+        float closestSqr = float.MaxValue;
+        foreach (Tower tower in ActiveTowers)
+        {
+            if (tower == null || tower.Health == null || tower.Health.CurrentHp <= 0f) continue;
+            float distance = ((Vector2)tower.transform.position - position).sqrMagnitude;
+            if (distance >= closestSqr) continue;
+            closest = tower;
+            closestSqr = distance;
+        }
+        return closest;
+    }
 
     private const int FirstUpgradeLevel = InitialLevel + 1;
 
@@ -80,6 +97,7 @@ public class Tower : MonoBehaviour
 
     [Header("Tower sprites by level")]
     [Tooltip("Level 1 sprite (tower).")]
+    [SerializeField] private Sprite level0Sprite;
     [SerializeField] private Sprite level1Sprite;
     [Tooltip("Level 2 sprite (tower2).")]
     [SerializeField] private Sprite level2Sprite;
@@ -240,6 +258,8 @@ public class Tower : MonoBehaviour
         switch (currentLevel)
         {
             case 0:
+                target = level0Sprite != null ? level0Sprite : level1Sprite;
+                break;
             case 1:
                 target = level1Sprite;
                 break;
@@ -332,12 +352,14 @@ public class Tower : MonoBehaviour
 
     private void OnEnable()
     {
+        ActiveTowers.Add(this);
         if (_health != null)
             _health.OnDeath.AddListener(OnDeath);
     }
 
     private void OnDisable()
     {
+        ActiveTowers.Remove(this);
         if (_health != null)
             _health.OnDeath.RemoveListener(OnDeath);
         if (_upgradePulseRoutine != null)

@@ -98,7 +98,8 @@ public class LootManager : MonoBehaviour
             return;
         }
 
-        GameObject parasiteObject = UnityEngine.Object.Instantiate(disguisePrefab, position, Quaternion.identity);
+        if (!ReachableGround.TryFind(position, 1f, out Vector2 ground)) return;
+        GameObject parasiteObject = UnityEngine.Object.Instantiate(disguisePrefab, ground, Quaternion.identity);
         parasiteObject.name = $"DisguisedParasite ({disguisePrefab.name})";
 
         ResourcePickup pickup = parasiteObject.GetComponent<ResourcePickup>();
@@ -128,7 +129,15 @@ public class LootManager : MonoBehaviour
         GameObject prefab = GetPrefabForResource(type);
         if (prefab == null) return;
         if (addRandomOffset)
-            position += (Vector2)UnityEngine.Random.insideUnitCircle * dropSpawnRadius;
+        {
+            Vector2 desired = position + UnityEngine.Random.insideUnitCircle * dropSpawnRadius;
+            if (!ReachableGround.TryFind(desired, 1f, out Vector2 reachable) &&
+                !ReachableGround.TryFind(position, 2f, out reachable)) return;
+            position = reachable;
+        }
+        else if (!ReachableGround.IsOpen(position)) return;
+        ResourcePickup template = prefab.GetComponent<ResourcePickup>();
+        if (addRandomOffset && template != null && ResourcePickup.TryMerge(type, position, template.Amount)) return;
         UnityEngine.Object.Instantiate(prefab, position, Quaternion.identity);
     }
 

@@ -43,11 +43,13 @@ public class GameHudUI : MonoBehaviour
             regionText.text = GameText.Translate(value);
         }
         MapController map = MapController.Instance;
-        if (threatText != null && map != null)
+        if (threatText != null && map != null && map.Player != null && map.PlayerHealth != null)
         {
-            bool safe = map.IsPlayerInMap1();
+            bool safe = map.IsSafeAt(map.Player.transform.position);
             float distance = tower != null && map.Player != null ? Vector2.Distance(tower.transform.position, map.Player.transform.position) : 0;
-            threatText.text = GameText.Translate(map.PlayerHealth != null && map.PlayerHealth.IsRecovering ? "返塔恢复中  |  每秒恢复 8 生命" :
+            threatText.text = map.PlayerHealth.ToxicProtectionSeconds > 0 && !safe
+                ? (GameText.English ? $"GAS PROTECTION  {Mathf.CeilToInt(map.PlayerHealth.ToxicProtectionSeconds)}s  |  Tower {distance:0}m {GameText.Translate(TowerDirection(map))}" : $"毒气防护  {Mathf.CeilToInt(map.PlayerHealth.ToxicProtectionSeconds)}秒  |  净化塔 {distance:0}米 {TowerDirection(map)}")
+                : GameText.Translate(map.PlayerHealth != null && map.PlayerHealth.IsRecovering ? "返塔恢复中  |  每秒恢复 8 生命" :
                 safe ? "安全区  |  塔自动攻击；返塔停留可回血，WASD 移动 / ESC 暂停" : $"毒气区 · 每秒 -{map.PlayerHealth.ToxicDamagePerSecond:0.#} 生命  |  净化塔 {distance:0}米 {TowerDirection(map)}");
             threatText.color = safe ? new Color(0.73f, 0.9f, 0.69f) : new Color(1f, 0.58f, 0.4f);
         }
@@ -55,6 +57,22 @@ public class GameHudUI : MonoBehaviour
 
     private string Objective(GameFlowManager flow)
     {
+        if (flow.ShowDangerNotice) return flow.GameplayNotice;
+        if (flow.SurvivalSeconds < 18) return "WASD 移动  |  采集、躲避，把敌人引向塔；清区后领取金色补给";
+        var player = MapController.Instance != null ? MapController.Instance.Player : null;
+        var cargo = player != null ? player.GetComponent<TowerRepairCargo>() : null;
+        if (cargo != null && cargo.IsCarrying)
+            return tower.Health.CurrentHp >= tower.Health.MaxHp && tower.IsPlayerInUpgradeRange
+                ? "修塔补给已保留  |  塔受损时在塔旁自动修复"
+                : "携带修塔补给  |  返回净化塔 " + TowerDirection(MapController.Instance);
+        var boss = FinalSiegeBoss.Active;
+        if (boss != null && boss.Health.CurrentHp > 0)
+            return GameText.English ? $"BONE WARDEN  {Mathf.CeilToInt(boss.Health.CurrentHp / boss.Health.MaxHp * 100)}%  |  Dodge orange circles; lure it to the tower"
+                : $"骸骨领主  {Mathf.CeilToInt(boss.Health.CurrentHp / boss.Health.MaxHp * 100)}%  |  避开橙色圈，将它引向净化塔";
+        if (flow.ShowNotice) return flow.GameplayNotice;
+        var interactable = ExplorationSupply.FindInteractable(player);
+        if (interactable != null)
+            return interactable.IsTowerRepair ? "修塔补给  |  带回塔旁修复 15% 生命，每次携带一份" : "侧路补给 [E]  |  主动领取材料、回血与毒气防护";
         if (_inventory == null && MapController.Instance != null && MapController.Instance.Player != null)
             _inventory = MapController.Instance.Player.GetComponent<PlayerInventory>();
         RegionSupplyCache cache = flow.ActiveSupplyCache;
@@ -73,7 +91,27 @@ public class GameHudUI : MonoBehaviour
             if (ready) return tower.IsPlayerInUpgradeRange ? "材料已备齐  |  按 E 或点击按钮升级净化塔" : "材料已备齐  |  返回净化塔 " + TowerDirection(MapController.Instance);
         }
         if (flow.ShowSupplyNotice) return flow.LatestSupplyNotice;
-        if (flow.SurvivalSeconds < 18) return "WASD 移动  |  采集、躲避，把敌人引向塔；清区后领取金色补给";
+        var map = MapController.Instance;
+        if (map != null && map.Player != null)
+        {
+            ExplorationSupply nearest = null; float distance = tower.IsMaxLevel ? float.MaxValue : 12f;
+            foreach (var supply in ExplorationSupply.Available)
+            {
+                if (supply == null) continue;
+                if (tower.IsMaxLevel && !supply.IsTowerRepair) continue;
+                float d = Vector2.Distance(supply.transform.position, map.Player.transform.position);
+                if (d < distance) { distance = d; nearest = supply; }
+            }
+            if (nearest != null)
+            {
+                string direction = Direction(nearest.transform.position - map.Player.transform.position);
+                if (nearest.IsTowerRepair)
+                    return GameText.English ? $"TOWER REPAIR {GameText.Translate(direction)} {distance:0}m  |  Bring home for up to 15% tower HP"
+                        : $"修塔补给 {direction} {distance:0}米  |  带回塔旁修复 15% 生命";
+                return GameText.English ? $"SIDE-ROUTE SUPPLIES {GameText.Translate(direction)} {distance:0}m  |  Materials, healing and gas protection"
+                    : $"侧路补给 {direction} {distance:0}米  |  材料、回血与毒气防护";
+            }
+        }
         if (tower.IsMaxLevel) return "最终任务  |  保护净化塔，清空三区全部波次和剩余敌人";
         return "采集可提前升级  |  清区后领取补给兜底，返塔按 E 升级";
     }

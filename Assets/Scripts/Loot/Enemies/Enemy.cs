@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// Enemy behaviour. Requires HealthSystem (set Enemy Type: Bug, Leader, or Boss).
@@ -7,6 +8,8 @@ using UnityEngine;
 [RequireComponent(typeof(HealthSystem))]
 public class Enemy : MonoBehaviour
 {
+    public static readonly HashSet<Enemy> ActiveEnemies = new HashSet<Enemy>();
+    public HealthSystem Health => _health;
     private HealthSystem _health;
     private bool _isParasiteHost;
 
@@ -25,12 +28,14 @@ public class Enemy : MonoBehaviour
 
     private void OnEnable()
     {
+        ActiveEnemies.Add(this);
         if (_health != null)
             _health.OnDeath.AddListener(OnDeath);
     }
 
     private void OnDisable()
     {
+        ActiveEnemies.Remove(this);
         if (_health != null)
             _health.OnDeath.RemoveListener(OnDeath);
     }

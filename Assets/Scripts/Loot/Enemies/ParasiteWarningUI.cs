@@ -5,13 +5,16 @@ using UnityEngine.UI;
 [DefaultExecutionOrder(1000)]
 public class ParasiteWarningUI : MonoBehaviour
 {
-    private const float EdgeThickness = 48f;
-    private const float MaxAlpha = 0.78f;
+    private const float MaxAlpha = 0.68f;
 
     private static ParasiteWarningUI _instance;
 
     private CanvasGroup _canvasGroup;
     private Transform _player;
+    private float _proximity;
+    private float _fadeVelocity;
+    private float _pulsePhase;
+    private bool _explained;
 
     public static void EnsureExists()
     {
@@ -39,7 +42,8 @@ public class ParasiteWarningUI : MonoBehaviour
         Canvas canvas = GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.overrideSorting = true;
-        canvas.sortingOrder = short.MaxValue;
+        // Above the world, below the health bars and menus.
+        canvas.sortingOrder = 5;
 
         CanvasScaler scaler = GetComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -50,10 +54,13 @@ public class ParasiteWarningUI : MonoBehaviour
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
 
-        CreateEdge("Top", new Vector2(0f, 1f), Vector2.one, new Vector2(0.5f, 1f), new Vector2(0f, EdgeThickness));
-        CreateEdge("Bottom", Vector2.zero, new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, EdgeThickness));
-        CreateEdge("Left", Vector2.zero, new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Vector2(EdgeThickness, 0f));
-        CreateEdge("Right", new Vector2(1f, 0f), Vector2.one, new Vector2(1f, 0.5f), new Vector2(EdgeThickness, 0f));
+        GameObject vignette = new GameObject("SoftWarning", typeof(RectTransform),
+            typeof(CanvasRenderer), typeof(ParasiteVignetteGraphic));
+        vignette.transform.SetParent(transform, false);
+        RectTransform rect = vignette.GetComponent<RectTransform>();
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = rect.offsetMax = Vector2.zero;
     }
 
     private void LateUpdate()
@@ -63,6 +70,7 @@ public class ParasiteWarningUI : MonoBehaviour
         if (GameFlowManager.Instance != null && !GameFlowManager.Instance.IsPlaying)
         {
             _canvasGroup.alpha = 0f;
+            _proximity = _fadeVelocity = _pulsePhase = 0f;
             return;
         }
 
@@ -81,26 +89,18 @@ public class ParasiteWarningUI : MonoBehaviour
         float intensity = _player == null
             ? 0f
             : DisguisedParasite.GetStrongestWarning(_player.position);
-        float pulse = 0.78f + Mathf.Sin(Time.unscaledTime * 8f) * 0.22f;
-        float targetAlpha = intensity * pulse * MaxAlpha;
-        _canvasGroup.alpha = Mathf.MoveTowards(_canvasGroup.alpha, targetAlpha, Time.unscaledDeltaTime * 2.5f);
-    }
-
-    private void CreateEdge(string edgeName, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 sizeDelta)
-    {
-        GameObject edgeObject = new GameObject(edgeName, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-        edgeObject.transform.SetParent(transform, false);
-
-        RectTransform rect = edgeObject.GetComponent<RectTransform>();
-        rect.anchorMin = anchorMin;
-        rect.anchorMax = anchorMax;
-        rect.pivot = pivot;
-        rect.anchoredPosition = Vector2.zero;
-        rect.sizeDelta = sizeDelta;
-
-        Image image = edgeObject.GetComponent<Image>();
-        image.color = new Color(0.9f, 0.02f, 0.02f, 1f);
-        image.raycastTarget = false;
+        float target = Mathf.SmoothStep(0f, 1f, intensity);
+        if (!_explained && intensity > .1f && GameFlowManager.Instance != null)
+        {
+            _explained = true;
+            GameFlowManager.Instance.ShowGameplayNotice("隐藏怪靠近  |  红色边缘越强越危险，绕开可疑掉落物", 8, true);
+        }
+        _proximity = Mathf.SmoothDamp(_proximity, target, ref _fadeVelocity,
+            target > _proximity ? 0.2f : 0.5f, Mathf.Infinity, Time.unscaledDeltaTime);
+        _pulsePhase = Mathf.Repeat(_pulsePhase + Time.unscaledDeltaTime *
+            Mathf.Lerp(0.6f, 1.05f, _proximity) * Mathf.PI * 2f, Mathf.PI * 2f);
+        float pulse = 0.86f + Mathf.Sin(_pulsePhase) * 0.14f;
+        _canvasGroup.alpha = _proximity * pulse * MaxAlpha;
     }
 
     private void OnDestroy()

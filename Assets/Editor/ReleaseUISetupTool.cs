@@ -97,6 +97,7 @@ public static class ReleaseUISetupTool
                 Button pause = ButtonAt(canvas, "PauseButton", "PAUSE  [ESC]", new Vector2(1, 1), new Vector2(-32, -24), new Vector2(180, 72), flow.PauseGame);
                 Ref(flow, "pauseButton", pause.gameObject);
                 BuildGameplay(scene);
+                SimpleMainMenuTool.ConfigurePause(scene);
             }
             RectTransform loading = Screen(canvas, "LoadingPanel", new Color(0.03f, 0.065f, 0.06f, 1));
             TextAt(loading, "LoadingText", "ENTERING THE BARRIER...", 38, Cream, new Vector2(.5f, .5f), Vector2.zero, new Vector2(900, 100));
@@ -115,20 +116,7 @@ public static class ReleaseUISetupTool
 
     private static void BuildMenu(RectTransform canvas, GameFlowUI flow)
     {
-        RectTransform panel = Screen(canvas, "MainMenuPanel", new Color(.055f, .1f, .095f, 1));
-        Image map = ImageAt(panel, "MapBackdrop", SpriteAt("Assets/Sprites/Sprites_map_1.png"),
-            new Vector2(.27f, .48f), Vector2.zero, new Vector2(1050, 1050), false);
-        map.color = new Color(.5f, .59f, .48f, 1);
-        ImageAt(panel, "TowerArtwork", SpriteAt("Assets/Sprites/Sprites_tower3.png"), new Vector2(.27f, .5f), new Vector2(0, 35), new Vector2(310, 460), false).preserveAspect = true;
-        TextAt(panel, "WorldCaption", "GATHER  /  DEFEND  /  RESTORE", 28, Cream, new Vector2(.27f, .16f), Vector2.zero, new Vector2(700, 60));
-        RectTransform card = Card(panel, "MenuCard", new Vector2(.74f, .5f), Vector2.zero, new Vector2(780, 890));
-        TextAt(card, "Eyebrow", "A LAST REFUGE IN THE TOXIC WILDS", 21, Gold, new Vector2(.5f, 1), new Vector2(0, -78), new Vector2(650, 35));
-        TextAt(card, "Title", "TOXIC\nBARRIER", 80, Cream, new Vector2(.5f, 1), new Vector2(0, -120), new Vector2(650, 180));
-        TextAt(card, "Subtitle", "Build the last defense. Reclaim all three regions.", 27, Cream, new Vector2(.5f, 1), new Vector2(0, -335), new Vector2(650, 70));
-        ButtonAt(card, "StartGameButton", "START GAME", new Vector2(.5f, 1), new Vector2(0, -440), new Vector2(530, 94), flow.StartNewGame);
-        ButtonAt(card, "QuitButton", "QUIT GAME", new Vector2(.5f, 1), new Vector2(0, -550), new Vector2(530, 82), flow.QuitGame, true);
-        TextAt(card, "HowToPlay", "WASD / ARROWS Move | ESC Pause\nYou gather and dodge; the tower auto-attacks\nClear regions for upgrade supplies\nE near tower: upgrade and restore health", 23, Cream, new Vector2(.5f, 1), new Vector2(0, -665), new Vector2(640, 145));
-        Ref(flow, "mainMenuPanel", panel.gameObject);
+        SimpleMainMenuTool.Configure(canvas.gameObject.scene);
     }
 
     private static void BuildPause(RectTransform canvas, GameFlowUI flow)
@@ -251,7 +239,7 @@ public static class ReleaseUISetupTool
         SerializedObject data = new SerializedObject(upgrade);
         SerializedProperty sprites = data.FindProperty("towerSprites"); sprites.arraySize = 4;
         for (int i = 0; i < 4; i++) sprites.GetArrayElementAtIndex(i).objectReferenceValue =
-            SpriteAt("Assets/Sprites/Sprites_tower" + (i < 2 ? "" : i.ToString()) + ".png");
+            SpriteAt("Assets/Sprites/Sprites_tower" + (i == 1 ? "" : i.ToString()) + ".png");
         data.ApplyModifiedPropertiesWithoutUndo();
         panel.gameObject.SetActive(false);
     }

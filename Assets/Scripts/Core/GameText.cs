@@ -11,9 +11,18 @@ public static class GameText
     public static event Action Changed;
     public static void SetEnglish(bool english) { PlayerPrefs.SetInt("English", english ? 1 : 0); PlayerPrefs.Save(); Changed?.Invoke(); }
     private static readonly Dictionary<string, string> Copy = new Dictionary<string, string> {
+        {"修塔补给已送达  |  净化塔恢复 15% 生命", "REPAIR DELIVERED  |  Restored up to 15% tower HP"},
+        {"已取得修塔补给  |  返回塔旁，修复 15% 塔生命", "REPAIR COLLECTED  |  Return to the tower to restore up to 15% HP"},
+        {"修塔补给已保留  |  塔受损时在塔旁自动修复", "REPAIR SAVED  |  Repairs automatically near the tower when damaged"},
+        {"携带修塔补给  |  返回净化塔", "CARRYING REPAIR  |  Return to tower"},
+        {"修塔补给  |  带回塔旁修复 15% 生命，每次携带一份", "TOWER REPAIR  |  Carry one home to restore up to 15% HP"},
+        {"侧路补给 [E]  |  主动领取材料、回血与毒气防护", "SUPPLIES [E]  |  Collect materials, healing and gas protection"},
+        {"骸骨领主来袭  |  离开橙色预警圈，保护净化塔", "BONE WARDEN APPROACHES  |  Dodge orange circles. Protect the tower."},
+        {"侧路补给  |  材料、35 生命、18 秒毒气防护", "SUPPLIES  |  Materials, +35 HP, 18s gas protection"},
+        {"隐藏怪靠近  |  红色边缘越强越危险，绕开可疑掉落物", "HIDDEN ENEMY NEARBY  |  Stronger red edges mean danger. Avoid suspicious drops."},
         {"采集  /  守护  /  净化", "GATHER  /  DEFEND  /  RESTORE"}, {"毒雾之中，守住最后的庇护所", "A LAST REFUGE IN THE TOXIC WILDS"},
         {"毒雾\n屏障", "TOXIC\nBARRIER"}, {"升级净化塔，夺回被毒雾吞没的三区。", "Build the last defense. Reclaim all three regions."},
-        {"开始游戏", "START GAME"}, {"退出游戏", "QUIT GAME"}, {"设置", "SETTINGS"}, {"暂歇片刻", "TAKE A BREATH"},
+        {"开始游戏", "START GAME"}, {"退出", "QUIT"}, {"退出游戏", "QUIT GAME"}, {"暂停", "PAUSED"}, {"设置", "SETTINGS"}, {"暂歇片刻", "TAKE A BREATH"},
         {"游戏已暂停", "The world is paused."}, {"继续游戏", "RESUME"}, {"重新开始", "RESTART RUN"}, {"返回主菜单", "MAIN MENU"}, {"再玩一次", "PLAY AGAIN"}, {"暂停 [ESC]", "PAUSE [ESC]"},
         {"三区全部净化", "ALL THREE REGIONS RECLAIMED"}, {"防线未能守住", "THE WILDS CLAIM ANOTHER"}, {"屏障重生", "BARRIER RESTORED"}, {"守护失败", "DEFENSE LOST"},
         {"所有敌人已消灭，净化塔依然矗立。", "All waves defeated. Your tower still stands."}, {"屏障已经倒下。", "The barrier has fallen."}, {"正在进入屏障…", "ENTERING THE BARRIER..."}, {"幸存者", "SURVIVOR"},

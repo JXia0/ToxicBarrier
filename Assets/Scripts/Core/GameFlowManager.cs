@@ -35,7 +35,52 @@ public class GameFlowManager : MonoBehaviour
     public string LatestSupplyNotice { get; private set; } = string.Empty;
     private float _supplyNoticeUntil;
     public bool ShowSupplyNotice => SurvivalSeconds < _supplyNoticeUntil && !string.IsNullOrEmpty(LatestSupplyNotice);
-    public RegionSupplyCache ActiveSupplyCache => FindObjectOfType<RegionSupplyCache>();
+    private readonly List<RegionSupplyCache> _supplyCaches = new List<RegionSupplyCache>();
+    public RegionSupplyCache ActiveSupplyCache
+    {
+        get { for (int i = 0; i < _supplyCaches.Count; i++) if (_supplyCaches[i] != null) return _supplyCaches[i]; return null; }
+    }
+    private sealed class Notice
+    {
+        public string Text;
+        public float Remaining;
+        public bool Urgent;
+    }
+    private Notice _notice;
+    private readonly List<Notice> _pendingNotices = new List<Notice>();
+    public string GameplayNotice => _notice?.Text ?? string.Empty;
+    public bool ShowNotice => _notice != null;
+    public bool ShowDangerNotice => _notice != null && _notice.Urgent;
+    public void ShowGameplayNotice(string text, float seconds, bool urgent = false)
+    {
+        if (string.IsNullOrEmpty(text) || seconds <= 0) return;
+        if (_notice != null && _notice.Text == text) return;
+        foreach (var pending in _pendingNotices) if (pending.Text == text) return;
+        var next = new Notice { Text = text, Remaining = seconds, Urgent = urgent };
+        if (_notice == null) { _notice = next; return; }
+        if (urgent && !_notice.Urgent)
+        {
+            _pendingNotices.Insert(0, _notice);
+            _notice = next;
+        }
+        else if (urgent)
+        {
+            int index = _pendingNotices.FindIndex(n => !n.Urgent);
+            _pendingNotices.Insert(index < 0 ? _pendingNotices.Count : index, next);
+        }
+        else _pendingNotices.Add(next);
+        if (_pendingNotices.Count > 8) _pendingNotices.RemoveAt(_pendingNotices.Count - 1);
+    }
+    private void TickNotices(float deltaTime)
+    {
+        if (_notice == null || (!_notice.Urgent && SurvivalSeconds < 18)) return;
+        _notice.Remaining -= deltaTime;
+        if (_notice.Remaining > 0) return;
+        _notice = _pendingNotices.Count > 0 ? _pendingNotices[0] : null;
+        if (_pendingNotices.Count > 0) _pendingNotices.RemoveAt(0);
+    }
+    public bool IsRegionCleared(int region)
+    { foreach (var spawner in _spawners) if (spawner != null && spawner.RegionLevel == region) return spawner.IsCleared; return false; }
     public int DefeatedEnemies
     {
         get
@@ -75,6 +120,7 @@ public class GameFlowManager : MonoBehaviour
         if (IsPlaying)
         {
             SurvivalSeconds += Time.deltaTime;
+            TickNotices(Time.deltaTime);
             AwardRegionSupplies();
             CheckVictory();
         }
@@ -182,7 +228,7 @@ public class GameFlowManager : MonoBehaviour
             if (spawner == null || !spawner.IsCleared || spawner.RegionLevel < 1 ||
                 spawner.RegionLevel >= 3 || _rewardedRegions.Contains(spawner)) continue;
             _rewardedRegions.Add(spawner);
-            RegionSupplyCache.Spawn(_tower, spawner.RegionLevel);
+            _supplyCaches.Add(RegionSupplyCache.Spawn(_tower, spawner.RegionLevel));
             LatestSupplyNotice = $"第 {spawner.RegionLevel} 区已清空！前往金色标记领取补给。";
             _supplyNoticeUntil = SurvivalSeconds + 12f;
         }
@@ -297,6 +343,8 @@ public class GameFlowManager : MonoBehaviour
         _tower = null;
         _spawners = new EnemySpawner[0];
         _rewardedRegions.Clear();
+        _supplyCaches.Clear();
+        _notice = null; _pendingNotices.Clear();
         if (_playerHealth != null)
             _playerHealth.OnDeath.RemoveListener(HandlePlayerDeath);
 

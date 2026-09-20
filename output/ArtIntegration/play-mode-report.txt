@@ -1,0 +1,79 @@
+PASS
+OK  Main menu entry state
+OK  One menu EventSystem
+OK  Settings opens from main menu
+OK  Chinese menu is available through language settings
+OK  English menu is retained and can be restored
+OK  Settings blocks keyboard navigation to underlying menu buttons
+OK  Music slider immediately updates audio volume
+OK  Escape closes settings without starting play
+OK  Bundled Chinese font contains game glyphs
+OK  Main menu has one active audio listener
+OK  Background music is connected and playing
+OK  Persistent flow manager has no duplicates
+OK  One gameplay EventSystem
+OK  Pause button is the topmost pointer raycast target
+OK  Player foot collider fits the navigable clearance
+OK  Uses assigned tower sprite for level 1
+OK  Uses assigned tower sprite for level 2
+OK  Uses assigned tower sprite for level 3
+OK  Tower has configured particle effects
+OK  Level zero uses first attack effect
+OK  Attack effect originates inside the tower sprite, not at the target
+OK  Repeated pickup collision awards one two-unit resource only once
+OK  Player damage updates filled health bar
+OK  Health value text updates
+OK  Pause button freezes game
+OK  Enemy physics footprint fits the baked navigation radius
+OK  Ready enemy attack cannot deal damage while paused
+OK  Pause preserves HP and survival timer
+OK  Resume returns to play
+OK  Closing pause settings keeps gameplay paused
+OK  Losing application focus pauses gameplay
+OK  Contact protection rejects repeated hits inside 0.75 seconds
+OK  Player recovers after three damage-free seconds beside the tower
+OK  Approaching tower opens saved upgrade panel
+OK  Insufficient resources disables upgrade
+OK  Real tower attack triggers configured particles
+OK  Cleared region does not deposit supplies remotely
+OK  Supply reward creates an actual collection destination
+OK  Region 1 clear guarantees cumulative supplies through tower level 2
+OK  Upgrade enabled when materials ready: 1
+OK  Pause hides upgrade panel
+OK  Pause holds upgrade animation and material payment
+OK  Both upgrade particles play at tower foot: 1
+OK  Tower sprite keeps its base aligned after upgrade: 1
+OK  Attack prefab matches tower level: 1
+OK  Upgrade consumes materials exactly once: 1
+OK  Upgrade restores player and tower: 1
+OK  Upgrade enabled when materials ready: 2
+OK  Both upgrade particles play at tower foot: 2
+OK  Tower sprite keeps its base aligned after upgrade: 2
+OK  Attack prefab matches tower level: 2
+OK  Upgrade consumes materials exactly once: 2
+OK  Upgrade restores player and tower: 2
+OK  Upgrade unlocks region 2
+OK  Cleared region does not deposit supplies remotely
+OK  Supply reward creates an actual collection destination
+OK  Region 2 clear guarantees remaining level 3 supplies
+OK  Upgrade enabled when materials ready: 3
+OK  Both upgrade particles play at tower foot: 3
+OK  Tower sprite keeps its base aligned after upgrade: 3
+OK  Attack prefab matches tower level: 3
+OK  Upgrade consumes materials exactly once: 3
+OK  Upgrade restores player and tower: 3
+OK  Upgrade unlocks region 3
+OK  Max tower alone does not trigger victory
+OK  Rapid attacks have a bounded particle pool
+OK  Pause freezes particle simulation
+OK  Attack and upgrade particles expire automatically
+OK  Spawn completion waits for remaining enemies
+OK  One remaining enemy prevents premature victory
+OK  Full clear enters frozen victory result
+OK  Victory cannot resume as gameplay
+OK  Restart restores scene tower level and time scale
+OK  Tower destruction triggers defeat
+OK  Player death triggers defeat
+OK  Death cannot be resumed
+OK  Return to menu restores time and single manager
+OK  No runtime exceptions or errors

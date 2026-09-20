@@ -1,0 +1,214 @@
+[
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\Sprites\\Sprites_map_1.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\MainMenu.unity"
+    ],
+    "status": "Existing reference"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\Sprites\\Sprites_map_2.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity"
+    ],
+    "status": "Existing reference"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\Sprites\\Sprites_map_3.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity"
+    ],
+    "status": "Existing reference"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\PeterRadiant\\Tiny Swords\\Buildings\\Black Buildings\\Archery.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity"
+    ],
+    "status": "Existing reference"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\PeterRadiant\\Tiny Swords\\UI Elements\\Bars\\BigBar_Base.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity"
+    ],
+    "status": "Existing reference"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\PeterRadiant\\Tiny Swords\\UI Elements\\Bars\\BigBar_Fill.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity"
+    ],
+    "status": "Existing reference"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\PeterRadiant\\Tiny Swords\\UI Elements\\Buttons\\BigBlueButton_Regular.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\MainMenu.unity"
+    ],
+    "status": "Existing reference"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\PeterRadiant\\Tiny Swords\\UI Elements\\Buttons\\BigRedButton_Regular.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\MainMenu.unity"
+    ],
+    "status": "Existing reference"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\PeterRadiant\\2D Pixel Art Black Knight\\Sprites\\Black_Knight_All_Frame_With_Border.png",
+    "fileID": "776787164",
+    "uses": [
+      "Assets\\Prefab\\Player.prefab"
+    ],
+    "status": "Existing reference"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\PeterRadiant\\Tiny Swords\\Buildings\\Black Buildings\\Castle.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity"
+    ],
+    "status": "Existing reference"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\Monsters Creatures Fantasy\\Sprites\\Flying eye\\Flight.png",
+    "fileID": "-4795363162621231457",
+    "uses": [
+      "Assets\\Prefab\\Leader.prefab"
+    ],
+    "status": "Existing reference"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\PeterRadiant\\Tiny Swords\\Buildings\\Black Buildings\\House1.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity"
+    ],
+    "status": "Existing reference"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\PeterRadiant\\Tiny Swords\\Buildings\\Black Buildings\\House3.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity"
+    ],
+    "status": "Existing reference"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\PeterRadiant\\Tiny Swords\\UI Elements\\Icons\\Icon_02.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity"
+    ],
+    "status": "Existing reference"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\PeterRadiant\\Tiny Swords\\UI Elements\\Icons\\Icon_02.png",
+    "status": "KEEP wood",
+    "uses": [
+      "WoodPickup.asset / HUD"
+    ]
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\Monsters Creatures Fantasy\\Sprites\\Skeleton\\Idle.png",
+    "fileID": "4723107735738678597",
+    "uses": [
+      "Assets\\Prefab\\Boss.prefab"
+    ],
+    "status": "Existing reference"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\Monsters Creatures Fantasy\\Sprites\\Goblin\\Idle.png",
+    "fileID": "4723107735738678597",
+    "uses": [
+      "Assets\\Prefab\\Bug.prefab"
+    ],
+    "status": "Existing reference"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\Sprites\\Sprites_gel.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Prefab\\Gel.prefab"
+    ],
+    "status": "UNDECIDED - redesign"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\Sprites\\Sprites_stone.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Prefab\\Stone.prefab"
+    ],
+    "status": "UNDECIDED - redesign"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\Sprites\\Sprites_teeth.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Prefab\\Teeth.prefab"
+    ],
+    "status": "UNDECIDED - redesign"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\Sprites\\Sprites_tower.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity"
+    ],
+    "status": "UNDECIDED - redesign"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\Sprites\\Sprites_tower3.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\MainMenu.unity"
+    ],
+    "status": "UNDECIDED - redesign"
+  },
+  {
+    "path": "C:\\GameProjects\\ToxicBarrier\\Assets\\PeterRadiant\\Tiny Swords\\UI Elements\\Wood Table\\WoodTable.png",
+    "fileID": "21300000",
+    "uses": [
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\GameScene.unity",
+      "Assets\\Scenes\\MainMenu.unity"
+    ],
+    "status": "Existing reference"
+  }
+]

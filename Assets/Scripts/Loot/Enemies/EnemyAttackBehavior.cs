@@ -53,6 +53,10 @@ public class EnemyAttackBehavior : MonoBehaviour
     private float _nextPathRefreshTime;
     private float _attackCooldown;
     private bool _playerCollisionIgnored;
+    private FinalSiegeBoss _siegeBoss;
+    private Vector2 _lastSeenPosition;
+    private float _lastSeenAt = float.NegativeInfinity;
+    private bool _searchingLastSeen;
 
     private void Awake()
     {
@@ -89,9 +93,15 @@ public class EnemyAttackBehavior : MonoBehaviour
         IgnorePlayerCollisions();
     }
 
+    private void Start() { TryGetComponent(out _siegeBoss); }
+
+    public void RegisterSiegeBoss(FinalSiegeBoss boss) { _siegeBoss = boss; }
+
     private void Update()
     {
         if (Time.timeScale <= 0f) return;
+        if (_siegeBoss != null && _siegeBoss.IsWindingUp)
+        { StopNavigation(); SetMovingAnimation(false); return; }
         if (!_playerCollisionIgnored)
             IgnorePlayerCollisions();
 
@@ -104,6 +114,12 @@ public class EnemyAttackBehavior : MonoBehaviour
         }
 
         UpdateTarget();
+        if (_searchingLastSeen)
+        {
+            if (Vector2.Distance(transform.position, _lastSeenPosition) > .2f) MoveAlongNavMesh(_lastSeenPosition);
+            else { StopNavigation(); SetMovingAnimation(false); }
+            return;
+        }
         if (_target == null)
         {
             StopNavigation();
@@ -115,7 +131,7 @@ public class EnemyAttackBehavior : MonoBehaviour
         Vector2 targetPos = _target.position;
         float dist = Vector2.Distance(pos, targetPos);
 
-        if (dist <= attackRange)
+        if (dist <= attackRange && ReachableGround.HasLineOfSight(pos, targetPos, _target))
         {
             StopNavigation();
             FaceTarget(targetPos);
@@ -139,6 +155,8 @@ public class EnemyAttackBehavior : MonoBehaviour
     private void OnDisable()
     {
         ActiveEnemies.Remove(this);
+        _lastSeenAt = float.NegativeInfinity;
+        _searchingLastSeen = false;
         _playerCollisionIgnored = false;
         StopNavigation();
         SetMovingAnimation(false);
@@ -158,7 +176,7 @@ public class EnemyAttackBehavior : MonoBehaviour
     private void IgnoreCollisionsWith(EnemyAttackBehavior other)
     {
         if (other == null || other == this) return;
-        IgnoreCollisionsWith(other.GetComponents<Collider2D>());
+        IgnoreCollisionsWith(other._colliders);
     }
 
     private void IgnoreCollisionsWith(Collider2D[] otherColliders)
@@ -220,7 +238,8 @@ public class EnemyAttackBehavior : MonoBehaviour
 
         _agent.nextPosition = transform.position;
         _agent.speed = GetMoveSpeed();
-        _agent.stoppingDistance = attackRange;
+        _agent.stoppingDistance = _searchingLastSeen ? .12f :
+            ReachableGround.HasLineOfSight(transform.position, targetPosition, _target) ? attackRange : .05f;
         _agent.isStopped = false;
 
         Vector3 destination = new Vector3(targetPosition.x, targetPosition.y, transform.position.z);
@@ -308,8 +327,9 @@ public class EnemyAttackBehavior : MonoBehaviour
     {
         if (MapController.Instance != null && MapController.Instance.Player != null)
         {
-            float playerSpeed = MapController.Instance.Player.GetMoveSpeed();
-            return Mathf.Max(0f, playerSpeed * 0.5f);
+            float regionSpeed = MapController.Instance.Player.GetMoveSpeedAt(transform.position);
+            float typeMultiplier = _health.CurrentEnemyType == HealthSystem.EnemyType.Leader ? .56f : .5f;
+            return Mathf.Max(0f, regionSpeed * typeMultiplier);
         }
         return baseMoveSpeed;
     }
@@ -317,12 +337,23 @@ public class EnemyAttackBehavior : MonoBehaviour
     private void UpdateTarget()
     {
         Vector2 pos = transform.position;
+        _searchingLastSeen = false;
 
         // 默认攻塔；若角色在仇恨范围内则优先攻击角色（每帧可重新判定目标）。
         Transform playerInRange = GetPlayerInAgroRange(pos);
         if (playerInRange != null)
         {
             _target = playerInRange;
+            _lastSeenPosition = playerInRange.position;
+            _lastSeenAt = Time.time;
+            return;
+        }
+
+        var playerHealth = MapController.Instance != null ? MapController.Instance.PlayerHealth : null;
+        if (playerHealth != null && playerHealth.CurrentHp > 0 && Time.time - _lastSeenAt < 1.6f)
+        {
+            _target = null;
+            _searchingLastSeen = true;
             return;
         }
 
@@ -345,7 +376,7 @@ public class EnemyAttackBehavior : MonoBehaviour
         if (!ph.IsPlayer || ph.CurrentHp <= 0f) return null;
 
         float sqrDist = ((Vector2)ph.transform.position - pos).sqrMagnitude;
-        if (sqrDist <= agroRange * agroRange)
+        if (sqrDist <= agroRange * agroRange && ReachableGround.HasLineOfSight(pos, ph.transform.position, ph.transform))
             return ph.transform;
 
         return null;
@@ -353,30 +384,14 @@ public class EnemyAttackBehavior : MonoBehaviour
 
     private Tower FindClosestTower()
     {
-        Tower[] towers = FindObjectsOfType<Tower>();
-        Tower closest = null;
-        float closestSqr = float.MaxValue;
-        Vector2 pos = transform.position;
-
-        foreach (Tower t in towers)
-        {
-            if (t == null || !t.gameObject.activeInHierarchy) continue;
-            if (t.Health == null || t.Health.CurrentHp <= 0f) continue;
-
-            float sqrDist = ((Vector2)t.transform.position - pos).sqrMagnitude;
-            if (sqrDist < closestSqr)
-            {
-                closestSqr = sqrDist;
-                closest = t;
-            }
-        }
-
-        return closest;
+        return Tower.FindClosestLivingTower(transform.position);
     }
 
     private void DealDamage()
     {
         if (_target == null) return;
+
+        if (!ReachableGround.HasLineOfSight(transform.position, _target.position, _target)) return;
 
         HealthSystem targetHealth = _target.GetComponent<HealthSystem>();
         if (targetHealth == null || targetHealth.CurrentHp <= 0f) return;

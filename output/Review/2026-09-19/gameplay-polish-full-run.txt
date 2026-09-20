@@ -1,0 +1,6 @@
+PASS
+Clock x4; walked to both physical region caches and returned to tower; dodged boss with normal movement; exactly one final boss defeated; no direct damage, resource injection, invincibility, or wave replacement.
+用时 07:46    |    击败 165    |    塔 3 级
+Region 1: 6/6, alive 0, cleared True
+Region 2: 7/7, alive 0, cleared True
+Region 3: 8/8, alive 0, cleared True

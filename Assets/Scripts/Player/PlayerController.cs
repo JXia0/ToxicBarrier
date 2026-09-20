@@ -62,6 +62,7 @@ public class PlayerController : MonoBehaviour
             feet.offset = Vector2.zero;
         }
         SetMovingAnimation(false);
+        if (GetComponent<SurvivorReadability>() == null) gameObject.AddComponent<SurvivorReadability>();
     }
 
     private void Update()
@@ -209,9 +210,16 @@ public class PlayerController : MonoBehaviour
 
     public float GetMoveSpeed()
     {
-        float distanceFromCenter = ((Vector2)transform.position).magnitude;
-        if (distanceFromCenter <= map1Radius) return map1MoveSpeed;
-        if (distanceFromCenter <= map2Radius) return map2MoveSpeed;
+        return GetMoveSpeedAt(transform.position);
+    }
+
+    public float GetMoveSpeedAt(Vector2 position)
+    {
+        MapController map = MapController.Instance;
+        Vector2 center = map != null ? map.GetMapCenter() : Vector2.zero;
+        float distanceFromCenter = Vector2.Distance(position, center);
+        if (distanceFromCenter <= (map != null ? map.GetMap1Radius() : map1Radius)) return map1MoveSpeed;
+        if (distanceFromCenter <= (map != null ? map.GetMap2Radius() : map2Radius)) return map2MoveSpeed;
         return map3MoveSpeed;
     }
 #if UNITY_EDITOR

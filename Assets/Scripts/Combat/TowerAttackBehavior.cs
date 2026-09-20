@@ -117,19 +117,21 @@ public class TowerAttackBehavior : MonoBehaviour
         float rangeSqr = range * range;
 
         // 若启用锁定并且当前目标仍在范围内且存活，则继续攻击同一目标
-        if (lockTarget && IsEnemyValidInRange(_currentTarget, rangeSqr))
+        if (lockTarget && IsEnemyValidInRange(_currentTarget, rangeSqr) && !_currentTarget.Health.IsFinalBoss)
             return _currentTarget;
 
         Vector2 pos = transform.position;
         Enemy nearest = null;
         float nearestSqr = rangeSqr;
 
-        foreach (Enemy e in FindObjectsOfType<Enemy>())
+        foreach (Enemy e in Enemy.ActiveEnemies)
         {
             if (!IsEnemyValidInRange(e, rangeSqr)) continue;
 
             float sqrDist = ((Vector2)e.transform.position - pos).sqrMagnitude;
-            if (sqrDist <= nearestSqr)
+            bool escortPriority = nearest != null && nearest.Health.IsFinalBoss && !e.Health.IsFinalBoss;
+            bool lowerPriority = nearest != null && !nearest.Health.IsFinalBoss && e.Health.IsFinalBoss;
+            if (escortPriority || (!lowerPriority && sqrDist <= nearestSqr))
             {
                 nearestSqr = sqrDist;
                 nearest = e;
@@ -144,7 +146,7 @@ public class TowerAttackBehavior : MonoBehaviour
     {
         if (e == null || !e.gameObject.activeInHierarchy) return false;
 
-        HealthSystem h = e.GetComponent<HealthSystem>();
+        HealthSystem h = e.Health;
         if (h == null || h.CurrentHp <= 0f) return false;
 
         float sqrDist = ((Vector2)e.transform.position - (Vector2)transform.position).sqrMagnitude;

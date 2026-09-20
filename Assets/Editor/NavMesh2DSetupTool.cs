@@ -117,6 +117,14 @@ public static class NavMesh2DSetupTool
             building.layer = obstacleLayer;
             spriteRenderer.sortingLayerName = "Environment";
 
+            PolygonCollider2D footprint = building.GetComponent<PolygonCollider2D>();
+            if (footprint != null)
+            {
+                BuildingNavigationGeometry.Sync(building, footprint);
+                count++;
+                continue;
+            }
+
             BoxCollider2D collider2D = building.GetComponent<BoxCollider2D>();
             if (collider2D == null)
             {
@@ -184,7 +192,15 @@ public static class NavMesh2DSetupTool
             Undo.RecordObject(collider, "Resize navigation ground");
 
         collider.center = new Vector3(0f, 0f, -0.05f);
-        collider.size = new Vector3(74f, 74f, 0.1f);
+        float radius = 35f;
+        foreach (MapZone zone in UnityEngine.Object.FindObjectsOfType<MapZone>())
+        {
+            if (zone.gameObject.scene != scene) continue;
+            zone.GetRingParams(out Vector2 center, out _, out float outer);
+            radius = Mathf.Max(radius, outer);
+            ground.transform.position = new Vector3(center.x, center.y, 0);
+        }
+        collider.size = new Vector3((radius + 2) * 2, (radius + 2) * 2, 0.1f);
         collider.isTrigger = false;
     }
 
@@ -211,6 +227,8 @@ public static class NavMesh2DSetupTool
         surface.collectObjects = CollectObjects.All;
         surface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
         surface.layerMask = (1 << navigationLayer) | (1 << obstacleLayer);
+        surface.overrideVoxelSize = true;
+        surface.voxelSize = .04f;
         return surface;
     }
 
@@ -252,7 +270,7 @@ public static class NavMesh2DSetupTool
         agent.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
     }
 
-    private static void BakeNavigation(NavMeshSurface surface)
+    public static void BakeNavigation(NavMeshSurface surface)
     {
         NavMeshData previousData = surface.navMeshData;
         string targetAssetPath = AssetDatabase.GetAssetPath(previousData);
@@ -263,6 +281,20 @@ public static class NavMesh2DSetupTool
         NavMeshData bakedData = surface.navMeshData;
         if (bakedData == null || bakedData == previousData)
             throw new InvalidOperationException("2D NavMesh bake produced no new data.");
+
+        if (previousData != null && AssetDatabase.Contains(previousData))
+        {
+            // Preserve the scene's existing asset GUID and any other scene references.
+            surface.RemoveData();
+            EditorUtility.CopySerialized(bakedData, previousData);
+            surface.navMeshData = previousData;
+            UnityEngine.Object.DestroyImmediate(bakedData);
+            surface.AddData();
+            EditorUtility.SetDirty(previousData);
+            EditorUtility.SetDirty(surface);
+            AssetDatabase.SaveAssets();
+            return;
+        }
 
         string targetFolder = Path.GetDirectoryName(targetAssetPath).Replace('\\', '/');
         string temporaryAssetPath = AssetDatabase.GenerateUniqueAssetPath(

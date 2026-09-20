@@ -5,7 +5,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class TowerParticleEffects : MonoBehaviour
 {
-    [Header("Upgrade: both effects play beneath the tower")]
+    [Header("Upgrade: both effects play at the tower base, rendered in front")]
     [SerializeField] private GameObject[] upgradePrefabs = new GameObject[2];
     [SerializeField, Min(.01f)] private float upgradeScale = .5f;
     [Tooltip("World-space offset from the bottom of the tower sprite.")]
@@ -29,8 +29,10 @@ public sealed class TowerParticleEffects : MonoBehaviour
     private readonly List<Effect> _attacks = new List<Effect>();
     private readonly List<Effect> _upgrades = new List<Effect>();
     private Transform _root;
-    public int ActiveAttackCount => _attacks.FindAll(e => e.root.activeSelf).Count;
-    public int ActiveUpgradeCount => _upgrades.FindAll(e => e.root.activeSelf).Count;
+    public int ActiveAttackCount => CountActive(_attacks);
+    public int ActiveUpgradeCount => CountActive(_upgrades);
+    private static int CountActive(List<Effect> effects)
+    { int count = 0; foreach (var effect in effects) if (effect.root.activeSelf) count++; return count; }
     public string LastAttackPrefab { get; private set; }
     public int AttackPlayCount { get; private set; }
 
@@ -84,12 +86,36 @@ public sealed class TowerParticleEffects : MonoBehaviour
             Effect effect = _upgrades.Find(e => e.prefab == prefab);
             if (effect == null)
             {
-                effect = Create(prefab, towerSprite != null ? towerSprite.sortingOrder - 1 : 5);
+                effect = Create(prefab, towerSprite != null ? towerSprite.sortingOrder + 1 : 5);
+                foreach (ParticleSystem particle in effect.particles)
+                {
+                    var emission = particle.emission;
+                    // Slow emitters form the main rings; scaling these can delay their first particle beyond the effect.
+                    if (emission.rateOverTimeMultiplier > 8f) emission.rateOverTimeMultiplier *= .55f;
+                    emission.rateOverDistanceMultiplier *= .55f;
+                    for (int i = 0; i < emission.burstCount; i++)
+                    {
+                        var burst = emission.GetBurst(i);
+                        var count = burst.count;
+                        // Single-particle rings are structural parts of the effect; never round them to zero.
+                        if (count.mode == ParticleSystemCurveMode.Constant)
+                            count.constant = Mathf.Max(1, Mathf.Ceil(count.constant * .55f));
+                        else if (count.mode == ParticleSystemCurveMode.TwoConstants)
+                        {
+                            count.constantMin = Mathf.Max(1, Mathf.Ceil(count.constantMin * .55f));
+                            count.constantMax = Mathf.Max(count.constantMin, Mathf.Ceil(count.constantMax * .55f));
+                        }
+                        else count.curveMultiplier *= .55f;
+                        burst.count = count; emission.SetBurst(i, burst);
+                    }
+                    var main = particle.main;
+                    main.startSizeMultiplier *= .8f;
+                }
                 foreach (ParticleSystem particle in effect.particles)
                     particle.GetComponent<ParticleSystemRenderer>().sortingLayerID = towerSprite != null ? towerSprite.sortingLayerID : SortingLayer.NameToID(SortingLayerNames.Environment);
                 _upgrades.Add(effect);
             }
-            Play(effect, foot + footOffset, upgradeScale, .6f, 2f);
+            Play(effect, foot + footOffset, upgradeScale * .8f, .6f, 1.5f);
         }
     }
 

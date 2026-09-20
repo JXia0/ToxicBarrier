@@ -1,0 +1,137 @@
+{
+  "backup": ".utmp\\art-backup\\20260919-145745",
+  "assets": [
+    {
+      "source": "C:\\Users\\Jiang\\.codex\\worktrees\\c35b\\ToxicBarrier\\output\\ArtOnly\\R01\\stone.png",
+      "target": "Assets\\Sprites\\Sprites_stone.png",
+      "source_sha256": "36880181aef5943a5f947ab246ca0735392dbee87ca6726088459c2ec76e22ed",
+      "guid": "0a4332ce0a87e9f41993f634416a73f4",
+      "crop": [
+        224,
+        233,
+        1039,
+        1052
+      ],
+      "dimensions": [
+        815,
+        819
+      ],
+      "ppu": 1247.6923076923076,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "visible_base_world": null
+    },
+    {
+      "source": "C:\\Users\\Jiang\\.codex\\worktrees\\c35b\\ToxicBarrier\\output\\ArtOnly\\R01\\gel.png",
+      "target": "Assets\\Sprites\\Sprites_gel.png",
+      "source_sha256": "4e934394e3d5024aa8993d3379d2eb674a08fb48455a0730b8371cf6852aec31",
+      "guid": "7c5c0c93b4741b843b890a92a64b0c04",
+      "crop": [
+        289,
+        354,
+        1017,
+        915
+      ],
+      "dimensions": [
+        728,
+        561
+      ],
+      "ppu": 1200.0,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "visible_base_world": null
+    },
+    {
+      "source": "C:\\Users\\Jiang\\.codex\\worktrees\\c35b\\ToxicBarrier\\output\\ArtOnly\\R01\\fang.png",
+      "target": "Assets\\Sprites\\Sprites_teeth.png",
+      "source_sha256": "da50e6919bfbaac5fa05a3f6fcca84047d1c194c26928ddf758a84fac12110d4",
+      "guid": "b83c211ab9fc7844caa59f8f90efab77",
+      "crop": [
+        198,
+        179,
+        1115,
+        1054
+      ],
+      "dimensions": [
+        917,
+        875
+      ],
+      "ppu": 1398.4615384615383,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "visible_base_world": null
+    },
+    {
+      "source": "C:\\Users\\Jiang\\.codex\\worktrees\\c35b\\ToxicBarrier\\output\\ArtOnly\\R01\\tower1.png",
+      "target": "Assets\\Sprites\\Sprites_tower.png",
+      "source_sha256": "084e0a493a987feed429087d0a8093b98c598d90142db70137400904e4087a80",
+      "guid": "4a5a2d54b82ed5744be76f31120e7378",
+      "crop": [
+        326,
+        252,
+        952,
+        1072
+      ],
+      "dimensions": [
+        626,
+        820
+      ],
+      "ppu": 1000,
+      "pivot": [
+        0.5,
+        0.4926829268292683
+      ],
+      "visible_base_world": -1.2000000000000002
+    },
+    {
+      "source": "C:\\Users\\Jiang\\.codex\\worktrees\\c35b\\ToxicBarrier\\output\\ArtOnly\\R01\\tower2.png",
+      "target": "Assets\\Sprites\\Sprites_tower2.png",
+      "source_sha256": "c6304bebc209c21d34c510185bf4c26097a1c5bf94d6a61070893b28d44563c0",
+      "guid": "b5d0e6ade63e06f40ad71785f4eee64b",
+      "crop": [
+        277,
+        131,
+        990,
+        1135
+      ],
+      "dimensions": [
+        713,
+        1004
+      ],
+      "ppu": 1000,
+      "pivot": [
+        0.5,
+        0.40239043824701193
+      ],
+      "visible_base_world": -1.2000000000000002
+    },
+    {
+      "source": "C:\\Users\\Jiang\\.codex\\worktrees\\c35b\\ToxicBarrier\\output\\ArtOnly\\R01\\tower3.png",
+      "target": "Assets\\Sprites\\Sprites_tower3.png",
+      "source_sha256": "3024ca35b6253f152676ac840366c7d6d09e83bc73c8134a5bc7f3a48004fe91",
+      "guid": "f941787da3f821c4ea14213d1fd09026",
+      "crop": [
+        213,
+        43,
+        1041,
+        1144
+      ],
+      "dimensions": [
+        828,
+        1101
+      ],
+      "ppu": 1000,
+      "pivot": [
+        0.5,
+        0.36693914623069934
+      ],
+      "visible_base_world": -1.2000000000000002
+    }
+  ]
+}

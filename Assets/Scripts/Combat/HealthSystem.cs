@@ -21,9 +21,9 @@ public class HealthSystem : MonoBehaviour
 
     [Header("Toxic Gas (Player only, used when not driven by MapController)")]
     [SerializeField] private bool affectedByToxicGas = true;
-    [SerializeField] private float toxicGasBaseDamagePerSecond = 5f;
+    [SerializeField] private float toxicGasBaseDamagePerSecond = 1.2f;
     [SerializeField] private float toxicGasPeriodSeconds = 60f;
-    [SerializeField] private float toxicGasDamageIncreasePerPeriod = 3f;
+    [SerializeField] private float toxicGasDamageIncreasePerPeriod = .1f;
 
     [Header("Debug")]
     [Tooltip("勾选后玩家不扣血、不会死亡（仅调试用，发布前请关闭）。")]
@@ -40,8 +40,11 @@ public class HealthSystem : MonoBehaviour
     private SpriteRenderer _visual;
     private Color _baseColor;
     private float _flashUntil;
+    private bool _finalBoss;
+    private float _toxicProtectionUntil;
+    public float ToxicProtectionSeconds => Mathf.Max(0, _toxicProtectionUntil - Time.time);
     public bool IsRecovering { get; private set; }
-    public float ToxicDamagePerSecond => Mathf.Min(8f, toxicGasBaseDamagePerSecond + _toxicGasPeriodsElapsed * toxicGasDamageIncreasePerPeriod);
+    public float ToxicDamagePerSecond => Mathf.Min(2f, toxicGasBaseDamagePerSecond + _toxicGasPeriodsElapsed * toxicGasDamageIncreasePerPeriod);
 
     public float CurrentHp => _currentHp;
     public float MaxHp => maxHp;
@@ -49,6 +52,7 @@ public class HealthSystem : MonoBehaviour
     public float Ats => ats;
     public bool IsPlayer => isPlayer;
     public bool IsTower => isTower;
+    public bool IsFinalBoss => _finalBoss;
     public EnemyType CurrentEnemyType => enemyType;
 
     public UnityEvent<float, float> OnHpChanged;
@@ -100,6 +104,7 @@ public class HealthSystem : MonoBehaviour
     private void ApplyEnemyTypeStats()
     {
         if (isPlayer || isTower) return;
+        if (_finalBoss) return;
         switch (enemyType)
         {
             case EnemyType.Bug:    atk = 100f;  ats = 2f;   maxHp = 50f;   break;  // DPS 200
@@ -122,7 +127,8 @@ public class HealthSystem : MonoBehaviour
 
     private void ApplyToxicGasDamage(float deltaTime)
     {
-        if (isPlayer && MapController.Instance != null && MapController.Instance.IsPlayerInMap1())
+        if (ToxicProtectionSeconds > 0) return;
+        if (isPlayer && MapController.Instance != null && MapController.Instance.IsSafeAt(transform.position))
             return;
 
         TakeDamage(ToxicDamagePerSecond * deltaTime, null);
@@ -184,6 +190,19 @@ public class HealthSystem : MonoBehaviour
         maxHp = Mathf.Max(1f, newMaxHp);
         _currentHp = maxHp * (_currentHp / Mathf.Max(0.001f, oldMax));
         OnHpChanged?.Invoke(_currentHp, maxHp);
+    }
+
+    public void GrantToxicProtection(float seconds)
+    {
+        if (isPlayer) _toxicProtectionUntil = Mathf.Max(_toxicProtectionUntil, Time.time + seconds);
+    }
+
+    public void ConfigureFinalBoss()
+    {
+        _finalBoss = true;
+        enemyType = EnemyType.Boss;
+        SetStats(350, .65f, 108000);
+        RestoreFullHealth();
     }
 
     /// <summary> Set enemy type at runtime (e.g. from EnemySpawner). Applies stats immediately. </summary>

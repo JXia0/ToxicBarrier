@@ -86,6 +86,9 @@ public class EnemySpawner : MonoBehaviour
         {
             for (int waveIndex = 0; waveIndex < levelWaves.waves.Length; waveIndex++)
             {
+                // Let the preceding siege finish so the climax has a readable, distinct entrance.
+                if (RegionLevel == 3 && waveIndex == TotalWaves - 1 && bossPrefab != null)
+                    while (_aliveEnemies > 0) yield return null;
                 CurrentWaveNumber = waveIndex + 1;
                 yield return SpawnWave(levelWaves.waves[waveIndex], waveIndex);
             }
@@ -103,7 +106,7 @@ public class EnemySpawner : MonoBehaviour
 
         for (int i = 0; i < enemies.Count; i++)
         {
-            SpawnEnemy(enemies[i], positions[i]);
+            SpawnEnemy(enemies[i], positions[i], RegionLevel == 3 && waveIndex == TotalWaves - 1 && i == 0 && enemies[i] == bossPrefab);
             yield return new WaitForSeconds(spawnIntervalSeconds);
         }
 
@@ -128,6 +131,14 @@ public class EnemySpawner : MonoBehaviour
     {
         var enemies = new List<GameObject>();
 
+        if (RegionLevel == 3 && waveIndex == TotalWaves - 1 && budget >= bossCost && bossPrefab != null)
+        {
+            enemies.Add(bossPrefab);
+            for (int i = 0; i < 2; i++) if (leaderPrefab != null) enemies.Add(leaderPrefab);
+            for (int i = 0; i < 4; i++) if (bugPrefab != null) enemies.Add(bugPrefab);
+            return enemies;
+        }
+
         while (budget >= bugCost)
         {
             if (waveIndex >= bossStartWave && budget >= bossCost)
@@ -150,12 +161,13 @@ public class EnemySpawner : MonoBehaviour
         return enemies;
     }
 
-    private void SpawnEnemy(GameObject prefab, Vector2 position)
+    private void SpawnEnemy(GameObject prefab, Vector2 position, bool finalBoss = false)
     {
         if (prefab == null) return;
 
         GameObject enemy = Instantiate(prefab, position, Quaternion.identity);
         enemy.name = prefab.name + "(Clone)";
+        if (finalBoss) { enemy.name = "Bone Warden"; enemy.AddComponent<FinalSiegeBoss>(); }
 
         HealthSystem health = enemy.GetComponent<HealthSystem>();
         if (health == null) return;

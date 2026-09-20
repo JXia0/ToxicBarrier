@@ -57,6 +57,8 @@ public static class FullRunReviewChecks
             }
             if (File.Exists("Temp/ToxicBarrierFlow.fulltest"))
             {
+                string seedText = File.ReadAllText("Temp/ToxicBarrierFlow.fulltest").Trim();
+                SessionState.SetInt(Key + ".Seed", int.TryParse(seedText, out int requestedSeed) ? requestedSeed : 20260912);
                 File.Delete("Temp/ToxicBarrierFlow.fulltest");
                 EditorSceneManager.SaveOpenScenes();
                 SessionState.SetString(Key + ".Scene", SceneManager.GetActiveScene().path);
@@ -89,7 +91,8 @@ public static class FullRunReviewChecks
     private static IEnumerator Run()
     {
         for (int i = 0; i < 10; i++) yield return null;
-        UnityEngine.Random.InitState(20260912);
+        int seed = SessionState.GetInt(Key + ".Seed", 20260912);
+        UnityEngine.Random.InitState(seed);
         GameObject.Find("StartGameButton").GetComponent<Button>().onClick.Invoke();
         while (!GameFlowManager.Instance.IsPlaying) yield return null;
         for (int i = 0; i < 10; i++) yield return null;
@@ -110,6 +113,8 @@ public static class FullRunReviewChecks
         int corner = 0;
         int collectedCaches = 0;
         bool travellingToCache = false;
+        int finalBossesSeen = 0;
+        var seenBosses = new System.Collections.Generic.HashSet<int>();
         while (GameFlowManager.Instance.IsPlaying || GameFlowManager.Instance.CurrentState == GameState.Paused)
         {
             // Keep this unattended test running if the editor loses focus; production remains paused.
@@ -119,6 +124,19 @@ public static class FullRunReviewChecks
             Vector3 goal = cache != null ? cache.transform.position : home;
             if (travellingToCache && cache == null) collectedCaches++;
             travellingToCache = cache != null;
+            // Dodge with normal directional input, using the same visible telegraph as a player.
+            var boss = FinalSiegeBoss.Active;
+            if (boss != null && seenBosses.Add(boss.GetInstanceID())) finalBossesSeen++;
+            if (cache == null && boss != null &&
+                (Vector2.Distance(player.transform.position, boss.transform.position) < 3f ||
+                 (boss.IsWindingUp && Vector2.Distance(player.transform.position, boss.StrikePosition) < FinalSiegeBoss.SlamRadius + .4f)))
+            {
+                Vector2 away = (Vector2)(player.transform.position - boss.transform.position);
+                if (boss.IsWindingUp) away = (Vector2)player.transform.position - boss.StrikePosition;
+                if (away.sqrMagnitude < .1f) away = Vector2.right;
+                Vector2 desired = (Vector2)tower.transform.position + away.normalized * 3.5f;
+                if (ReachableGround.TryFind(desired, 1.5f, out Vector2 dodge)) goal = dodge;
+            }
             if (Vector2.Distance(goal, lastGoal) > .1f)
             {
                 if (!NavMesh.SamplePosition(player.transform.position, out NavMeshHit start, 2, NavMesh.AllAreas) ||
@@ -127,15 +145,18 @@ public static class FullRunReviewChecks
                     throw new Exception("Cannot walk to supply/home at " + goal);
                 corner = 1; lastGoal = goal;
             }
-            while (corner < route.corners.Length && Vector2.Distance(player.transform.position, route.corners[corner]) < .3f) corner++;
+            while (corner < route.corners.Length && Vector2.Distance(player.transform.position, route.corners[corner]) < .06f) corner++;
             Vector3 waypoint = corner < route.corners.Length ? route.corners[corner] : goal;
-            player.SetReviewMovement(Vector2.Distance(player.transform.position, goal) < .2f ? Vector2.zero : ((Vector2)(waypoint - player.transform.position)).normalized);
+            Vector2 step = waypoint - player.transform.position;
+            float stepDistance = player.GetMoveSpeed() * Mathf.Max(Time.deltaTime, Time.fixedDeltaTime);
+            Vector2 input = step.normalized * Mathf.Clamp01(step.magnitude / Mathf.Max(.001f, stepDistance));
+            player.SetReviewMovement(Vector2.Distance(player.transform.position, goal) < .2f ? Vector2.zero : input);
             if (tower.CanUpgrade(inventory) && button.interactable) button.onClick.Invoke();
             if (Time.time >= nextLog)
             {
                 nextLog = Time.time + 10;
                 var enemies = UnityEngine.Object.FindObjectsOfType<Enemy>();
-                string progress = $"Clock x4; route: walk to clear caches then return to tower; seed 20260912; caches collected {collectedCaches}; player {player.transform.position}; goal {goal}\n{GameFlowManager.Instance.RunSummary}\nPlayer {MapController.Instance.PlayerHealth.CurrentHp} Tower {tower.Health.CurrentHp}\n" +
+                string progress = $"Clock x4; route: walk to clear caches, return to tower and dodge boss; seed {seed}; final bosses seen {finalBossesSeen}; caches collected {collectedCaches}; player {player.transform.position}; goal {goal}\n{GameFlowManager.Instance.RunSummary}\nPlayer {MapController.Instance.PlayerHealth.CurrentHp} Tower {tower.Health.CurrentHp}\n" +
                     string.Join("\n", spawners.Select(s => $"Region {s.RegionLevel}: {s.CurrentWaveNumber}/{s.TotalWaves}, alive {s.AliveEnemies}, finished {s.HasFinishedSpawning}")) + "\n" +
                     string.Join("\n", enemies.Take(12).Select(e => { var a=e.GetComponent<NavMeshAgent>(); return $"{e.name} at {e.transform.position}, nav={a.isOnNavMesh}, path={(a.isOnNavMesh ? a.pathStatus.ToString() : "off mesh")}"; }));
                 File.WriteAllText(".utmp/full-review/progress.txt", progress);
@@ -146,7 +167,8 @@ public static class FullRunReviewChecks
         if (GameFlowManager.Instance.CurrentState != GameState.Won)
             throw new Exception("Defense route ended: " + GameFlowManager.Instance.EndReason + " / " + GameFlowManager.Instance.RunSummary);
         if (collectedCaches != 2) throw new Exception("Expected two physically collected region caches, got " + collectedCaches);
-        File.WriteAllText(".utmp/full-review/progress.txt", "Clock x4; walked to both physical region caches and returned to tower; no direct damage, resource injection, invincibility, or wave replacement.\n" + GameFlowManager.Instance.RunSummary + "\n" +
+        if (finalBossesSeen != 1) throw new Exception("Expected exactly one final siege boss, got " + finalBossesSeen);
+        File.WriteAllText(".utmp/full-review/progress.txt", $"Seed {seed}. Clock x4; walked to both physical region caches and returned to tower; dodged boss with normal movement; exactly one final boss defeated; no direct damage, resource injection, invincibility, or wave replacement.\n" + GameFlowManager.Instance.RunSummary + "\n" +
             string.Join("\n", spawners.Select(s => $"Region {s.RegionLevel}: {s.CurrentWaveNumber}/{s.TotalWaves}, alive {s.AliveEnemies}, cleared {s.IsCleared}")));
         ScreenCapture.CaptureScreenshot(".utmp/full-review/victory.png");
         for (int i = 0; i < 8; i++) yield return null;

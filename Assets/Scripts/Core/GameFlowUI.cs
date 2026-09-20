@@ -100,6 +100,11 @@ public class GameFlowUI : MonoBehaviour
         GameFlowManager.Instance?.QuitGame();
     }
 
+    public void ToggleLanguage()
+    {
+        GameText.SetEnglish(!GameText.English);
+    }
+
     private static void SetActive(GameObject target, bool active)
     {
         if (target != null && target.activeSelf != active)

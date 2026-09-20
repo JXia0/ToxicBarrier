@@ -94,6 +94,24 @@ public class MapController : MonoBehaviour
         return radius;
     }
 
+    public float GetMap2Radius()
+    {
+        map2Zone.GetRingParams(out _, out _, out float radius);
+        return radius;
+    }
+
+    public int GetRegionAt(Vector2 position)
+    {
+        float distance = Vector2.Distance(position, GetMapCenter());
+        return distance <= GetMap1Radius() ? 1 : distance <= GetMap2Radius() ? 2 : 3;
+    }
+
+    public bool IsSafeAt(Vector2 position)
+    {
+        int region = GetRegionAt(position);
+        return region == 1 || (GameFlowManager.Instance != null && GameFlowManager.Instance.IsRegionCleared(region));
+    }
+
     public bool IsPlayerInMap1()
     {
         return ((Vector2)playerHealth.transform.position - _map1Center).sqrMagnitude <= _map1RadiusSquared;
