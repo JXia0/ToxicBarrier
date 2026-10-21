@@ -1,0 +1,107 @@
+{
+  "version": "R01",
+  "date": "2026-09-19",
+  "status": "candidate-awaiting-user-art-approval",
+  "generator": "built-in image_gen",
+  "assets": [
+    {
+      "file": "stone.png",
+      "label": "石料",
+      "design": "灰褐断石；浅色破裂面；一大一小紧凑轮廓",
+      "width": 1254,
+      "height": 1254,
+      "visibleBoundsAlpha128": [
+        228,
+        237,
+        1035,
+        1048
+      ],
+      "transparentPercent": 72.47,
+      "sha256": "36880181AEF5943A5F947AB246CA0735392DBEE87CA6726088459C2EC76E22ED"
+    },
+    {
+      "file": "gel.png",
+      "label": "凝胶",
+      "design": "低饱和青绿稠块；少量高光；厚重下坠边缘",
+      "width": 1254,
+      "height": 1254,
+      "visibleBoundsAlpha128": [
+        293,
+        358,
+        1013,
+        911
+      ],
+      "transparentPercent": 83.68,
+      "sha256": "4E934394E3D5024AA8993D3379D2EB674A08FB48455A0730B8371CF6852AEC31"
+    },
+    {
+      "file": "fang.png",
+      "label": "尖牙",
+      "design": "旧象牙色单颗弯牙；宽根与尖端；灰褐旧痕",
+      "width": 1254,
+      "height": 1254,
+      "visibleBoundsAlpha128": [
+        202,
+        183,
+        1111,
+        1050
+      ],
+      "transparentPercent": 81.96,
+      "sha256": "DA50E6919BFBAAC5FA05A3F6FCCA84047D1C194C26928DDF758A84FAC12110D4"
+    },
+    {
+      "file": "tower1.png",
+      "label": "一级塔",
+      "design": "八角石塔、低垛口、拱门与单齿徽",
+      "width": 1254,
+      "height": 1254,
+      "visibleBoundsAlpha128": [
+        330,
+        256,
+        948,
+        1068
+      ],
+      "transparentPercent": 73.29,
+      "sha256": "084E0A493A987FEED429087D0A8093B98C598D90142DB70137400904E4087A80"
+    },
+    {
+      "file": "tower2.png",
+      "label": "二级塔",
+      "design": "增加扶壁、箭窗、第二道束带与双齿饰",
+      "width": 1254,
+      "height": 1254,
+      "visibleBoundsAlpha128": [
+        281,
+        135,
+        986,
+        1131
+      ],
+      "transparentPercent": 64.34,
+      "sha256": "C6304BEBC209C21D34C510185BF4C26097A1C5BF94D6A61070893B28D44563C0"
+    },
+    {
+      "file": "tower3.png",
+      "label": "三级塔",
+      "design": "增加侧护塔、四齿冠饰与菱形石碑",
+      "width": 1254,
+      "height": 1254,
+      "visibleBoundsAlpha128": [
+        217,
+        47,
+        1037,
+        1140
+      ],
+      "transparentPercent": 58.17,
+      "sha256": "3024CA35B6253F152676AC840366C7D6D09E83BC73C8134A5BC7F3A48004FE91"
+    }
+  ],
+  "references": "Read-only copies of approved assets from C:/GameProjects/ToxicBarrier; no worktree map used.",
+  "limitations": [
+    "True alpha present; low-alpha stray pixels and near-opaque alpha around 253 remain from generator.",
+    "Tower raw baseline y values differ: 1068, 1131, 1140 (exclusive bounds). Preview uses display-only bounding boxes and baseline alignment.",
+    "Canvas cropping and exact nearest-neighbor sprite grid are not normalized in original PNGs.",
+    "HTML browser visual QA blocked by local-file URL security policy; 32/48 px display checks and map switching are included for user inspection, not claimed verified."
+  ],
+  "scope": "No game code, scenes, prefabs, references, values or UI changed. No commits or pushes.",
+  "next": "Main Menu redesign only after user approves these four asset categories."
+}
