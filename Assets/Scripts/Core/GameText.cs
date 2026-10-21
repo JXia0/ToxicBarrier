@@ -11,6 +11,14 @@ public static class GameText
     public static event Action Changed;
     public static void SetEnglish(bool english) { PlayerPrefs.SetInt("English", english ? 1 : 0); PlayerPrefs.Save(); Changed?.Invoke(); }
     private static readonly Dictionary<string, string> Copy = new Dictionary<string, string> {
+        {"已取得防御补给  |  返塔修复并获得短暂防护", "FIELD SUPPLIES  |  Return to the tower for repair and temporary protection"},
+        {"防御补给已送达  |  修复 15% 生命，12 秒内减伤 35%", "FIELD SUPPLIES DELIVERED  |  Repairs 15% HP; 35% less damage for 12s"},
+        {"防御补给 [E]  |  带回塔旁修复并获得防护", "FIELD SUPPLIES [E]  |  Bring home for repair and protection"},
+        {"一夜之间，毒雾从地下喷涌而出，吞没了中世纪的王国。", "One night, toxic fog erupted beneath a medieval kingdom, swallowing its streets."},
+        {"哥布林占据废墟，死者走出坟墓。昔日的城镇陷入沉寂。", "Goblins claimed the ruins. The dead rose from their graves. The kingdom fell silent."},
+        {"唯有一座古塔仍在抵御毒雾，庇护最后的幸存者。", "One ancient tower still held back the poison, sheltering the last survivors."},
+        {"你是它最后的守护者。踏入废墟，收集材料，修复高塔，守住希望。", "You are its last defender. Gather supplies. Restore the tower. Keep its light alive."},
+        {"跳过", "Skip"},
         {"修塔补给已送达  |  净化塔恢复 15% 生命", "REPAIR DELIVERED  |  Restored up to 15% tower HP"},
         {"已取得修塔补给  |  返回塔旁，修复 15% 塔生命", "REPAIR COLLECTED  |  Return to the tower to restore up to 15% HP"},
         {"修塔补给已保留  |  塔受损时在塔旁自动修复", "REPAIR SAVED  |  Repairs automatically near the tower when damaged"},

@@ -35,8 +35,11 @@ public sealed class TowerNavigationFootprint : MonoBehaviour
         _lastSprite = _renderer.sprite;
         if (_lastSprite == null) return;
         Bounds bounds = _lastSprite.bounds;
-        Vector2 size = new Vector2(bounds.size.x * .78f, .12f);
-        Vector2 centre = new Vector2(bounds.center.x, bounds.min.y + .085f);
+        // Tight-cropped tower art: follow each tier's visible foundation instead of a fixed-height strip.
+        Vector2 size = new Vector2(bounds.size.x * .94f, bounds.size.y * .105f);
+        Vector2 centre = new Vector2(bounds.center.x, bounds.min.y + size.y * .55f);
+        if (_renderer.flipX) centre.x = -centre.x;
+        if (_renderer.flipY) centre.y = -centre.y;
         _feet.size = size;
         _feet.offset = centre;
         _navigation.size = new Vector3(size.x, size.y, 1f);

@@ -1,0 +1,44 @@
+[
+  {
+    "region": 2,
+    "source_resolution": [
+      1254,
+      1254
+    ],
+    "master_resolution": [
+      5016,
+      5016
+    ],
+    "runtime_resolution": [
+      4096,
+      4096
+    ],
+    "original_alpha_preserved": true,
+    "guid": "67cec9cd52350c1438c80a4555d0b65a",
+    "sprite_local_width": 1,
+    "png_sha256": "dcebdff32f786af778830124e7e6f4321f0c5e1be8e1cf67e5b222a414e49a1f",
+    "model": "realesrgan-x4plus",
+    "source_blend": 0.25
+  },
+  {
+    "region": 3,
+    "source_resolution": [
+      1254,
+      1254
+    ],
+    "master_resolution": [
+      5016,
+      5016
+    ],
+    "runtime_resolution": [
+      4096,
+      4096
+    ],
+    "original_alpha_preserved": true,
+    "guid": "a0a142d8c09503344af21e584e643bde",
+    "sprite_local_width": 1,
+    "png_sha256": "0dec77ab723136cc673c6caf9290beb55f4c4f066526aa33336119ca4ab53321",
+    "model": "realesrgan-x4plus",
+    "source_blend": 0.25
+  }
+]

@@ -11,6 +11,10 @@ internal static class WorldLayoutPlayChecks
         var player = health.GetComponent<PlayerController>();
         var body = player.GetComponent<Rigidbody2D>();
         Vector3 original = player.transform.position;
+        var playerArt=player.GetComponent<SpriteRenderer>();
+        check(Mathf.Abs(playerArt.sprite.pivot.x-51)<.01f && Mathf.Abs(playerArt.sprite.pivot.y-5)<.01f &&
+            playerArt.spriteSortPoint==SpriteSortPoint.Pivot,
+            "Player animation origin and depth sort align with the feet instead of the top-right of the body");
         var buildings = UnityEngine.Object.FindObjectsOfType<PolygonCollider2D>().Where(p => p.transform.Find("NavigationObstacle") != null).ToArray();
         check(buildings.Length == 30, "Thirty buildings have ground footprints");
         check(buildings.Count(b => MapController.Instance.GetRegionAt(b.transform.position) == 1) == 6 &&
@@ -54,6 +58,23 @@ internal static class WorldLayoutPlayChecks
         }
         player.SetReviewMovement(null); player.StopMovement();
         check(Vector2.Distance(body.position, goal) < .16f, "Actual Rigidbody movement reaches the other side of the house");
+        var archery=buildings.First(p=>p.name=="Archery");
+        var sprite=archery.GetComponent<SpriteRenderer>().sprite;
+        Vector2 courtyardLocal=new Vector2(63-sprite.pivot.x, sprite.rect.height-200-sprite.pivot.y)/sprite.pixelsPerUnit;
+        Vector2 courtyard=archery.transform.TransformPoint(courtyardLocal);
+        check(!archery.OverlapPoint(courtyard) && ReachableGround.IsOpen(courtyard,.225f),
+            "Archery courtyard is open at the actual source-art courtyard, not an invisible horizontal wall");
+        Vector2 entrance=archery.transform.TransformPoint(courtyardLocal+Vector2.down*.82f);
+        body.position=entrance; player.transform.position=entrance; Physics2D.SyncTransforms();
+        deadline=Time.realtimeSinceStartup+8;
+        while(Vector2.Distance(body.position,courtyard)>.08f)
+        {
+            if(Time.realtimeSinceStartup>deadline) throw new Exception("Player blocked at the visible archery entrance.");
+            player.SetReviewMovement((courtyard-body.position).normalized);
+            yield return null;
+        }
+        player.SetReviewMovement(null); player.StopMovement();
+        check(true,"Actual player walks through the visible archery gate into the courtyard");
         ScreenCapture.CaptureScreenshot(".utmp/ui-checks/11-building-route.png");
         for (int i = 0; i < 4; i++) yield return null;
         body.position = original; player.transform.position = original; Physics2D.SyncTransforms();

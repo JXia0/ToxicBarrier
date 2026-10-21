@@ -26,6 +26,7 @@ public class GameFlowManager : MonoBehaviour
     private GameFlowUI _flowUI;
     private int _initializedSceneHandle = -1;
     private bool _isQuitting;
+    private StoryIntroUI _storyIntro;
     private Tower _tower;
     private HealthSystem _towerHealth;
     private EnemySpawner[] _spawners = new EnemySpawner[0];
@@ -125,7 +126,13 @@ public class GameFlowManager : MonoBehaviour
             CheckVictory();
         }
         if (!Input.GetKeyDown(KeyCode.Escape)) return;
+        if (CurrentState == GameState.StoryIntro)
+        {
+            _storyIntro?.Skip();
+            return;
+        }
         if (GameSettingsUI.CloseIfOpen()) return;
+        if (ExplorationMapUI.Instance != null && ExplorationMapUI.Instance.Close()) return;
 
         if (CurrentState == GameState.Playing)
             PauseGame();
@@ -141,7 +148,14 @@ public class GameFlowManager : MonoBehaviour
     public void StartNewGame()
     {
         if (CurrentState != GameState.MainMenu) return;
-        BeginSceneTransition(GameplaySceneName);
+        SetPlayerControl(false);
+        Time.timeScale = 0f;
+        SetState(GameState.StoryIntro);
+        if (_storyIntro == null) _storyIntro = gameObject.AddComponent<StoryIntroUI>();
+        _storyIntro.Play(() =>
+        {
+            if (CurrentState == GameState.StoryIntro) BeginSceneTransition(GameplaySceneName);
+        });
     }
 
     public void PauseGame()
@@ -164,7 +178,7 @@ public class GameFlowManager : MonoBehaviour
 
     public void RestartGame()
     {
-        if (CurrentState == GameState.MainMenu || CurrentState == GameState.Transitioning) return;
+        if (CurrentState == GameState.MainMenu || CurrentState == GameState.Transitioning || CurrentState == GameState.StoryIntro) return;
         BeginSceneTransition(GameplaySceneName);
     }
 
@@ -264,9 +278,16 @@ public class GameFlowManager : MonoBehaviour
         if (!Application.CanStreamedLevelBeLoaded(sceneName))
         {
             Debug.LogError($"GameFlowManager cannot load scene '{sceneName}'. Add it to Build Settings.", this);
+            if (CurrentState == GameState.StoryIntro)
+            {
+                _storyIntro?.Cancel();
+                Time.timeScale = 1f;
+                SetState(GameState.MainMenu);
+            }
             return;
         }
 
+        _storyIntro?.Cancel();
         SetPlayerControl(false);
         UnbindPlayer();
         Time.timeScale = 1f;

@@ -1,0 +1,27 @@
+PASS
+PASS Start Game opens the story
+PASS Gameplay has not loaded and simulation is frozen
+PASS No waves or survival time advance during the story
+PASS Repeated start/restart/pause cannot interrupt the intro
+PASS Image 1 uses the finished illustration
+PASS English caption 1 is localized and fits
+PASS Image 1 stays approximately five seconds
+PASS Image 2 uses the finished illustration
+PASS English caption 2 is localized and fits
+PASS Image 2 stays approximately five seconds
+PASS Image 3 uses the finished illustration
+PASS English caption 3 is localized and fits
+PASS Image 3 stays approximately five seconds
+PASS Image 4 uses the finished illustration
+PASS English caption 4 is localized and fits
+PASS All four images complete automatically in about 20 seconds (20.07s)
+PASS Story ends in a fresh playable run with a reset clock
+PASS Tower still starts at level zero
+PASS Pause remains functional after the intro
+PASS Restart retries immediately without replaying the opening
+PASS New Start Game replays the opening in selected Chinese
+PASS All Chinese story characters are baked into the shipped font
+PASS Skip is the topmost clickable UI target
+PASS Skip loads gameplay once and preserves language
+PASS Leaving an intro cancels it cleanly without a delayed scene load
+PASS No runtime errors or missing-glyph warnings

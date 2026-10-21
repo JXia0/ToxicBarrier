@@ -22,6 +22,7 @@ public static class ReleaseUIPlayModeChecks
     private static readonly List<string> Errors = new List<string>();
     private static int _frames;
     private static int _lastPlayFrame = -1;
+    private static bool _expectedPause;
 
     static ReleaseUIPlayModeChecks()
     {
@@ -39,6 +40,7 @@ public static class ReleaseUIPlayModeChecks
             Application.runInBackground = true;
             Passed.Clear(); Errors.Clear();
             _lastPlayFrame = -1;
+            _expectedPause = false;
             Application.logMessageReceived += Log;
             _deadline = EditorApplication.timeSinceStartup + 240;
             _run = Run();
@@ -59,7 +61,12 @@ public static class ReleaseUIPlayModeChecks
             !EditorApplication.isUpdating && !File.Exists("Temp/ToxicBarrierUI.setup") && File.Exists("Temp/ToxicBarrierUI.test"))
         {
             File.Delete("Temp/ToxicBarrierUI.test");
-            EditorSceneManager.SaveOpenScenes();
+            if (SceneManager.GetActiveScene().isDirty)
+            {
+                Directory.CreateDirectory(".utmp/ui-checks");
+                File.WriteAllText(".utmp/ui-checks/report.txt", "BLOCKED: Save the current scene before running checks.");
+                return;
+            }
             SessionState.SetString(ActiveKey + ".Scene", SceneManager.GetActiveScene().path);
             SessionState.SetBool(ActiveKey, true);
             Directory.CreateDirectory(".utmp/ui-checks");
@@ -75,10 +82,16 @@ public static class ReleaseUIPlayModeChecks
         // Editor update can run several times between player frames. Wait for actual lifecycle/render work.
         if (_lastPlayFrame == Time.frameCount) return;
         _lastPlayFrame = Time.frameCount;
+        // A focus change during unattended editor review must not strand the fixture.
+        // Deliberate pauses made by a check remain paused across its yielded frames.
+        if (!_expectedPause && GameFlowManager.Instance != null && GameFlowManager.Instance.CurrentState == GameState.Paused)
+            GameFlowManager.Instance.ResumeGame();
         try
         {
             if (EditorApplication.timeSinceStartup > _deadline) throw new Exception("Play Mode checks timed out");
-            if (_run.MoveNext()) return;
+            bool running = _run.MoveNext();
+            _expectedPause = GameFlowManager.Instance != null && GameFlowManager.Instance.CurrentState == GameState.Paused;
+            if (running) return;
             Check(Errors.Count == 0, "No runtime exceptions or errors");
             Finish("PASS\n" + string.Join("\n", Passed));
         }
@@ -316,6 +329,8 @@ public static class ReleaseUIPlayModeChecks
         while (outerChecks.MoveNext()) yield return outerChecks.Current;
         IEnumerator repairChecks = RouteGameplayPlayChecks.CheckRepair(player, tower, Check);
         while (repairChecks.MoveNext()) yield return repairChecks.Current;
+        IEnumerator mapChecks = ExplorationMapChecks.Run(player, tower, Check);
+        while (mapChecks.MoveNext()) yield return mapChecks.Current;
         StartShortWave(spawners[2]);
         while (spawners.Any(s => !s.HasFinishedSpawning)) yield return null;
         Check(GameFlowManager.Instance.IsPlaying && spawners.Sum(s => s.AliveEnemies) > 0, "Spawn completion waits for remaining enemies");

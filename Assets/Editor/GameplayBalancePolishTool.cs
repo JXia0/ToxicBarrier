@@ -57,6 +57,9 @@ public static class GameplayBalancePolishTool
         for (int i = 1; i <= 3; i++)
         {
             var importer = (TextureImporter)AssetImporter.GetAtPath($"Assets/Sprites/Sprites_map_{i}.png");
+            importer.GetSourceTextureWidthAndHeight(out int width, out int height);
+            // Preserve the dedicated HD terrain import settings when rerunning gameplay tuning.
+            if (width >= 4096 && height >= 4096) continue;
             importer.filterMode = FilterMode.Point;
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             var platform = importer.GetPlatformTextureSettings("Standalone");

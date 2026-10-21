@@ -31,6 +31,7 @@ public class TowerUpgradePanelUI : MonoBehaviour
     private PlayerController _playerController;
     private bool _upgradeInProgress;
     private GameFlowManager _flow;
+    public bool IsVisible => panelRoot != null && panelRoot.gameObject.activeInHierarchy;
 
     private void Start()
     {

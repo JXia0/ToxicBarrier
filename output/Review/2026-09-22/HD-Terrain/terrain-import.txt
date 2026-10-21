@@ -1,0 +1,3 @@
+PASS
+Region 2: 4096x4096, PPU 4096, BC7, mip levels 13, one local unit; GUID unchanged.
+Region 3: 4096x4096, PPU 4096, BC7, mip levels 13, one local unit; GUID unchanged.

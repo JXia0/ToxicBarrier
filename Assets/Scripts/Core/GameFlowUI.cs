@@ -47,7 +47,7 @@ public class GameFlowUI : MonoBehaviour
     {
         GameSettingsUI.CloseIfOpen();
         SetActive(mainMenuPanel, state == GameState.MainMenu);
-        SetActive(pausePanel, state == GameState.Paused);
+        SetActive(pausePanel, state == GameState.Paused && !ExplorationMapUI.Expanded);
         SetActive(deathPanel, state == GameState.Dead);
         SetActive(loadingPanel, state == GameState.Transitioning);
         SetActive(pauseButton, state == GameState.Playing);
@@ -60,7 +60,7 @@ public class GameFlowUI : MonoBehaviour
             if (victorySummary != null) victorySummary.text = GameText.Translate(flow.RunSummary);
         }
         GameObject activePanel = state == GameState.MainMenu ? mainMenuPanel :
-            state == GameState.Paused ? pausePanel : state == GameState.Dead ? deathPanel :
+            state == GameState.Paused && !ExplorationMapUI.Expanded ? pausePanel : state == GameState.Dead ? deathPanel :
             state == GameState.Won ? victoryPanel : null;
         if (EventSystem.current != null)
         {

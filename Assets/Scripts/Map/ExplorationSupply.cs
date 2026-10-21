@@ -72,25 +72,28 @@ public sealed class ExplorationSupply : MonoBehaviour
         PlayerInventory bag = player.GetComponent<PlayerInventory>();
         HealthSystem health = player.GetComponent<HealthSystem>();
         if (bag == null || health == null || health.CurrentHp <= 0) return;
-        if (IsTowerRepair)
+        Tower tower = Tower.FindClosestLivingTower(transform.position);
+        bool fieldSupplies = !IsTowerRepair && tower != null && tower.IsMaxLevel;
+        if (IsTowerRepair || fieldSupplies)
         {
             var cargo = player.GetComponent<TowerRepairCargo>();
             if (cargo == null) cargo = player.gameObject.AddComponent<TowerRepairCargo>();
-            if (!cargo.TryLoad()) return;
+            if (!cargo.TryLoad(fieldSupplies)) return;
         }
         else if (!manual && health.CurrentHp >= health.MaxHp - .01f) return;
         _collected = true;
         if (manual) _lastManualFrame = Time.frameCount;
         // Exploration accelerates upgrades, while finite clear rewards still guarantee progression.
-        if (!IsTowerRepair)
+        if (!IsTowerRepair && !fieldSupplies)
         {
-            bag.Add(LootManager.ResourceType.Wood, 5);
-            bag.Add(LootManager.ResourceType.Gel, 3);
-            if (Region >= 2) { bag.Add(LootManager.ResourceType.Stone, 5); bag.Add(LootManager.ResourceType.Teeth, 2); }
+            bag.Add(LootManager.ResourceType.Wood, 10);
+            bag.Add(LootManager.ResourceType.Gel, 6);
+            if (Region >= 2) { bag.Add(LootManager.ResourceType.Stone, 12); bag.Add(LootManager.ResourceType.Teeth, 5); }
         }
         health.Heal(35); health.GrantToxicProtection(18);
         GameAudio.Play("Supply", .5f);
-        GameFlowManager.Instance.ShowGameplayNotice(IsTowerRepair ? "已取得修塔补给  |  返回塔旁，修复 15% 塔生命" : "侧路补给  |  材料、35 生命、18 秒毒气防护", 6);
+        GameFlowManager.Instance.ShowGameplayNotice(fieldSupplies ? "已取得防御补给  |  返塔修复并获得短暂防护" :
+            IsTowerRepair ? "已取得修塔补给  |  返回塔旁，修复 15% 塔生命" : "侧路补给  |  材料、35 生命、18 秒毒气防护", 6);
         Destroy(gameObject);
     }
 }

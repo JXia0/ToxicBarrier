@@ -121,7 +121,7 @@ internal static class GameplayEdgePlayChecks
         flow.PauseGame(); Call(supply, "TryCollect", controller, true);
         check(bag.GetCount(LootManager.ResourceType.Wood) == wood, "Manual supply interaction is disabled during pause");
         flow.ResumeGame(); Call(supply, "TryCollect", controller, true);
-        check(bag.GetCount(LootManager.ResourceType.Wood) == wood + 5, "Manual supply interaction grants materials at full health");
+        check(bag.GetCount(LootManager.ResourceType.Wood) == wood + 10, "Manual supply interaction grants materials at full health");
         check(ExplorationSupply.FindInteractable(controller) == null, "One keypress cannot consume several exploration supplies");
         Vector2 restorePoint = supply.transform.position;
         Place(player, original); player.RestoreFullHealth();

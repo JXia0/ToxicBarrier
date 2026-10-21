@@ -12,7 +12,9 @@ public sealed class RegionSupplyCache : MonoBehaviour
     public static RegionSupplyCache Spawn(Tower tower, int region)
     {
         Vector3 origin = tower.transform.position;
-        float radius = region == 1 ? 8.5f : MapController.Instance.GetMap1Radius() + 2.5f;
+        // The guaranteed reward stays inside the region just cleared, even after map resizing.
+        float radius = region == 1 ? MapController.Instance.GetMap1Radius() * .68f :
+            Mathf.Lerp(MapController.Instance.GetMap1Radius(), MapController.Instance.GetMap2Radius(), .65f);
         var path = new NavMeshPath();
         Vector3 position = origin;
         bool found = false;

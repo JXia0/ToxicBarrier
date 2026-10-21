@@ -127,7 +127,7 @@ public static class WorldLayoutPolishTool
         visibility.ApplyModifiedPropertiesWithoutUndo();
     }
 
-    private static void Fit(SpriteRenderer renderer)
+    public static void Fit(SpriteRenderer renderer)
     {
         var obj = renderer.gameObject;
         obj.layer = LayerMask.NameToLayer("Obstacle");
@@ -139,27 +139,31 @@ public static class WorldLayoutPolishTool
         Vector2[][] paths;
         if (name.StartsWith("Archery"))
             paths = new[] {
-                Points(20,169, 122,169, 133,183, 119,200, 35,200, 18,188),
-                Points(117,196, 163,196, 175,209, 172,232, 115,236, 107,218),
-                Points(10,215, 31,215, 32,235, 9,235) };
+                Points(10,176, 24,176, 24,216, 10,216),
+                Points(10,218, 44,218, 44,235, 10,235),
+                Points(81,219, 113,219, 113,235, 81,235),
+                Points(117,216, 165,216, 173,228, 165,236, 116,236, 110,228) };
         else if (name.StartsWith("House1"))
-            paths = new[] { Points(26,136, 101,136, 110,148, 108,166, 23,168, 17,151) };
+            paths = new[] { Points(23,153, 107,153, 110,163, 101,171, 25,171, 18,164) };
         else if (name.StartsWith("House3"))
-            paths = new[] { Points(20,139, 108,139, 116,153, 109,167, 18,167, 12,154) };
+            paths = new[] { Points(19,151, 110,151, 115,161, 106,171, 21,171, 13,162) };
         else if (name.StartsWith("Castle"))
             paths = new[] { Points(28,187, 288,187, 302,204, 281,224, 186,228, 165,242, 141,242, 123,228, 36,225, 18,207) };
         else throw new InvalidOperationException("A ground footprint must be authored for " + name);
         // Castle has a shallow doorway protrusion; split it into convex paths for the mesh extrusion.
         if (name.StartsWith("Castle")) paths = new[] {
-            Points(28,187, 288,187, 302,204, 281,224, 36,225, 18,207),
-            Points(124,220, 185,220, 177,236, 165,242, 141,242, 128,235) };
+            Points(28,209, 289,209, 299,218, 280,231, 39,231, 22,221),
+            Points(127,229, 184,229, 176,242, 141,245, 129,238) };
         footprint.pathCount = paths.Length;
         footprint.offset = Vector2.zero;
         footprint.isTrigger = false;
         for (int p = 0; p < paths.Length; p++)
         {
-            Vector2[] local = paths[p].Select(point => new Vector2(point.x - renderer.sprite.pivot.x,
-                renderer.sprite.rect.height - point.y - renderer.sprite.pivot.y) / renderer.sprite.pixelsPerUnit).ToArray();
+            Sprite sprite = renderer.sprite;
+            Vector2[] local = paths[p].Select(point => Vector2.Scale(new Vector2(
+                point.x - sprite.rect.x - sprite.pivot.x,
+                sprite.texture.height - point.y - sprite.rect.y - sprite.pivot.y) / sprite.pixelsPerUnit,
+                new Vector2(renderer.flipX ? -1 : 1, renderer.flipY ? -1 : 1))).ToArray();
             Array.Reverse(local); // Input is clockwise in screen coordinates; store CCW in world XY.
             footprint.SetPath(p, local);
         }

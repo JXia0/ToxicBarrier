@@ -1,0 +1,289 @@
+PASS
+OK  Main menu entry state
+OK  One menu EventSystem
+OK  Main menu contains Start Game, Quit and the language shortcut
+OK  Quit button is bound to game exit
+OK  Simplified menu retains Chinese localization
+OK  English Start Game and Quit labels
+OK  Bundled Chinese font contains game glyphs
+OK  Main menu has one active audio listener
+OK  Background music is connected and playing
+OK  Persistent flow manager has no duplicates
+OK  One gameplay EventSystem
+OK  Pause button is the topmost pointer raycast target
+OK  Player foot collider fits the navigable clearance
+OK  Enemy target registry finds the living tower
+OK  New game begins at tower level zero
+OK  Tower uses the reduced 4.75 metre defense range
+OK  Timer and defeated count share the compact HUD bar
+OK  Player animation origin and depth sort align with the feet instead of the top-right of the body
+OK  Thirty buildings have ground footprints
+OK  Buildings are distributed 6 / 10 / 14 across the three regions
+OK  Route03_NorthB navigation uses the actual collision outline
+OK  Route03_NortheastB navigation uses the actual collision outline
+OK  Route02_EastA navigation uses the actual collision outline
+OK  Route02_NorthB navigation uses the actual collision outline
+OK  Route03_SouthwestB navigation uses the actual collision outline
+OK  Archery navigation uses the actual collision outline
+OK  Route03_NortheastA navigation uses the actual collision outline
+OK  Route02_GatewayA navigation uses the actual collision outline
+OK  Route03_SoutheastB navigation uses the actual collision outline
+OK  Route03_SouthA navigation uses the actual collision outline
+OK  Route03_NorthwestB navigation uses the actual collision outline
+OK  Route01_Southeast navigation uses the actual collision outline
+OK  Route03_WestA navigation uses the actual collision outline
+OK  Route03_WestB navigation uses the actual collision outline
+OK  Route02_SouthA navigation uses the actual collision outline
+OK  Route02_NorthA navigation uses the actual collision outline
+OK  Route01_Northwest navigation uses the actual collision outline
+OK  Route02_SouthB navigation uses the actual collision outline
+OK  House1 navigation uses the actual collision outline
+OK  Route03_NorthA navigation uses the actual collision outline
+OK  Route03_SouthB navigation uses the actual collision outline
+OK  Route02_EastB navigation uses the actual collision outline
+OK  Route02_WestB navigation uses the actual collision outline
+OK  Route03_NorthwestA navigation uses the actual collision outline
+OK  Route02_WestA navigation uses the actual collision outline
+OK  Route02_GatewayB navigation uses the actual collision outline
+OK  House3 navigation uses the actual collision outline
+OK  Route03_SouthwestA navigation uses the actual collision outline
+OK  Castle navigation uses the actual collision outline
+OK  Route03_SoutheastA navigation uses the actual collision outline
+OK  Central tower base has solid collision and dynamic navigation carving
+OK  Locked outer-ring buildings remain hidden until unlocked
+OK  Expanded second region keeps its correct movement speed at 26 metres
+OK  Navigation bends around the house instead of crossing the wall
+OK  Actual Rigidbody movement reaches the other side of the house
+OK  Archery courtyard is open at the actual source-art courtyard, not an invisible horizontal wall
+OK  Actual player walks through the visible archery gate into the courtyard
+OK  Opening tutorial outranks supply feedback and nearby supplies
+OK  Danger preempts pickup feedback without replacing an active warning
+OK  Pause preserves queued danger feedback
+OK  Second danger waits until the first warning finishes
+OK  Interrupted pickup feedback resumes after danger warnings
+OK  Nearby ordinary drops merge without losing resource quantity
+OK  Merged pickup displays its quantity
+OK  Different resource types never merge
+OK  Same-type drops across a wall do not merge
+OK  A wall blocks ordinary pickup collection
+OK  Paused pickup cannot change inventory
+OK  Resume collects the entire stack exactly once
+OK  A disguised parasite cannot absorb normal drops
+OK  Parasite spawn rejects ground intersecting a building footprint
+OK  Cover blocks parasite contact damage
+OK  Parasite still damages on the same side of cover
+OK  Walking over exploration supplies at full health preserves them
+OK  Full-health player can choose nearby supplies explicitly
+OK  Manual supply interaction is disabled during pause
+OK  Manual supply interaction grants materials at full health
+OK  One keypress cannot consume several exploration supplies
+OK  Exploration fixture restores its cache for downstream checks
+OK  Manual supplies retain English localization
+OK  Manual supplies have baked Chinese glyphs
+OK  Unseen player behind a wall does not attract enemies away from tower
+OK  Visible player inside aggro range attracts the enemy
+OK  Lost sight searches the fixed last-seen position rather than tracking through walls
+OK  Pause does not consume the enemy's search memory
+OK  After 1.6 seconds without sight, the enemy resumes attacking the tower
+OK  Emerging from cover can draw enemy attention again
+OK  Reachable resource candidates remain available: 19/Map1
+OK  Reachable resource candidates remain available: 19/Map2
+OK  Reachable resource candidates remain available: 19/Map3
+OK  Reachable resource candidates remain available: 713/Map1
+OK  Reachable resource candidates remain available: 713/Map2
+OK  Reachable resource candidates remain available: 713/Map3
+OK  Reachable resource candidates remain available: 20260919/Map1
+OK  Reachable resource candidates remain available: 20260919/Map2
+OK  Reachable resource candidates remain available: 20260919/Map3
+OK  Resource positions avoid walls and retain complete paths across three random seeds (360)
+OK  A thin wall blocks actual enemy melee damage at close range
+OK  The same melee strike damages the player when cover is removed
+OK  Enemy speed uses its own region and is unaffected by the player's region
+OK  Scene poison budget is 1.2-2 HP per second
+OK  Late-run poison is capped at two HP per second
+OK  Side-route buildings expose finite exploration supplies
+OK  Exploration supplies have a complete navigable route
+OK  Physical exploration pickup awards its finite material reward
+OK  Exploration pickup heals 35 and grants gas protection
+OK  Gas protection actually prevents poison damage
+OK  Pause preserves temporary gas protection duration
+OK  Final boss custom health survives Start and cannot be one-shot by the tower
+OK  Tower prioritizes an escort over the high-health final boss
+OK  Boss telegraph locks to the floor and moving out avoids damage
+OK  Boss telegraph and damage freeze during pause
+OK  Remaining inside the telegraph takes one 30 HP slam
+OK  Boss HUD reference is cleared on despawn
+OK  Player readability shader is included as a runtime resource
+OK  Chinese font has baked glyphs for all new gameplay notices
+OK  Hidden-enemy guidance has an English translation
+OK  Uses assigned tower sprite for level 0
+OK  Uses assigned tower sprite for level 1
+OK  Uses assigned tower sprite for level 2
+OK  Uses assigned tower sprite for level 3
+OK  Tower has configured particle effects
+OK  Level zero uses first attack effect
+OK  Attack effect originates inside the tower sprite, not at the target
+OK  Repeated pickup collision awards one two-unit resource only once
+OK  Disabled parasite disguise cannot award a resource
+OK  Warning has a transparent centre and feathered visible edges
+OK  Warning sits below HUD and never blocks clicks
+OK  Distant hidden enemy produces no warning
+OK  Nearby hidden enemy increases warning strength
+OK  Near warning fades in with capped opacity
+OK  Active warning fades away after leaving danger without pausing
+OK  Pause hides warning and blocks hidden enemy damage
+OK  Warning clears when player leaves the danger radius
+OK  Player damage updates filled health bar
+OK  Health value text updates
+OK  Pause button freezes game
+OK  Enemy physics footprint fits the baked navigation radius
+OK  Ready enemy attack cannot deal damage while paused
+OK  Pause preserves HP and survival timer
+OK  Resume returns to play
+OK  Simple pause has three actions and a language shortcut
+OK  Pause language switch updates Chinese labels without resuming
+OK  Pause language switch restores English without resuming
+OK  Losing application focus pauses gameplay
+OK  Contact protection rejects repeated hits inside 0.75 seconds
+OK  Player recovers after three damage-free seconds beside the tower
+OK  Approaching tower opens saved upgrade panel
+OK  Insufficient resources disables upgrade
+OK  Real tower attack triggers configured particles
+OK  Cleared region does not deposit supplies remotely
+OK  Supply reward creates an actual collection destination
+OK  Region 1 clear guarantees cumulative supplies through tower level 2
+OK  Upgrade enabled when materials ready: 1
+OK  Pause hides upgrade panel
+OK  Pause holds upgrade animation and material payment
+OK  Both upgrade particles play at tower foot: 1
+OK  Tower sprite keeps its base aligned after upgrade: 1
+OK  Attack prefab matches tower level: 1
+OK  Upgrade consumes materials exactly once: 1
+OK  Upgrade restores player and tower: 1
+OK  Upgrade enabled when materials ready: 2
+OK  Both upgrade particles play at tower foot: 2
+OK  Tower sprite keeps its base aligned after upgrade: 2
+OK  Attack prefab matches tower level: 2
+OK  Upgrade consumes materials exactly once: 2
+OK  Upgrade restores player and tower: 2
+OK  Upgrade unlocks region 2
+OK  Cleared region does not deposit supplies remotely
+OK  Supply reward creates an actual collection destination
+OK  Region 2 clear guarantees remaining level 3 supplies
+OK  Upgrade enabled when materials ready: 3
+OK  Both upgrade particles play at tower foot: 3
+OK  Tower sprite keeps its base aligned after upgrade: 3
+OK  Attack prefab matches tower level: 3
+OK  Upgrade consumes materials exactly once: 3
+OK  Upgrade restores player and tower: 3
+OK  Upgrade unlocks region 3
+OK  Max tower alone does not trigger victory
+OK  Rapid attacks have a bounded particle pool
+OK  Pause freezes particle simulation
+OK  Attack and upgrade particles expire automatically
+OK  Expanded buildings retain four second-region supplies and three finite third-region repairs
+OK  Side-route supply is navigable: Side-route supplies 2
+OK  Side-route supply is navigable: Side-route supplies 1
+OK  Side-route supply is navigable: Side-route supplies 2
+OK  Side-route supply is navigable: Side-route supplies 2
+OK  Side-route supply is navigable: Side-route supplies 2
+OK  Side-route supply is navigable: Tower repair supplies 3
+OK  Side-route supply is navigable: Tower repair supplies 3
+OK  Side-route supply is navigable: Tower repair supplies 3
+OK  Clearing region two actually removes its toxic damage
+OK  Cleared region immunity is enforced by HealthSystem
+OK  Uncleared third region remains toxic
+OK  Uncleared region still damages the player
+OK  Camera remains perpendicular to the 2D world in the outer region
+OK  Outer-region silhouette rim follows the current animated player sprite
+OK  Map retains crisp sprite filtering: Map1
+OK  Map retains crisp sprite filtering: Map2
+OK  Map retains crisp sprite filtering: Map3
+OK  Exactly three finite repair caches exist, all in region three
+OK  Physical contact collects a repair parcel in the outer region
+OK  Repair caches do not multiply ordinary upgrade materials
+OK  Only one repair parcel can be carried at a time
+OK  Full-health tower preserves carried repair supply
+OK  Repair delivery is frozen during pause
+OK  Repair cache has a complete return path through expanded building routes
+OK  Actual player movement delivers the parcel and repairs exactly 15 percent tower HP
+OK  Repair parcel cannot heal the tower twice
+OK  Collected repair cache remains consumed
+OK  Repair objectives retain English localization
+OK  Navigation retains all three authored map rings
+OK  Navigation does not bypass initial region locks
+OK  Tower level two still unlocks only region two
+OK  Tower level three unlocks the final ring
+OK  Map geometry follows resized collider bounds
+OK  Authored terrain edge reconstruction compiles in region 2
+OK  Original terrain artwork retained, without replacement tiles: 2
+OK  Authored terrain edge reconstruction compiles in region 3
+OK  Original terrain artwork retained, without replacement tiles: 3
+OK  Unvisited supplies stay hidden from navigation
+OK  Nearby supplies become discovered map markers
+OK  Region-two clear reward requires a reachable trip into region two
+OK  Expanded map pauses gameplay
+OK  Full map submits actual ring and marker geometry to the canvas
+OK  Actual terrain drawn: FullMapGeometryTerrain1 / Sprites_map_1
+OK  Actual terrain drawn: FullMapGeometryTerrain2 / Sprites_map_2
+OK  Actual terrain drawn: FullMapGeometryTerrain3 / Sprites_map_3
+OK  Expanded map does not overlap the pause menu
+OK  Full map labels fit and switch language: True
+OK  Map layout fits MapTitle / True
+OK  Map layout fits RegionBadge1 / True
+OK  Map layout fits RegionBadge2 / True
+OK  Map layout fits RegionBadge3 / True
+OK  Map layout fits North / True
+OK  Map layout fits MapPosition / True
+OK  Map layout fits RegionHeading / True
+OK  Map layout fits RegionState1 / True
+OK  Map layout fits RegionState2 / True
+OK  Map layout fits RegionState3 / True
+OK  Map layout fits LegendHeading / True
+OK  Map layout fits MapLegend / True
+OK  Map layout fits MapHint / True
+OK  Map layout fits MapFooter / True
+OK  Map layout fits Label / True
+OK  Full map labels fit and switch language: False
+OK  Map layout fits MapTitle / False
+OK  Map layout fits RegionBadge1 / False
+OK  Map layout fits RegionBadge2 / False
+OK  Map layout fits RegionBadge3 / False
+OK  Map layout fits North / False
+OK  Map layout fits MapPosition / False
+OK  Map layout fits RegionHeading / False
+OK  Map layout fits RegionState1 / False
+OK  Map layout fits RegionState2 / False
+OK  Map layout fits RegionState3 / False
+OK  Map layout fits LegendHeading / False
+OK  Map layout fits MapLegend / False
+OK  Map layout fits MapHint / False
+OK  Map layout fits MapFooter / False
+OK  Map layout fits Label / False
+OK  Closing navigation resumes gameplay
+OK  Upgrade panel hides the minimap instead of being covered by it
+OK  Ordinary pause keeps its own simple menu
+OK  Navigation test starts with an empty field-supply slot
+OK  Max-level side supplies become finite defensive cargo instead of unused upgrade materials
+OK  Defensive cargo still has one-parcel capacity
+OK  Healthy tower preserves defensive cargo for later
+OK  Returning defensive cargo repairs fifteen percent and grants a twelve-second ward
+OK  Field ward reduces actual tower damage by thirty-five percent
+OK  Pause preserves tower ward duration
+OK  Expired ward restores normal incoming damage
+OK  Collected supply marker is removed from navigation
+OK  Minimap returns while exploring region 2
+OK  Bottom-left map does not overlap the journey status: region 2
+OK  Minimap returns while exploring region 3
+OK  Bottom-left map does not overlap the journey status: region 3
+OK  Spawn completion waits for remaining enemies
+OK  One remaining enemy prevents premature victory
+OK  Full clear enters frozen victory result
+OK  Victory cannot resume as gameplay
+OK  Restart restores scene tower level and time scale
+OK  Tower destruction triggers defeat
+OK  Destroyed tower leaves the enemy target registry
+OK  Player death triggers defeat
+OK  Death cannot be resumed
+OK  Return to menu restores time and single manager
+OK  No runtime exceptions or errors

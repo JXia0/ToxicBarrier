@@ -6,5 +6,6 @@ public enum GameState
     Paused,
     Dead,
     Transitioning,
-    Won
+    Won,
+    StoryIntro
 }

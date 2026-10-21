@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ToxicBarrier · Portfolio layout study</title>
+<style>
+:root{--paper:#f0e3c7;--gold:#dfb46f;--dim:#bead98;--ink:#241b17;--mint:#8fc4b3}*{box-sizing:border-box}body{margin:0;background:#100e0d;color:var(--paper);font-family:Arial,sans-serif}.toolbar{position:sticky;top:0;z-index:100;background:#181412f5;border-bottom:1px solid #685039;padding:14px 24px;display:flex;gap:12px;align-items:center;font-size:14px}.toolbar strong{margin-right:auto}.toolbar button{background:#30241b;color:#efdfc3;border:1px solid #795d40;padding:9px 16px;cursor:pointer}.toolbar button.on{background:#d4ac70;color:#201712}.toolbar span{color:#bfae96}main{padding:24px 0}.frame{position:relative;margin:0 auto 30px;overflow:hidden;box-shadow:0 12px 50px #0009}.sheet{position:absolute;width:3000px;height:1500px;overflow:hidden;background:#241b17;transform-origin:top left}.el{position:absolute}.kicker{font:700 26px Arial;letter-spacing:4px;text-transform:uppercase;color:var(--gold)}h1,h2,h3,p,figure{margin:0}h2{font:84px/1.05 Georgia,serif;letter-spacing:-2px}h3{font:700 34px/1.15 Arial;color:var(--gold)}p{font:32px/1.34 Arial;color:var(--paper)}.small{font-size:25px;line-height:1.32;color:var(--dim)}.note{font:italic 34px/1.15 Georgia;color:#dbba84}.rule{border-top:2px solid #bc95665c}.shot{width:100%;height:100%;object-fit:cover}.fit{object-fit:contain}.rim{outline:2px solid #92755066;outline-offset:8px}.footer{position:absolute;bottom:28px;left:80px;right:80px;border-top:1px solid #bd946443;padding-top:14px;display:flex;justify-content:space-between;font-size:22px;letter-spacing:2px;color:#b29a7c}.mapstack{position:absolute;width:1000px;height:1000px}.mapstack img{position:absolute;object-fit:contain;inset:0;width:100%;height:100%}.mapstack img:nth-child(2){width:66%;height:66%;inset:17%}.mapstack img:nth-child(3){width:33%;height:33%;inset:33.5%}.corner{pointer-events:none;opacity:.17;filter:sepia(.2);}.corner.left{left:-680px;bottom:-600px;width:1550px;height:1550px;transform:rotate(-18deg)}.corner.right{right:-600px;bottom:-620px;width:1750px;height:1750px;transform:rotate(18deg)}.fade{position:absolute;inset:0;background:linear-gradient(180deg,#211915cc 0%,transparent 65%);pointer-events:none}.header{position:absolute;left:80px;top:62px;right:80px;height:116px;border-bottom:2px solid #bb925f88}.header .index{position:absolute;right:0;top:12px;font:26px Arial;letter-spacing:3px;color:var(--dim)}.sectionno{font-family:Georgia;font-style:italic;color:#927653;font-size:55px;margin-right:14px}.sketchbox{position:absolute;overflow:hidden;background:#ddd9d0}.sketchbox img{position:absolute;width:560px;height:996px;object-fit:cover;transform:rotate(-90deg);left:180px;top:-255px}.crop img{object-fit:cover}.caption{position:absolute;font:25px/1.28 Arial;color:var(--dim)}.label{font-size:24px;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}.towerrow{display:flex;align-items:flex-end;justify-content:space-between;height:400px;gap:25px}.towerrow figure{text-align:center;flex:1}.towerrow img{height:340px;width:100%;object-fit:contain;image-rendering:pixelated}.towerrow figcaption{font:25px Arial;letter-spacing:2px;color:#d9c8a8;margin-top:15px}.resources{display:flex;justify-content:space-between}.resources figure{width:160px;text-align:center}.resources img{width:145px;height:145px;object-fit:contain;image-rendering:pixelated}.resources figcaption{font-size:27px;margin-top:8px}.sheet[hidden]{display:none}.paperimage{box-shadow:12px 14px 0 #0003}.subtle{color:#a8947e}.annotation{font:italic 29px Georgia;color:#d2bc99}.cover-title{font-family:Impact,'Arial Black',sans-serif;font-weight:400;font-stretch:condensed;line-height:.85;letter-spacing:8px;text-shadow:7px 9px 0 #130f0c,11px 13px 0 #a77b3444}.cover-meta{font-size:24px;letter-spacing:3px}.cover-bottom{font:31px/1.45 Georgia;color:#e5d6bd}.cover-rail{border-left:3px solid #b78646;padding-left:30px}.titlebar{background:#71312b;transform:rotate(-1.3deg)}
+.towerrow figure:nth-child(1) img{height:262px}.towerrow figure:nth-child(2) img{height:276px}.towerrow figure:nth-child(3) img{height:302px}
+@media print{.toolbar{display:none}main{padding:0}.frame{margin:0;break-after:page}.sheet{transform:none!important}}
+</style></head><body>
+<nav class="toolbar"><strong>ToxicBarrier / 排版预览</strong><span>3000 × 1500 · 先看效果，未导出 PPT</span><button data-page="1" class="on">01 封面</button><button data-page="2">02 玩法与关卡</button><button data-page="3">03 美术制作</button><button id="all">全部</button><button id="zoom">100% 查看</button></nav>
+<main>
+<div class="frame" data-number="1"><section class="sheet" id="page1">
+ <img class="el" src="assets/cover.png" alt="Pixel artwork of the defender protecting the tower" style="left:600px;top:0;width:2400px;height:1500px;object-fit:cover;object-position:66% center">
+ <div class="el" style="inset:0;background:linear-gradient(90deg,#211812 0%,#211812f5 19%,#21181299 40%,#21181205 69%),linear-gradient(0deg,#1d1713ef,transparent 29%)"></div>
+ <div class="el kicker" style="left:92px;top:75px">01 / Game design portfolio</div>
+ <div class="el cover-meta" style="right:90px;top:76px;text-align:right;line-height:1.65">SOLO PROJECT<br><span style="color:#d4b68c">Unity / C# / GitHub</span></div>
+ <div class="el titlebar" style="left:-50px;top:641px;width:1550px;height:189px"></div>
+ <h1 class="el cover-title" style="left:82px;top:286px;font-size:340px">TOXIC<br><span style="font-size:316px;color:#f0cd83">BARRIER</span></h1>
+ <div class="el kicker" style="left:98px;top:881px;letter-spacing:5px">2D survival & tower defense</div>
+ <p class="el" style="left:97px;top:964px;width:1010px;font:51px/1.2 Georgia">A lone defender.<br>A tower worth protecting.</p>
+ <p class="el cover-bottom cover-rail" style="left:99px;top:1153px;width:970px">Toxic fog consumed a medieval kingdom.<br>Gather resources, strengthen the last tower<br>and push back the poison.</p>
+ <div class="el" style="left:100px;bottom:46px;font-size:25px;color:#d3b482">github.com/JXia0/ToxicBarrier</div>
+ <div class="el" style="right:80px;bottom:46px;font-size:23px;color:#b8a589">Picture Generated by AI</div>
+</section></div>
+<div class="frame" data-number="2"><section class="sheet" id="page2">
+ <div class="mapstack corner left"><img src="assets/map3.png"><img src="assets/map2.png"><img src="assets/map1.png"></div><div class="mapstack corner right"><img src="assets/map3.png"><img src="assets/map2.png"><img src="assets/map1.png"></div><div class="fade"></div>
+ <header class="header"><h2>One tower. Three regions.</h2><div class="index">TOXIC BARRIER / LEVEL DESIGN</div></header>
+ <h3 class="el" style="left:80px;top:209px"><span class="sectionno">01</span>The original plan</h3>
+ <div class="sketchbox paperimage" style="left:96px;top:289px;width:866px;height:387px;transform:rotate(-1.6deg)"><img src="assets/level-sketch.jpg" alt="Original hand drawn concentric region plan"></div>
+ <p class="el small" style="left:100px;top:702px;width:846px">My sketch keeps the tower at the centre.<br>Upgrades open the surrounding layers.</p>
+ <div class="mapstack" style="left:110px;top:806px;width:595px;height:595px;filter:drop-shadow(0 12px 20px #0009)"><img src="assets/map3.png"><img src="assets/map2.png"><img src="assets/map1.png"></div>
+ <div class="el" style="left:716px;top:846px;width:246px"><h3 style="color:#dec087">REGION 1</h3><p class="small" style="margin:12px 0 30px">Available at the start</p><h3 style="color:#93b9ac">REGION 2</h3><p class="small" style="margin:12px 0 30px">Unlock at tower Lv.2</p><h3 style="color:#d19591">REGION 3</h3><p class="small" style="margin:12px 0 0">Unlock at tower Lv.3</p></div>
+ <p class="el annotation" style="left:730px;top:1230px;width:220px;transform:rotate(-4deg)">The refuge stays<br>at the heart<br>of the map.</p>
+ <h3 class="el" style="left:1040px;top:208px"><span class="sectionno">02</span>Learn near safety</h3>
+ <figure class="el rim" style="left:1040px;top:293px;width:1010px;height:495px"><img class="shot" src="assets/play.png" alt="Gameplay near the allied tower"></figure>
+ <p class="el" style="left:1040px;top:818px;width:995px">Gather resources and lure enemies into tower range.<br>The player moves. The tower attacks.</p>
+ <div class="el rule" style="left:1040px;top:940px;width:1010px"></div>
+ <h3 class="el" style="left:1040px;top:969px">Detours & returns</h3>
+ <figure class="el" style="left:1040px;top:1036px;width:490px;height:240px"><img class="shot" src="assets/route.png" alt="A building creates a route around enemies"></figure>
+ <figure class="el" style="left:1560px;top:1036px;width:490px;height:240px"><img class="shot" src="assets/repair.png" alt="Repair supply collection and return route"></figure>
+ <p class="el small" style="left:1040px;top:1297px;width:475px">Buildings let players break pursuit<br>and find a route back.</p>
+ <p class="el small" style="left:1560px;top:1297px;width:485px">Repair supplies give each trip<br>a reason to return to the tower.</p>
+ <h3 class="el" style="left:2130px;top:208px"><span class="sectionno">03</span>Beyond the refuge</h3>
+ <figure class="el" style="left:2130px;top:293px;width:788px;height:363px"><img class="shot" src="assets/outer.png" alt="The second region in game"></figure>
+ <p class="el small" style="left:2130px;top:678px;width:788px"><b style="color:#96c4b1">REGION 2</b> / Longer journeys for supplies.<br>Cover helps manage the risk of leaving safety.</p>
+ <figure class="el" style="left:2130px;top:799px;width:788px;height:363px"><img class="shot" src="assets/region3.png" alt="The outer region in game"></figure>
+ <p class="el small" style="left:2130px;top:1187px;width:788px"><b style="color:#d59e99">REGION 3</b> / The final defence.<br>Keep the tower standing through the remaining waves.</p>
+ <p class="el" style="left:2130px;top:1300px;width:780px;font-size:28px;color:#dfc596">VICTORY / Tower Lv.3 + all three regions cleared.</p>
+ <footer class="footer"><span>EXPLORATION · RESOURCE GATHERING · TOWER PROGRESSION</span><span>02</span></footer>
+</section></div>
+<div class="frame" data-number="3"><section class="sheet" id="page3">
+ <div class="mapstack corner left" style="opacity:.21"><img src="assets/map3.png"><img src="assets/map2.png"><img src="assets/map1.png"></div><div class="mapstack corner right"><img src="assets/map3.png"><img src="assets/map2.png"><img src="assets/map1.png"></div><div class="fade"></div>
+ <header class="header"><h2>Art direction & development</h2><div class="index">TOXIC BARRIER / VISUAL PROCESS</div></header>
+ <h3 class="el" style="left:80px;top:208px"><span class="sectionno">01</span>Silhouette first</h3>
+ <div class="sketchbox paperimage" style="left:91px;top:291px;width:964px;height:486px;transform:rotate(-1.8deg)"><img src="assets/tower-sketch.jpg" alt="My early tower and resource sketch" style="width:625px;height:1112px;left:165px;top:-287px"></div>
+ <p class="el" style="left:94px;top:813px;width:958px">I sketched a tower that grows with each upgrade,<br>alongside the four resources used to improve it.</p>
+ <div class="el resources" style="left:120px;top:949px;width:878px"><figure><img src="assets/wood.png" alt="Wood"><figcaption>Wood</figcaption></figure><figure><img src="assets/stone.png" alt="Stone"><figcaption>Stone</figcaption></figure><figure><img src="assets/gel.png" alt="Gel"><figcaption>Gel</figcaption></figure><figure><img src="assets/teeth.png" alt="Teeth"><figcaption>Teeth</figcaption></figure></div>
+ <p class="el note" style="left:97px;top:1211px;width:913px;transform:rotate(-1deg)">Small on screen. Recognisable at a glance.</p>
+ <p class="el small" style="left:99px;top:1287px;width:940px">Resource shapes stay distinct against the busy ground.<br>The wood asset remains part of the original set.</p>
+ <h3 class="el" style="left:1162px;top:207px"><span class="sectionno">02</span>Tower progression</h3>
+ <div class="el towerrow" style="left:1150px;top:295px;width:1750px"><figure><img src="assets/tower0.png" alt="Tower level 0"><figcaption>LV.0</figcaption></figure><figure><img src="assets/tower1.png" alt="Tower level 1"><figcaption>LV.1</figcaption></figure><figure><img src="assets/tower2.png" alt="Tower level 2"><figcaption>LV.2</figcaption></figure><figure><img src="assets/tower3.png" alt="Tower level 3"><figcaption>LV.3</figcaption></figure></div>
+ <p class="el small" style="left:1170px;top:739px;width:1730px">Increasing height and mass make progression visible. Shared stone colours keep the stages related.</p>
+ <div class="el rule" style="left:1166px;top:811px;width:1737px"></div>
+ <h3 class="el" style="left:1162px;top:842px"><span class="sectionno">03</span>A shared visual language</h3>
+ <div class="el" style="left:1165px;top:925px;width:250px;height:250px"><img class="shot fit" src="assets/map1.png" alt="Warm gold first region"></div><div class="el" style="left:1420px;top:945px;width:250px;height:250px"><img class="shot fit" src="assets/map2.png" alt="Teal second region"></div><div class="el" style="left:1675px;top:922px;width:250px;height:250px"><img class="shot fit" src="assets/map3.png" alt="Dark outer region"></div>
+ <p class="el small" style="left:1166px;top:1209px;width:763px">Approved backgrounds guide new artwork.<br>I compare palette, lighting and pixel detail<br>before preparing sprites for Unity.</p>
+ <figure class="el rim" style="left:2041px;top:936px;width:868px;height:315px"><img class="shot" src="assets/final.png" alt="The final tower integrated into the game"></figure>
+ <p class="el small" style="left:2041px;top:1286px;width:859px">I use sketches, prompts and style references to generate<br>artwork with AI, then select and integrate the results.</p>
+ <footer class="footer"><span>MY SKETCHES & ART DIRECTION / AI-ASSISTED ARTWORK</span><span>03</span></footer>
+</section></div>
+</main><script>
+let mode='fit';const frames=[...document.querySelectorAll('.frame')];
+function scale(){let s=mode==='actual'?1:Math.min((innerWidth-32)/3000,1);frames.forEach(f=>{f.style.width=3000*s+'px';f.style.height=1500*s+'px';f.querySelector('.sheet').style.transform=`scale(${s})`})}
+function show(n){frames.forEach(f=>f.style.display=!n||f.dataset.number===n?'block':'none');document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('on',b.dataset.page===n));scale()}
+document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>show(b.dataset.page));document.getElementById('all').onclick=()=>show(null);document.getElementById('zoom').onclick=()=>{mode=mode==='fit'?'actual':'fit';document.getElementById('zoom').textContent=mode==='fit'?'100% 查看':'适应窗口';scale()};addEventListener('resize',scale);
+if(new URLSearchParams(location.search).has('render')){document.querySelector('.toolbar').style.display='none';document.querySelector('main').style.padding='0';mode='actual';show(new URLSearchParams(location.search).get('page')||'1');document.querySelectorAll('.frame').forEach(f=>{f.style.margin='0';f.style.boxShadow='none'})}else{show('1')}
+</script></body></html>

@@ -77,7 +77,7 @@ internal static class GameplayBalancePlayChecks
         Place(player, cachePosition);
         float timeout = Time.realtimeSinceStartup + 3;
         while (cache != null && Time.realtimeSinceStartup < timeout) yield return null;
-        check(cache == null && inventory.GetCount(LootManager.ResourceType.Wood) == wood + 5, "Physical exploration pickup awards its finite material reward");
+        check(cache == null && inventory.GetCount(LootManager.ResourceType.Wood) == wood + 10, "Physical exploration pickup awards its finite material reward");
         check(player.CurrentHp >= 85 && player.ToxicProtectionSeconds > 16, "Exploration pickup heals 35 and grants gas protection");
         Place(player, new Vector2(16, 0));
         float protectedHp = player.CurrentHp;

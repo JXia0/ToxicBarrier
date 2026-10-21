@@ -40,6 +40,7 @@ public class MapZone : MonoBehaviour
     private void Start()
     {
         _zoneRenderer = GetComponent<SpriteRenderer>();
+        if (mapLevel >= 2 && GetComponent<GroundDetailLayer>() == null) gameObject.AddComponent<GroundDetailLayer>();
         RefreshUnlockVisuals();
     }
 

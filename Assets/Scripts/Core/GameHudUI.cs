@@ -14,6 +14,7 @@ public class GameHudUI : MonoBehaviour
     private float _refreshAt;
     private GameState _lastState;
     private PlayerInventory _inventory;
+    private void Start() { if (GetComponent<ExplorationMapUI>() == null) gameObject.AddComponent<ExplorationMapUI>(); }
 
     private void Update()
     {
@@ -24,7 +25,8 @@ public class GameHudUI : MonoBehaviour
         _refreshAt = Time.unscaledTime + 0.2f;
         if (timeText != null)
             timeText.text = GameText.Translate($"{Mathf.FloorToInt(flow.SurvivalSeconds / 60):00}:{Mathf.FloorToInt(flow.SurvivalSeconds % 60):00}  |  击败 {flow.DefeatedEnemies}");
-        if (towerText != null && tower != null) towerText.text = GameText.Translate($"净化塔  {tower.CurrentLevel} 级");
+        if (towerText != null && tower != null) towerText.text = GameText.Translate($"净化塔  {tower.CurrentLevel} 级") +
+            (tower.Health.TowerProtectionSeconds > 0 ? (GameText.English ? "  WARD " : "  防护 ") + Mathf.CeilToInt(tower.Health.TowerProtectionSeconds) + "s" : "");
         if (objectiveText != null && tower != null)
             objectiveText.text = GameText.Translate(Objective(flow));
         if (regionText != null && spawners != null)
@@ -72,7 +74,8 @@ public class GameHudUI : MonoBehaviour
         if (flow.ShowNotice) return flow.GameplayNotice;
         var interactable = ExplorationSupply.FindInteractable(player);
         if (interactable != null)
-            return interactable.IsTowerRepair ? "修塔补给  |  带回塔旁修复 15% 生命，每次携带一份" : "侧路补给 [E]  |  主动领取材料、回血与毒气防护";
+            return interactable.IsTowerRepair ? "修塔补给  |  带回塔旁修复 15% 生命，每次携带一份" :
+                tower.IsMaxLevel ? "防御补给 [E]  |  带回塔旁修复并获得防护" : "侧路补给 [E]  |  主动领取材料、回血与毒气防护";
         if (_inventory == null && MapController.Instance != null && MapController.Instance.Player != null)
             _inventory = MapController.Instance.Player.GetComponent<PlayerInventory>();
         RegionSupplyCache cache = flow.ActiveSupplyCache;
@@ -98,13 +101,15 @@ public class GameHudUI : MonoBehaviour
             foreach (var supply in ExplorationSupply.Available)
             {
                 if (supply == null) continue;
-                if (tower.IsMaxLevel && !supply.IsTowerRepair) continue;
                 float d = Vector2.Distance(supply.transform.position, map.Player.transform.position);
                 if (d < distance) { distance = d; nearest = supply; }
             }
             if (nearest != null)
             {
                 string direction = Direction(nearest.transform.position - map.Player.transform.position);
+                if (tower.IsMaxLevel && !nearest.IsTowerRepair)
+                    return GameText.English ? $"FIELD SUPPLIES {GameText.Translate(direction)} {distance:0}m  |  Bring home for repair + protection. M: map"
+                        : $"防御补给 {direction} {distance:0}米  |  返塔修复并获得防护，M 查看地图";
                 if (nearest.IsTowerRepair)
                     return GameText.English ? $"TOWER REPAIR {GameText.Translate(direction)} {distance:0}m  |  Bring home for up to 15% tower HP"
                         : $"修塔补给 {direction} {distance:0}米  |  带回塔旁修复 15% 生命";

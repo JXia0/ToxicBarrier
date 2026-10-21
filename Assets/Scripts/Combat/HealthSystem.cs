@@ -42,6 +42,8 @@ public class HealthSystem : MonoBehaviour
     private float _flashUntil;
     private bool _finalBoss;
     private float _toxicProtectionUntil;
+    private float _towerProtectionUntil;
+    public float TowerProtectionSeconds => Mathf.Max(0, _towerProtectionUntil - Time.time);
     public float ToxicProtectionSeconds => Mathf.Max(0, _toxicProtectionUntil - Time.time);
     public bool IsRecovering { get; private set; }
     public float ToxicDamagePerSecond => Mathf.Min(2f, toxicGasBaseDamagePerSecond + _toxicGasPeriodsElapsed * toxicGasDamageIncreasePerPeriod);
@@ -137,6 +139,7 @@ public class HealthSystem : MonoBehaviour
     public void TakeDamage(float amount, GameObject source)
     {
         if (amount <= 0f || _hasDied) return;
+        if (isTower && TowerProtectionSeconds > 0) amount *= .65f;
         if (isPlayer && playerInvincibleForDebug) return;
         if (isPlayer && source != null)
         {
@@ -195,6 +198,11 @@ public class HealthSystem : MonoBehaviour
     public void GrantToxicProtection(float seconds)
     {
         if (isPlayer) _toxicProtectionUntil = Mathf.Max(_toxicProtectionUntil, Time.time + seconds);
+    }
+
+    public void GrantTowerProtection(float seconds)
+    {
+        if (isTower && !_hasDied) _towerProtectionUntil = Mathf.Max(_towerProtectionUntil, Time.time + seconds);
     }
 
     public void ConfigureFinalBoss()

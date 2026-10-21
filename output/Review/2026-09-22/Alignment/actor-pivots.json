@@ -1,0 +1,58 @@
+[
+  {
+    "file": "Assets\\PeterRadiant\\2D Pixel Art Black Knight\\Sprites\\Black_Knight_All_Frame_With_Border.png.meta",
+    "frames": 324,
+    "pivot": [
+      0.40476190476190477,
+      0.08064516129032258
+    ]
+  },
+  {
+    "file": "Assets\\Monsters Creatures Fantasy\\Sprites\\Goblin\\Idle.png.meta",
+    "frames": 4,
+    "pivot": [
+      0.5,
+      0.36
+    ]
+  },
+  {
+    "file": "Assets\\Monsters Creatures Fantasy\\Sprites\\Goblin\\Run.png.meta",
+    "frames": 8,
+    "pivot": [
+      0.5,
+      0.36
+    ]
+  },
+  {
+    "file": "Assets\\Monsters Creatures Fantasy\\Sprites\\Goblin\\Attack1.png.meta",
+    "frames": 8,
+    "pivot": [
+      0.5,
+      0.36
+    ]
+  },
+  {
+    "file": "Assets\\Monsters Creatures Fantasy\\Sprites\\Skeleton\\Idle.png.meta",
+    "frames": 4,
+    "pivot": [
+      0.5,
+      0.36
+    ]
+  },
+  {
+    "file": "Assets\\Monsters Creatures Fantasy\\Sprites\\Skeleton\\Walk.png.meta",
+    "frames": 4,
+    "pivot": [
+      0.5,
+      0.36
+    ]
+  },
+  {
+    "file": "Assets\\Monsters Creatures Fantasy\\Sprites\\Skeleton\\Attack1.png.meta",
+    "frames": 8,
+    "pivot": [
+      0.5,
+      0.36
+    ]
+  }
+]

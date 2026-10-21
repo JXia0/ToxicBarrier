@@ -40,7 +40,9 @@ public static class BuildingNavigationGeometry
                     start + next, start + n + next, start + n + i });
             }
         }
-        Mesh mesh = new Mesh { name = building.GetComponent<SpriteRenderer>().sprite.name + "_Footprint" };
+        // Instances can have different offsets/paths despite sharing a sprite. Never overwrite another instance's bake source.
+        string identity = GlobalObjectId.GetGlobalObjectIdSlow(building).ToString();
+        Mesh mesh = new Mesh { name = building.GetComponent<SpriteRenderer>().sprite.name + "_" + Hash128.Compute(identity) + "_Footprint" };
         mesh.SetVertices(vertices); mesh.SetTriangles(triangles, 0); mesh.RecalculateNormals(); mesh.RecalculateBounds();
         const string folder = "Assets/Navigation/Footprints";
         if (!Directory.Exists(folder)) { Directory.CreateDirectory(folder); AssetDatabase.Refresh(); }
