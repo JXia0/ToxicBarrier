@@ -1,0 +1,81 @@
+{
+  "backup": ".utmp\\r05-backup\\20260919-155214",
+  "assets": [
+    {
+      "level": 0,
+      "target": "Assets\\Sprites\\Sprites_tower0.png",
+      "dimensions": [
+        752,
+        1020
+      ],
+      "crop": [
+        251,
+        144,
+        1003,
+        1164
+      ],
+      "ppu": 1380.0,
+      "pivotY": 0.5450980392156862,
+      "worldHeight": 2.2,
+      "worldWidth": 1.617391304347826,
+      "worldBaseY": -1.2
+    },
+    {
+      "level": 1,
+      "target": "Assets\\Sprites\\Sprites_tower.png",
+      "dimensions": [
+        771,
+        1072
+      ],
+      "crop": [
+        241,
+        91,
+        1012,
+        1163
+      ],
+      "ppu": 1276.8,
+      "pivotY": 0.4801492537313433,
+      "worldHeight": 2.5,
+      "worldWidth": 1.792763157894737,
+      "worldBaseY": -1.2
+    },
+    {
+      "level": 2,
+      "target": "Assets\\Sprites\\Sprites_tower2.png",
+      "dimensions": [
+        830,
+        1173
+      ],
+      "crop": [
+        212,
+        29,
+        1042,
+        1202
+      ],
+      "ppu": 1205.1724137931035,
+      "pivotY": 0.4143810447717318,
+      "worldHeight": 2.9,
+      "worldWidth": 2.0461802575107297,
+      "worldBaseY": -1.2
+    },
+    {
+      "level": 3,
+      "target": "Assets\\Sprites\\Sprites_tower3.png",
+      "dimensions": [
+        1008,
+        1322
+      ],
+      "crop": [
+        60,
+        33,
+        1068,
+        1355
+      ],
+      "ppu": 1159.4117647058824,
+      "pivotY": 0.35383109370828514,
+      "worldHeight": 3.4,
+      "worldWidth": 2.58751902587519,
+      "worldBaseY": -1.2
+    }
+  ]
+}

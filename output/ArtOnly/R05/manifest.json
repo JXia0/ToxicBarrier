@@ -1,0 +1,61 @@
+{
+  "revision": "R05",
+  "levels": [
+    {
+      "level": 0,
+      "file": "tower0.png",
+      "width": 1254,
+      "height": 1254,
+      "alphaVisibleBounds": [
+        255,
+        148,
+        999,
+        1160
+      ],
+      "sha256": "06C1F064630F74F78261EB6ABE1340993BA3A756BAEA413791D7AE54866E58F8"
+    },
+    {
+      "level": 1,
+      "file": "tower1.png",
+      "width": 1254,
+      "height": 1254,
+      "alphaVisibleBounds": [
+        245,
+        95,
+        1008,
+        1159
+      ],
+      "sha256": "8E7FDED388BA79B94CB8C7C266B651E4A3FC0B002012EBB366203E877745E93D"
+    },
+    {
+      "level": 2,
+      "file": "tower2.png",
+      "width": 1254,
+      "height": 1254,
+      "alphaVisibleBounds": [
+        216,
+        33,
+        1038,
+        1198
+      ],
+      "sha256": "9D635638779EFDC2D0443D266C437A53F43B39D57F63ECA08DA7A51A92DE891E"
+    },
+    {
+      "level": 3,
+      "file": "tower3.png",
+      "width": 1128,
+      "height": 1394,
+      "alphaVisibleBounds": [
+        64,
+        37,
+        1064,
+        1351
+      ],
+      "sha256": "D0C4DB3F2EE092AC7CAAD12F393BFA4D7608F81C19DD103645D2C793EA817ACE"
+    }
+  ],
+  "finalLevel3": "tower3.png is the taller revision; never integrate tower3-before-height-revision.png",
+  "integrationThreadId": "01a0938d-be0b-7351-9b55-b2e0ee1714a4",
+  "integrationStatus": "Complete. Original project reports 77 PlayMode checks PASS. Reviewed final level3 and level0-world screenshots; level0-world HUD is stale in capture, alternate level0 capture has correct HUD but framing is obstructed. No commit or push.",
+  "sourceArtUnmodified": true
+}

@@ -1,0 +1,23 @@
+# R02 方形神庙方向 — 已被用户否决
+
+用户反馈：不是很喜欢这个设计。
+
+此图不得用于替换。二级生成遇到网络错误，未成功产出；停止扩展该造型。改为先澄清用户偏好的塔轮廓。用户此前已授权最终三级新塔完成后委托另一个代理替换，授权仍在，但不包含使用此否决稿。
+
+## 一级提示词
+
+Use case: style-transfer / precise-object-edit. Inputs: image 1 is the ACTUAL adopted warm tooth-ruins map; image 2 is the ACTUAL adopted dark-gold tooth-ruins map. Transform ONE of their perimeter tooth shrine/pillar structures into a standalone LEVEL ONE DEFENSIVE SHRINE TOWER sprite. Output one isolated asset, no map.
+Critical art direction: it must appear built by the SAME artist from the SAME coarse masonry and pixel clusters as these maps. The previous generic gray castle turret with crisp black seams and polished brass horizontal bands looked pasted-on and was rejected. Do not repeat that castle design.
+Design: a squat ancient SQUARE stone shrine/watchtower, broad chamfered corners, front and a little right side visible, camera elevated approx 35 degrees consistent with map perimeter monuments. Six or seven broad irregular warm dusty ochre/taupe stone courses in the whole body; shallow indented seams only a shade darker, no heavy black brick grid. Front carries an ivory DOUBLE-ROOT MOLAR bas-relief carved into the stone lintel above a small shallow sepia entrance recess (not a pitch-black hole). A low uneven crown of FOUR blunt monumental stone posts surrounds a shallow roof slab; no regular castle battlement ring. The posts have chipped caps and tiny old brass corner inlays. Lower body broadens organically into ONE thin broken stone footing, weathered ragged contact edge, no raised multi-step platform or pedestal island. Very sparse dry olive moss hugging lower edges. Not a ruin falling apart, still defensible and stable.
+Muted earth palette: warm stone midtones approximately #897450 #aa9062 #b9a076, shadows #66583e, darkest accents #493f30; ivory #d2bd8c; dull buried bronze #88713c. No black outlines. Narrow localized dark crevices acceptable, broad surfaces should stay warm and dusty. Upper-left warm diffuse lighting, compressed value range, matte mineral texture, low specularity.
+Pixel-art native-looking coarse scale equivalent to roughly 100x130 pixel structure, big calm clusters, minimal tiny noise; pixel edges deliberately chunky matching map, NOT high-resolution smooth 3D or crisp vector. No fake blur filter; actual large pixel planes. Full tower fills roughly center 60% width and 65% height of a square canvas. Clearly top-down-ish game object, not eye-level architectural render.
+REAL transparent PNG alpha outside asset, clean alpha with no stray detached pixels. No backdrop, checkerboard, ground patch, detached rocks, floaty shadow, writing, labels, logos, watermark, flags, weapons, fire, magical glow or neon. Entire object within margins. Only level one, not a sheet.
+
+## 未成功生成的二级提示词
+
+Use case: precise-object-edit. Image 1 is the new LEVEL ONE tooth-shrine tower; image 2 is the adopted environment providing style discipline. Output one standalone LEVEL TWO upgraded version of image 1 on real transparent alpha.
+Keep exactly this architectural family, warm dusty ochre-brown mineral palette, modest old-gold inlays, chunky chipped stone blocks, double-root molar relief above the sepia doorway, irregular shallow single footing, small olive moss accents. Match the same camera angle, right side visibility, upper-left diffuse light, coarse pixel clusters. Preserve the base width and door scale relative to stone blocks.
+Upgrade through construction: add a SHORT extra upper masonry story with two narrow warm shadowed arrow-slits above the molar relief. Extend the two front corner columns into thicker protective buttresses with a small stepped shoulder. At the top add TWO short dull-ivory tooth finials seated directly in the rear corner stones. Keep the flat stone rooftop visible. The upper story is only modestly taller, around 20 percent taller than level one at equivalent base width; not a huge keep. Do not add castle merlon rings, cylindrical forms, polished metal belt, giant black entrance, bright jewel or magic. Embedded architectural ornaments rather than pasted-on icons.
+Simplify the small speckled texture: broad matte pixel planes, restrained highlights, shallow ochre-brown mortar seams, no near-black outlines. Ivory is aged cream not pure white. Old gold is muted ochre, not bright yellow. Whole silhouette complete within 10 percent margins, bottom centered. Same thin weathered irregular stone-foot contact, no thick pedestal and no extra ground island.
+The only output is the LEVEL TWO building, no map, no sheet, no labels, text, watermark, detached fragments or background. Genuine clean transparent alpha, no checkerboard matte, zero-alpha background, predominantly opaque interior.
+
