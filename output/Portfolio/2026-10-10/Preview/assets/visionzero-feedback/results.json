@@ -1,0 +1,56 @@
+{
+  "respondents": 4,
+  "duplicateUploadsCountedOnce": true,
+  "records": [
+    {
+      "id": 1,
+      "rating": 5,
+      "rules": "Somewhat easy",
+      "improvements": [
+        "Rule explanations and player aids",
+        "Dice randomness"
+      ],
+      "comments": [
+        "Enjoyed interacting with players",
+        "Balance dice randomness; end goal feels hard to achieve"
+      ]
+    },
+    {
+      "id": 2,
+      "rating": 5,
+      "rules": "Somewhat easy",
+      "improvements": [
+        "Strategy balance"
+      ],
+      "comments": [
+        "Combining Legislative Chamber and Budget Office",
+        "Provide more blue dice"
+      ]
+    },
+    {
+      "id": 3,
+      "rating": 4,
+      "rules": "Neither easy nor difficult",
+      "improvements": [
+        "Strategy balance",
+        "Player interaction"
+      ],
+      "comments": [],
+      "note": "Handwritten free-text not transcribed where uncertain"
+    },
+    {
+      "id": 4,
+      "rating": 4,
+      "rules": "Somewhat difficult",
+      "improvements": [
+        "Rule explanations and player aids",
+        "Dice randomness"
+      ],
+      "comments": [
+        "More dice",
+        "Remove Urban Planning"
+      ],
+      "note": "Remaining handwritten free-text not transcribed where uncertain"
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "toxicbarrier": "Current HTML v19; only AI credit color changed to #888888",
+  "visionzero": {
+    "source": "output/Portfolio/2026-09-26/Peter_Portfolio_Final.pptx",
+    "slides": [
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "presentation": "Six editable HTML slides, dense rules, production and playtest evidence",
+    "resolution": [
+      6000,
+      3000
+    ],
+    "physicalPhotos": {
+      "source": "User-supplied physical prototype photos, October 2026",
+      "pages": [
+        1,
+        2,
+        4,
+        6
+      ],
+      "files": [
+        "components.jpg",
+        "board.jpg",
+        "cards.jpg",
+        "dice.jpg"
+      ],
+      "notes": "Cover: enlarged board with card and dice detail. Components page: physical set. Final page: components and real playtest video frames. Written feedback left empty."
+    },
+    "playtestFrames": [
+      {
+        "source": "C:/GameProjects/CityBoardGame/Video素材/VisionZero-Playtest1.mp4",
+        "time": "00:13:20",
+        "asset": "assets/visionzero-photos/playtest-1.jpg"
+      },
+      {
+        "source": "C:/GameProjects/CityBoardGame/Video素材/PlayTest2.mp4",
+        "time": "00:08:00",
+        "asset": "assets/visionzero-photos/playtest-2.jpg"
+      }
+    ],
+    "dice": {
+      "pedestrian": 6,
+      "vehicle": 6,
+      "emergency": 6,
+      "source": "Latest explicit user correction; supersedes older DOCX counts"
+    },
+    "ruleSources": [
+      "C:/GameProjects/CityBoardGame/Vision Zero - The Safe City Project Rulebook.docx",
+      "C:/GameProjects/CityBoardGame/Production/Work_Design_Brief.txt"
+    ],
+    "rulesPrecedence": "User dice correction first; newer board brief for department timing and actions; rulebook for remaining mechanics. No unverified playtest findings.",
+    "playtestFeedback": "User has collected notes and will supply them after returning home. Reserved space retained; no results invented.",
+    "cover": "Simplified cover: logo, premise, board photo and essential credits. Gameplay details moved to slides 2–4."
+  },
+  "lettinggo": {
+    "source": "output/Portfolio/2026-09-26/Peter_Portfolio_Final.pptx",
+    "slides": [
+      13
+    ],
+    "resolution": [
+      6000,
+      3000
+    ],
+    "presentation": "Editable 3000 × 1500 HTML page: chapter mechanics, persistent choices and implementation",
+    "gameProject": "C:/GameProjects/Golden-Quad",
+    "sources": [
+      "Docs/PlayerReadme.md",
+      "Docs/MeaningfulChoicesPlayable.md",
+      "Docs/PerformanceAndLearning.md",
+      "Docs/LearnedHabits.md",
+      "Assets/Scripts/Core/HandConnection.cs",
+      "Assets/Scripts/Core/JourneyChoices.cs"
+    ],
+    "screenshots": {
+      "kindergarten.png": "01-hand-thread-near.png",
+      "stage.png": "03-stage-open-arms.png",
+      "research.png": "05-guide-gap.png",
+      "goodbye.png": "06-hand-thread-reassurance.png"
+    },
+    "notes": "Current project mechanics; existing role and four-person team credit retained. No playtest outcomes added.",
+    "background": "Restored original illustration from source PPTX slide 13, ppt/media/image37.png. Dark overlay for readability; dense editable content retained."
+  },
+  "seekingmuffles": {
+    "year": 2026,
+    "yearSource": "User correction on October 28, 2026",
+    "teamSize": 5,
+    "role": "One of two game programmers",
+    "reference": "C:/Users/Jiang/Documents/xwechat_files/wxid_1wc507eee7qt12_7a96/msg/file/2026-10/Seeking Muffle.pdf",
+    "gameProject": "C:/GameProjects/GGJ1-26",
+    "contributionNote": "No individual ownership claimed for systems attributed to teammate in reference",
+    "referenceYear": 2026,
+    "mechanicSources": [
+      "Assets/Scripts/Mask/AnxietyMaskRuntime.cs",
+      "Assets/Scripts/Mask/SilenceMaskRuntime.cs",
+      "Assets/Scripts/Player/MaskController.cs",
+      "Assets/Scripts/Mask/MaskInventory.cs",
+      "Assets/Scripts/LevelController/RestPoint.cs",
+      "Assets/Scripts/Map/LevelRestFlow.cs",
+      "Assets/Scripts/Player/PlayerMovementRe.cs",
+      "Assets/Scripts/Player/PlayerAttack.cs",
+      "Assets/Scripts/Mask/AngerMaskRuntime.cs",
+      "Assets/Scripts/Mask/HappinessMaskRuntime.cs"
+    ],
+    "wordmark": "Editable two-line typography using Oswald-Bold from project TMP examples; replaces reference logo. Generated ornamented alternative rejected and not used.",
+    "analysis": "Gameplay explanations checked against code and scene/prefab configuration. Design reading is interpretation, not a reported player outcome or an attribution of individual system authorship."
+  }
+}

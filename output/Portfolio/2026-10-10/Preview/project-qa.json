@@ -1,0 +1,74 @@
+{
+  "pages": [
+    {
+      "project": "toxicbarrier",
+      "page": 1,
+      "imagesLoaded": true
+    },
+    {
+      "project": "toxicbarrier",
+      "page": 2,
+      "imagesLoaded": true
+    },
+    {
+      "project": "toxicbarrier",
+      "page": 3,
+      "imagesLoaded": true
+    },
+    {
+      "project": "toxicbarrier",
+      "page": 4,
+      "imagesLoaded": true
+    },
+    {
+      "project": "toxicbarrier",
+      "page": 5,
+      "imagesLoaded": true
+    },
+    {
+      "project": "toxicbarrier",
+      "page": 6,
+      "imagesLoaded": true
+    },
+    {
+      "project": "visionzero",
+      "page": 1,
+      "imagesLoaded": true
+    },
+    {
+      "project": "visionzero",
+      "page": 2,
+      "imagesLoaded": true
+    },
+    {
+      "project": "visionzero",
+      "page": 3,
+      "imagesLoaded": true
+    },
+    {
+      "project": "visionzero",
+      "page": 4,
+      "imagesLoaded": true
+    },
+    {
+      "project": "visionzero",
+      "page": 5,
+      "imagesLoaded": true
+    },
+    {
+      "project": "visionzero",
+      "page": 6,
+      "imagesLoaded": true
+    },
+    {
+      "project": "lettinggo",
+      "page": 1,
+      "imagesLoaded": true
+    }
+  ],
+  "credit": "rgb(136, 136, 136)",
+  "deepLinks": true,
+  "legacyLinks": true,
+  "navigation": true,
+  "errors": []
+}

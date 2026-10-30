@@ -1,3 +1,9 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 output/Release/2026-09-26/ToxicBarrier_Windows_and_Posters_2026-09-26.zip filter=lfs diff=lfs merge=lfs -text
+output/video/*.mp4 filter=lfs diff=lfs merge=lfs -text
+output/Portfolio/2026-10-10/ToxicBarrier_Preview_Offline.html filter=lfs diff=lfs merge=lfs -text
+output/Portfolio/2026-10-29/*.pptx filter=lfs diff=lfs merge=lfs -text
+output/Portfolio/2026-10-30/*.pptx filter=lfs diff=lfs merge=lfs -text
+Video素材/*.MP4 filter=lfs diff=lfs merge=lfs -text
+Video素材/*.mp4 filter=lfs diff=lfs merge=lfs -text

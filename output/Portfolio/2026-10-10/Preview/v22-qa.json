@@ -1,0 +1,36 @@
+{
+  "overlaps": [
+    [
+      "SEEKING",
+      "MUFFLES"
+    ]
+  ],
+  "overflow": [],
+  "visionZeroSizes": [
+    [
+      6000,
+      3000
+    ],
+    [
+      6000,
+      3000
+    ],
+    [
+      6000,
+      3000
+    ],
+    [
+      6000,
+      3000
+    ],
+    [
+      6000,
+      3000
+    ],
+    [
+      6000,
+      3000
+    ]
+  ],
+  "newProjectNavigation": true
+}
